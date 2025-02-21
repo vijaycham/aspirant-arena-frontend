@@ -3,11 +3,20 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <div  className="bg-orange-200 h-14 px-6 flex justify-between items-center shadow-md">
-      <h1 className="text-xl font-bold">Aspirant Arena</h1>
+    <div className="bg-orange-200 h-14 px-6 flex justify-between items-center shadow-md">
+      <h1 className="text-xl font-bold">
+        <Link to="/" className="hover:text-orange-700">
+          Aspirant Arena
+        </Link>
+      </h1>
 
       <div className="flex items-center space-x-4">
         <ul className="flex space-x-4">
+          <li>
+            <Link to="/" className="hover:text-orange-700">
+              Home
+            </Link>
+          </li>
           <li>
             <Link to="/todo" className="hover:text-orange-700">
               ToDo
