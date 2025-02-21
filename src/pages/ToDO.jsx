@@ -1,7 +1,9 @@
-import React from "react";
+import React from 'react'
 
-const ToDO = () => {
-  return <div>ToDO</div>;
-};
+const ToDo = () => {
+  return (
+    <div>ToDo</div>
+  )
+}
 
-export default ToDO;
+export default ToDo
