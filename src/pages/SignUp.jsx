@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 import axios from "axios";
 
 const SignUp = () => {
@@ -13,6 +13,7 @@ const SignUp = () => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -37,6 +38,9 @@ const SignUp = () => {
       console.log("Sign Up success!", res.data.message);
       setLoading(false);
       setError(""); // Clear error if successful
+
+      navigate("/"); // Redirect to sign in page  after successful sign up
+
     } catch (error) {
       setLoading(false);
 
