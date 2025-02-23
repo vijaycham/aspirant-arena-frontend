@@ -43,7 +43,7 @@ const OAuth = () => {
         onClick={handleGoogleSignIn}
         className="bg-red-700 text-white p-2 rounded-lg uppercase hover:bg-red-600 w-full"
       >
-        scontinue with google
+        continue with google
       </button>
     </div>
   );
