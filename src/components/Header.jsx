@@ -1,7 +1,20 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { signOut } from "../redux/user/userSlice";
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleSingOut = () => {
+    dispatch(signOut());
+    localStorage.removeItem("token");
+    navigate("/signin");
+    
+
+  };
+
   return (
     <div className="bg-orange-200 h-14 px-6 flex justify-between items-center shadow-md">
       <h1 className="text-xl font-bold">
@@ -44,7 +57,10 @@ const Header = () => {
           </li>
         </ul>
 
-        <button className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600">
+        <button
+          onClick={handleSingOut}
+          className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600"
+        >
           Sign Out
         </button>
       </div>
