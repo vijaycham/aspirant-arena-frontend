@@ -1,6 +1,12 @@
 import React, { useState } from "react";
-import { Link , useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -8,9 +14,9 @@ const SignIn = () => {
     password: "",
   });
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -20,26 +26,21 @@ const SignIn = () => {
     e.preventDefault();
 
     try {
-      setLoading(true);
+      dispatch(signInStart());
       const res = await axios.post(
         "http://localhost:8888/api/auth/signin",
         formData
       );
 
       console.log("Sign In success!", res.data.message);
-      setLoading(false);
-      setError(""); // Clear error if successful
+      dispatch(signInSuccess(res.data.userProfile)); // Clear error if successful
 
-      navigate("/"); 
-
+      navigate("/");
     } catch (error) {
-      setLoading(false);
-
-      if (error.response && error.response.data.error) {
-        setError(error.response.data.error); // Show backend error message
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-      }
+      const errorMessage =
+        error.response?.data?.error ||
+        "An unexpected error occurred. Please try again.";
+      dispatch(signInFailure(errorMessage));
     }
   };
 
@@ -85,6 +86,5 @@ const SignIn = () => {
     </div>
   );
 };
-
 
 export default SignIn;
