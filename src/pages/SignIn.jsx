@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import OAuth from "../components/OAuth";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -7,6 +8,7 @@ import {
   signInFailure,
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -75,6 +77,7 @@ const SignIn = () => {
         >
           {loading ? "Loading..." : "Sign In"}
         </button>
+        <OAuth />
       </form>
       {error && <p className="text-red-700 text-sm">* {error}</p>}
       <div className="flex justify-center gap-2 mt-5">
