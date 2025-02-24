@@ -9,7 +9,6 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-
 const SignIn = () => {
   const [formData, setFormData] = useState({
     emailId: "",
@@ -33,11 +32,20 @@ const SignIn = () => {
         "http://localhost:8888/api/auth/signin",
         formData
       );
+      console.log("Response:", res.data);
+      const { userProfile, token } = res.data; //  Extract token
+
+      if (token) {
+        localStorage.setItem("token", token); //  Store token in localStorage
+      } else {
+        alert("Login failed: No token received");
+        return;
+      }
 
       console.log("Sign In success!", res.data.message);
-      dispatch(signInSuccess(res.data.userProfile)); // Clear error if successful
+      dispatch(signInSuccess(userProfile)); // ✅ Store user profile in Redux
 
-      navigate("/");
+      navigate("/"); // Redirect to home
     } catch (error) {
       const errorMessage =
         error.response?.data?.error ||
@@ -48,7 +56,9 @@ const SignIn = () => {
 
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold mt-8 mb-4">Welcome back</h1>
+      <h1 className="text-3xl text-center font-semibold mt-8 mb-4">
+        Welcome back
+      </h1>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 p-4 rounded-lg"
