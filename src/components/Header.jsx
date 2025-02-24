@@ -1,103 +1,193 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signOut } from "../redux/user/userSlice";
+import { persistor } from "../redux/store";
+import {
+  FaSignOutAlt,
+  FaTasks,
+  FaUserCircle,
+  FaStickyNote,
+  FaClock,
+  FaHome,
+  FaInfoCircle,
+  FaBars,
+  FaTimes,
+} from "react-icons/fa";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector((state) => state.user.currentUser);
-
   const isAuthenticated = !!user;
-  console.log("User Data:", user);
 
-  const handleSignOut = () => {
-    dispatch(signOut());
-    localStorage.removeItem("token");
-    navigate("/signin");
+  // 📱 Mobile Menu State
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // 📱 Toggle Mobile Menu
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  // 🏁 Sign Out Handler
+  const handleSignOut = async () => {
+    try {
+      dispatch({ type: "USER_SIGN_OUT" });
+      await persistor.purge();
+      await persistor.flush();
+      localStorage.removeItem("token");
+      sessionStorage.clear();
+      document.cookie.split(";").forEach((cookie) => {
+        document.cookie = `${
+          cookie.split("=")[0]
+        }=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+      window.location.reload();
+      navigate("/signin");
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
   };
 
   return (
-    <div className="bg-orange-200 h-14 px-6 flex justify-between items-center shadow-md">
-      <h1 className="text-xl font-bold">
-        <Link to="/" className="hover:text-orange-700">
-          Aspirant Arena
-        </Link>
-      </h1>
+    <header className="bg-peach-200 text-gray-800 shadow-md">
+      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        {/* Logo */}
+        <h1 className="text-2xl font-bold">
+          <Link
+            to="/"
+            className="hover:text-orange-600 transition duration-300"
+          >
+            Aspirant Arena
+          </Link>
+        </h1>
 
-      <div className="flex items-center  object-center space-x-4">
-        <ul className="flex space-x-4">
-          <li>
-            <Link to="/about" className="hover:text-orange-700">
-              About Us
-            </Link>
-          </li>
-          {isAuthenticated && (
-            <>
-              {" "}
+        {/* 📱 Mobile Menu Button */}
+        <button
+          onClick={toggleMobileMenu}
+          className="lg:hidden text-2xl focus:outline-none"
+        >
+          {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+        </button>
+
+        {/* 🌍 Navigation Menu */}
+        <nav
+          className={`lg:flex items-center space-x-6 ${
+            mobileMenuOpen
+              ? "block absolute top-16 left-0 w-full bg-peach-200 py-4 px-6"
+              : "hidden lg:flex"
+          }`}
+        >
+          <ul className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
+            {/* 🏠 Home */}
+            {isAuthenticated && (
               <li>
-                <Link to="/" className="hover:text-orange-700">
-                  Home
+                <Link
+                  to="/"
+                  className="flex items-center space-x-2 hover:text-orange-600 transition duration-300"
+                >
+                  <FaHome /> <span>Home</span>
                 </Link>
               </li>
+            )}
+
+            {/* ✅ To-Do */}
+            {isAuthenticated && (
               <li>
-                <Link to="/todo" className="hover:text-orange-700">
-                  ToDo
+                <Link
+                  to="/todo"
+                  className="flex items-center space-x-2 hover:text-orange-600 transition duration-300"
+                >
+                  <FaTasks /> <span>To-Do</span>
                 </Link>
               </li>
-              <li>
-                <Link to="/notes" className="hover:text-blue-700">
-                  Notes
-                </Link>
+            )}
+
+            {/* 📝 Notes (Coming Soon) */}
+            {isAuthenticated && (
+              <li className="opacity-50 cursor-not-allowed">
+                <div className="flex items-center space-x-2">
+                  <FaStickyNote className="text-gray-500" /> <span>Notes</span>
+                </div>
               </li>
-              <li>
-                <Link to="/timer" className="hover:text-blue-700">
-                  Timer
-                </Link>
+            )}
+
+            {/* ⏳ Timer (Coming Soon) */}
+            {isAuthenticated && (
+              <li className="opacity-50 cursor-not-allowed">
+                <div className="flex items-center space-x-2">
+                  <FaClock className="text-gray-500" /> <span>Timer</span>
+                </div>
               </li>
+            )}
+
+            {/* ℹ️ About Us - Only on Sign In / Sign Up pages */}
+            {!isAuthenticated &&
+              (location.pathname === "/signin" ||
+                location.pathname === "/signup") && (
+                <li>
+                  <Link
+                    to="/about"
+                    className="flex items-center space-x-2 hover:text-orange-600 transition duration-300"
+                  >
+                    <FaInfoCircle /> <span>About Us</span>
+                  </Link>
+                </li>
+              )}
+
+            {/* 👤 Profile */}
+            {isAuthenticated && (
               <li>
-                <Link to="/profile" className="hover:text-blue-700">
+                <Link
+                  to="/profile"
+                  className="hover:text-orange-600 transition duration-300"
+                >
                   {user.photoUrl ? (
                     <img
                       src={user.photoUrl}
                       alt="User"
-                      className="w-9 h-9 object-cover rounded-full"
+                      className="w-10 h-10 object-cover rounded-full border-2 border-orange-500"
                     />
                   ) : (
-                    "Profile"
+                    <FaUserCircle className="text-3xl text-gray-700" />
                   )}
                 </Link>
               </li>
-            </>
-          )}
-        </ul>
-        {!isAuthenticated ? (
-          location.pathname === "/signin" ? (
-            <Link
-              to="/signup"
-              className="bg-orange-500 text-white text-xs px-2 py-1 rounded-md hover:bg-orange-600"
-            >
-              Sign Up
-            </Link>
-          ) : (
-            <Link
-              to="/signin"
-              className="bg-orange-500 text-white text-xs px-2 py-1 rounded-md hover:bg-orange-600"
-            >
-              Sign In
-            </Link>
-          )
-        ) : (
-          <button
-            onClick={handleSignOut}
-            className="bg-orange-500 text-white text-xs px-2 py-1 rounded-md hover:bg-orange-600"
-          >
-            Sign Out
-          </button>
-        )}
+            )}
+          </ul>
+
+          {/* 🔑 Sign In / Out Buttons */}
+          <div className="mt-4 lg:mt-0">
+            {!isAuthenticated ? (
+              location.pathname === "/signin" ? (
+                <Link
+                  to="/signup"
+                  className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition duration-300 text-sm font-semibold"
+                >
+                  Sign Up
+                </Link>
+              ) : (
+                <Link
+                  to="/signin"
+                  className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition duration-300 text-sm font-semibold"
+                >
+                  Sign In
+                </Link>
+              )
+            ) : (
+              <button
+                onClick={handleSignOut}
+                className="flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition duration-300 text-sm font-semibold"
+              >
+                <FaSignOutAlt />
+                <span>Sign Out</span>
+              </button>
+            )}
+          </div>
+        </nav>
       </div>
-    </div>
+    </header>
   );
 };
 

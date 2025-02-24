@@ -1,27 +1,39 @@
-import {configureStore, combineReducers} from '@reduxjs/toolkit';
-import userReducer from './user/userSlice';
-import storage from 'redux-persist/lib/storage';
-import { persistReducer, persistStore } from 'redux-persist';     
-
-
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import userReducer from "./user/userSlice";
+import todoReducer from "./slice/toDoSlice";
+import storage from "redux-persist/lib/storage";
+import { persistReducer, persistStore } from "redux-persist";
 
 const persistConfig = {
-  key: "root", // Key for localStorage 
+  key: "root", // Key for localStorage
   version: 1, // Version
   storage, // Where to store data
-  whitelist: ["user"], // Persist only user state (exclude other state if needed)
+  whitelist: ["user", "todo"], // Persist user & todo
 };
 
-const rootReducer = combineReducers({
+// Root Reducer
+const appReducer = combineReducers({
   user: userReducer,
+  todo: todoReducer,
 });
 
+// 🔹 Reset Redux State on Logout
+const rootReducer = (state, action) => {
+  if (action.type === "USER_SIGN_OUT") {
+    storage.removeItem("persist:root"); // Clear persisted state
+    return appReducer(undefined, action); // Reset Redux state
+  }
+  return appReducer(state, action);
+};
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: false
-  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export const persistor = persistStore(store);

@@ -10,11 +10,13 @@ import Timer from "./pages/Timer";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <>
       <Header />
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/about" element={<About />} />
         <Route path="/signin" element={<SignIn />} />
@@ -23,6 +25,7 @@ const App = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+
           <Route path="/todo" element={<ToDo />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/timer" element={<Timer />} />
