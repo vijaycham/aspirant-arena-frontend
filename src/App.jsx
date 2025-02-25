@@ -11,10 +11,12 @@ import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
     <>
+      <ToastContainer position="top-right" autoClose={3000} />
       <Header />
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>

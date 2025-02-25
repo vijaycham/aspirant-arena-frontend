@@ -103,7 +103,7 @@ const ToDo = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f5ddd5] p-6">
+    <div className="min-h-screen flex items-center justify-center   bg-gray-100 p-6">
       <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-lg">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
           📝 To-Do List

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { signOut } from "../redux/user/userSlice";
 import { persistor } from "../redux/store";
 import {
   FaSignOutAlt,
@@ -33,22 +32,37 @@ const Header = () => {
   // 🏁 Sign Out Handler
   const handleSignOut = async () => {
     try {
+      // Dispatch Redux action to clear user state
       dispatch({ type: "USER_SIGN_OUT" });
+
+      // Ensure persistor is cleared properly
       await persistor.purge();
       await persistor.flush();
+
+      // Remove stored authentication data
       localStorage.removeItem("token");
+      localStorage.removeItem("user"); // Ensure user is also cleared
       sessionStorage.clear();
+
+      // Clear all cookies
       document.cookie.split(";").forEach((cookie) => {
         document.cookie = `${
           cookie.split("=")[0]
         }=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
       });
-      window.location.reload();
+      //  dispatch({ type: "RESET_AUTH" });
+      // Redirect to Sign In page
       navigate("/signin");
+
+      // // Reload only if absolutely necessary
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (error) {
       console.error("Logout Error:", error);
     }
   };
+
 
   return (
     <header className="bg-peach-200 text-gray-800 shadow-md">
@@ -147,7 +161,7 @@ const Header = () => {
                     <img
                       src={user.photoUrl}
                       alt="User"
-                      className="w-10 h-10 object-cover rounded-full border-2 border-orange-500"
+                      className="w-10 h-10 object-cover rounded-full border-2"
                     />
                   ) : (
                     <FaUserCircle className="text-3xl text-gray-700" />

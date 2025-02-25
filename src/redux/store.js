@@ -1,6 +1,7 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import userReducer from "./user/userSlice";
+import userReducer from "./user/authSlice";
 import todoReducer from "./slice/toDoSlice";
+import profileReducer from "./user/profileSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 
@@ -8,13 +9,14 @@ const persistConfig = {
   key: "root", // Key for localStorage
   version: 1, // Version
   storage, // Where to store data
-  whitelist: ["user", "todo"], // Persist user & todo
+  whitelist: ["user", "todo", "profile"], // Persist user & todo
 };
 
 // Root Reducer
 const appReducer = combineReducers({
   user: userReducer,
   todo: todoReducer,
+  profile: profileReducer,
 });
 
 // 🔹 Reset Redux State on Logout

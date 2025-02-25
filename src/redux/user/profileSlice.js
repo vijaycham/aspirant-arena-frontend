@@ -12,7 +12,10 @@ const profileSlice = createSlice({
       state.currentUser = action.payload;
     },
     updateProfile: (state, action) => {
-      state.currentUser = { ...state.currentUser, ...action.payload };
+      return {
+        ...state,
+        currentUser: { ...state.currentUser, ...action.payload },
+      };
     },
   },
 });

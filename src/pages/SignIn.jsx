@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import OAuth from "../components/OAuth";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -6,7 +6,7 @@ import {
   signInStart,
   signInSuccess,
   signInFailure,
-} from "../redux/user/userSlice";
+} from "../redux/user/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const SignIn = () => {
@@ -17,7 +17,14 @@ const SignIn = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.user);
+  const { loading, error, currentUser } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token || currentUser) {
+      navigate("/"); // Redirect to home or dashboard
+    }
+  }, [currentUser, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -25,7 +32,6 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       dispatch(signInStart());
       const res = await axios.post(
@@ -33,19 +39,17 @@ const SignIn = () => {
         formData
       );
       console.log("Response:", res.data);
-      const { userProfile, token } = res.data; //  Extract token
+      const { userProfile, token } = res.data;
 
       if (token) {
-        localStorage.setItem("token", token); //  Store token in localStorage
+        localStorage.setItem("token", token); // Save token in localStorage
       } else {
         alert("Login failed: No token received");
         return;
       }
 
-      console.log("Sign In success!", res.data.message);
-      dispatch(signInSuccess(userProfile)); // ✅ Store user profile in Redux
-
-      navigate("/"); // Redirect to home
+      dispatch(signInSuccess(userProfile)); // Store user in Redux
+      navigate("/"); // Redirect after login
     } catch (error) {
       const errorMessage =
         error.response?.data?.error ||
