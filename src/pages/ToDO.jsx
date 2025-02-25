@@ -6,7 +6,7 @@ import {
   addTodo,
   removeTodo,
   toggleTodo,
-} from "../redux/slice/toDoSlice";
+} from "../redux/slice/todoSlice";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
