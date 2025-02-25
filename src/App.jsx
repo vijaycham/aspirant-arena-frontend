@@ -4,7 +4,7 @@ import About from "./pages/About";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
-import ToDo from "./pages/ToDo";
+import Todo from "./pages/Todo";
 import Notes from "./pages/Notes";
 import Timer from "./pages/Timer";
 import NotFound from "./pages/NotFound";
@@ -28,7 +28,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
 
-          <Route path="/todo" element={<ToDo />} />
+          <Route path="/todo" element={<Todo />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/timer" element={<Timer />} />
         </Route>

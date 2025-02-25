@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 const API_URL = "http://localhost:8888/api/todo";
 const api = axios.create({ baseURL: API_URL });
 
-const ToDo = () => {
+const Todo = () => {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todo.todos);
   const user = useSelector((state) => state.user.currentUser);
@@ -178,4 +178,4 @@ const ToDo = () => {
   );
 };
 
-export default ToDo;
+export default Todo;
