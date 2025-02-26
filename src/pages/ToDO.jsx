@@ -11,9 +11,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
 const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
-const api = axios.create({ baseURL: API_URL });
 
-const ToDO = () => {
+const ToDo = () => {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todo.todos);
   const user = useSelector((state) => state.user.currentUser);
@@ -23,15 +22,16 @@ const ToDO = () => {
   const fetchTodos = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return;
+      if (!token) return; // Ensure token exists before making a request
 
-      const res = await api.get("/", {
+      const res = await axios.get(`${API_URL}/api/todo`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Todos:", res.data);
+
       dispatch(setTodos(res.data));
     } catch (error) {
       console.error("Error fetching todos:", error);
+      toast.error("Failed to load tasks.");
     }
   };
 
@@ -43,21 +43,19 @@ const ToDO = () => {
     if (task.trim()) {
       try {
         const token = localStorage.getItem("token");
-        const res = await api.post(
-          "/",
+        if (!token) return;
+
+        const res = await axios.post(
+          `${API_URL}/api/todo`,
           { text: task },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         dispatch(addTodo(res.data));
         setTask(""); // Clear input field
         toast.success("Task added successfully!");
       } catch (error) {
-        console.error("Error adding todo:", error);
+        console.error("Error adding task:", error);
         toast.error("Failed to add task.");
       }
     }
@@ -65,16 +63,18 @@ const ToDO = () => {
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
-      event.preventDefault(); // Prevent form submission
-      addTask(); // Call addTask function
+      event.preventDefault();
+      addTask();
     }
   };
 
   const toggleTask = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await api.patch(
-        `/${id}`,
+      if (!token) return;
+
+      const res = await axios.patch(
+        `${API_URL}/api/todo/${id}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -82,7 +82,7 @@ const ToDO = () => {
       dispatch(toggleTodo(res.data));
       toast.success("Task status updated!");
     } catch (error) {
-      console.error("Error toggling todo:", error);
+      console.error("Error toggling task:", error);
       toast.error("Failed to update task.");
     }
   };
@@ -90,20 +90,22 @@ const ToDO = () => {
   const removeTask = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await api.delete(`/${id}`, {
+      if (!token) return;
+
+      await axios.delete(`${API_URL}/api/todo/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       dispatch(removeTodo(id));
       toast.success("Task removed!");
     } catch (error) {
-      console.error("Error deleting todo:", error);
+      console.error("Error deleting task:", error);
       toast.error("Failed to delete task.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center   bg-gray-100 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-lg">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-4">
           📝 To-Do List
@@ -113,7 +115,7 @@ const ToDO = () => {
             type="text"
             value={task}
             onChange={(e) => setTask(e.target.value)}
-            onKeyDown={handleKeyDown} // Detect "Enter" key
+            onKeyDown={handleKeyDown}
             placeholder="Add a new task..."
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
@@ -178,4 +180,4 @@ const ToDO = () => {
   );
 };
 
-export default ToDO;
+export default ToDo;

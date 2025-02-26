@@ -13,6 +13,8 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
+import axios from "axios";
+const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -32,6 +34,8 @@ const Header = () => {
   // 🏁 Sign Out Handler
   const handleSignOut = async () => {
     try {
+      await axios.post(`${API_URL}/api/auth/signout`, {
+      });
       // Dispatch Redux action to clear user state
       dispatch({ type: "USER_SIGN_OUT" });
 
