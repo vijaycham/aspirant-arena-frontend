@@ -10,7 +10,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:8888/api/todo";
+const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
 const api = axios.create({ baseURL: API_URL });
 
 const ToDO = () => {

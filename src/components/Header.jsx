@@ -54,10 +54,10 @@ const Header = () => {
       // Redirect to Sign In page
       navigate("/signin");
 
-      // // Reload only if absolutely necessary
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // // // Reload only if absolutely necessary
+      // setTimeout(() => {
+      //   window.location.reload();
+      // }, 500);
     } catch (error) {
       console.error("Logout Error:", error);
     }
@@ -89,7 +89,7 @@ const Header = () => {
         <nav
           className={`lg:flex items-center space-x-6 ${
             mobileMenuOpen
-              ? "block absolute top-16 left-0 w-full bg-peach-200 py-4 px-6"
+              ? "block absolute top-16 left-48 w-full bg-peach-200 py-4 px-6"
               : "hidden lg:flex"
           }`}
         >

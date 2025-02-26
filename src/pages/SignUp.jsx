@@ -4,6 +4,8 @@ import axios from "axios";
 import OAuth from "../components/OAuth";
 import { useSelector } from "react-redux";
 
+const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+
 const SignUp = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -41,8 +43,8 @@ const SignUp = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(
-        "http://localhost:8888/api/auth/signup",
+      const res = await axios.post(`
+        ${API_URL}/api/auth/signup`,
         formData
       );
 

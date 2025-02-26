@@ -9,6 +9,8 @@ import {
 } from "../redux/user/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+
 const SignIn = () => {
   const [formData, setFormData] = useState({
     emailId: "",
@@ -34,8 +36,8 @@ const SignIn = () => {
     e.preventDefault();
     try {
       dispatch(signInStart());
-      const res = await axios.post(
-        "http://localhost:8888/api/auth/signin",
+      const res = await axios.post(`
+        ${API_URL}/api/auth/signin`,
         formData
       );
       console.log("Response:", res.data);

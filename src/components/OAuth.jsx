@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/authSlice";
 import { useNavigate } from "react-router-dom";
-
+const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
 const OAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const OAuth = () => {
       const firstName = nameParts.at(0)?.trim() || "User"; // Ensure a fallback first name
       const lastName = nameParts.slice(1).join(" ").trim() || ""; // Optional last name
 
-      const res = await axios.post("http://localhost:8888/api/auth/google", {
+      const res = await axios.post(`${API_URL}/api/auth/google`, {
         idToken,
         firstName,
         lastName,

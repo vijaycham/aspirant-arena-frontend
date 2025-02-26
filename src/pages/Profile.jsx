@@ -5,6 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+
 const Profile = () => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
@@ -22,17 +24,16 @@ const Profile = () => {
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Fetch latest profile when component mounts
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:8888/api/profile", {
+        const response = await axios.get(`${API_URL}/api/profile`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
 
-        dispatch(updateProfile(response.data.user)); // Update Redux store
+        dispatch(updateProfile(response.data.user));
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -71,7 +72,7 @@ const Profile = () => {
         password: showPasswordFields ? formData.password : undefined,
       };
 
-      await axios.put("http://localhost:8888/api/profile", updateData, {
+      await axios.put(`${API_URL}/api/profile`, updateData, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -79,13 +80,12 @@ const Profile = () => {
         withCredentials: true,
       });
 
-      // Fetch updated profile data after patch
-      const response = await axios.get("http://localhost:8888/api/profile", {
+      const response = await axios.get(`${API_URL}/api/profile`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
 
-      dispatch(updateProfile(response.data.user)); // Update Redux store
+      dispatch(updateProfile(response.data.user));
       toast.success("Profile updated successfully!");
     } catch (error) {
       toast.error(error.response?.data?.error || "An error occurred.");
