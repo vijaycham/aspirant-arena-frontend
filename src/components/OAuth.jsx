@@ -4,10 +4,13 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/authSlice";
 import { useNavigate } from "react-router-dom";
+
 const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+
 const OAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleGoogleSignIn = async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -21,23 +24,20 @@ const OAuth = () => {
       const firstName = nameParts.at(0)?.trim() || "User"; // Ensure a fallback first name
       const lastName = nameParts.slice(1).join(" ").trim() || ""; // Optional last name
 
-      const res = await axios.post(`${API_URL}/api/auth/google`, {
-        idToken,
-        firstName,
-        lastName,
-        emailId: result.user.email,
-        photoURL: result.user.photoURL,
-      });
-      const { userProfile, token } = res.data;
-
-      if (token) {
-        localStorage.setItem("token", token); // 🔥 Store token
-        localStorage.setItem("user", JSON.stringify(userProfile));
-        dispatch(signInSuccess(res.data.userProfile));
+      const res = await axios.post(
+        `${API_URL}/api/auth/google`,
+        {
+          idToken,
+          firstName,
+          lastName,
+          emailId: result.user.email,
+          photoURL: result.user.photoURL,
+        },
+        { withCredentials: true }
+      );
+      const { userProfile} = res.data;
+       dispatch(signInSuccess(res.data.userProfile));
         navigate("/");
-      } else {
-        alert("Google Login failed: No token received");
-      }
     } catch (error) {
       console.error("Google Sign In error", error);
     }

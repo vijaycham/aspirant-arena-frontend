@@ -21,13 +21,9 @@ const ToDo = () => {
 
   const fetchTodos = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return; // Ensure token exists before making a request
-
       const res = await axios.get(`${API_URL}/api/todo`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
       });
-
       dispatch(setTodos(res.data));
     } catch (error) {
       console.error("Error fetching todos:", error);
@@ -36,7 +32,7 @@ const ToDo = () => {
   };
 
   useEffect(() => {
-    if (user) fetchTodos();
+    fetchTodos(user);
   }, [user]);
 
   const addTask = async () => {
@@ -48,9 +44,8 @@ const ToDo = () => {
         const res = await axios.post(
           `${API_URL}/api/todo`,
           { text: task },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { withCredentials: true }
         );
-
         dispatch(addTodo(res.data));
         setTask(""); // Clear input field
         toast.success("Task added successfully!");
@@ -70,13 +65,10 @@ const ToDo = () => {
 
   const toggleTask = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
       const res = await axios.patch(
         `${API_URL}/api/todo/${id}`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }
       );
 
       dispatch(toggleTodo(res.data));
@@ -89,11 +81,8 @@ const ToDo = () => {
 
   const removeTask = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
       await axios.delete(`${API_URL}/api/todo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
       });
 
       dispatch(removeTodo(id));

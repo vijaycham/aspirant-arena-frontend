@@ -33,9 +33,13 @@ const Header = () => {
 
   // 🏁 Sign Out Handler
   const handleSignOut = async () => {
+    console.log("Logging out..."); // Debugging log
     try {
-      await axios.post(`${API_URL}/api/auth/signout`, {
-      });
+      await axios.post(
+        `${API_URL}/api/auth/signout`,
+        {},
+        { withCredentials: true }
+      );
       // Dispatch Redux action to clear user state
       dispatch({ type: "USER_SIGN_OUT" });
 
@@ -48,25 +52,21 @@ const Header = () => {
       localStorage.removeItem("user"); // Ensure user is also cleared
       sessionStorage.clear();
 
-      // Clear all cookies
-      document.cookie.split(";").forEach((cookie) => {
-        document.cookie = `${
-          cookie.split("=")[0]
-        }=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      });
+      // Manually clear the authentication cookie
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       //  dispatch({ type: "RESET_AUTH" });
       // Redirect to Sign In page
       navigate("/signin");
 
-      // // // Reload only if absolutely necessary
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 500);
+      // Delay navigation to ensure UI updates
+      setTimeout(() => {
+        navigate("/signin");
+      }, 300);
     } catch (error) {
       console.error("Logout Error:", error);
     }
   };
-
 
   return (
     <header className="bg-peach-200 text-gray-800 shadow-md">

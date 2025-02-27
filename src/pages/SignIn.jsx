@@ -22,9 +22,8 @@ const SignIn = () => {
   const { loading, error, currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token || currentUser) {
-      navigate("/"); // Redirect to home or dashboard
+    if (currentUser) {
+      navigate("/"); // Redirect if user is already logged in
     }
   }, [currentUser, navigate]);
 
@@ -36,21 +35,14 @@ const SignIn = () => {
     e.preventDefault();
     try {
       dispatch(signInStart());
-      const res = await axios.post(`
-        ${API_URL}/api/auth/signin`,
-        formData
-      );
+
+      const res = await axios.post(`${API_URL}/api/auth/signin`, formData, {
+        withCredentials: true,
+      });
+
       console.log("Response:", res.data);
-      const { userProfile, token } = res.data;
 
-      if (token) {
-        localStorage.setItem("token", token); // Save token in localStorage
-      } else {
-        alert("Login failed: No token received");
-        return;
-      }
-
-      dispatch(signInSuccess(userProfile)); // Store user in Redux
+      dispatch(signInSuccess(res.data.userProfile)); // Store user in Redux
       navigate("/"); // Redirect after login
     } catch (error) {
       const errorMessage =
