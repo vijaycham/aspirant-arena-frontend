@@ -7,7 +7,7 @@ const todoSlice = createSlice({
   initialState,
   reducers: {
     setTodos: (state, action) => {
-      state.todos = action.payload;
+      state.todos = Array.isArray(action.payload) ? action.payload : [];
     },
     addTodo: (state, action) => {
       state.todos.push(action.payload);

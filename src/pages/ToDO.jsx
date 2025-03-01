@@ -10,11 +10,11 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
-const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ToDo = () => {
   const dispatch = useDispatch();
-  const todos = useSelector((state) => state.todo.todos);
+  const todos = useSelector((state) => state.todo.todos || []);
   const user = useSelector((state) => state.user.currentUser);
   const loading = useSelector((state) => state.user.loading);
   const [task, setTask] = useState("");
@@ -24,35 +24,47 @@ const ToDo = () => {
       const res = await axios.get(`${API_URL}/api/todo`, {
         withCredentials: true,
       });
-      dispatch(setTodos(res.data));
+      console.log("Fetched todos:", res.data);
+
+      if (Array.isArray(res.data)) {
+        dispatch(setTodos(res.data));
+      } else {
+        console.error("Unexpected API response:", res.data);
+        dispatch(setTodos([])); // Ensure state consistency
+      }
     } catch (error) {
-      console.error("Error fetching todos:", error);
-      toast.error("Failed to load tasks.");
+      console.error(
+        "Error fetching task:",
+        error.response?.data || error.message
+      );
+      toast.error(error.response?.data?.message || "Failed to load task.");
     }
   };
 
   useEffect(() => {
-    fetchTodos(user);
-  }, [user]);
+    if (user && !loading) {
+      fetchTodos();
+    }
+  }, [user, loading]);
 
   const addTask = async () => {
-    if (task.trim()) {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        const res = await axios.post(
-          `${API_URL}/api/todo`,
-          { text: task },
-          { withCredentials: true }
-        );
-        dispatch(addTodo(res.data));
-        setTask(""); // Clear input field
-        toast.success("Task added successfully!");
-      } catch (error) {
-        console.error("Error adding task:", error);
-        toast.error("Failed to add task.");
-      }
+    const trimmedTask = task.trim();
+    if (!trimmedTask) return;
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/todo`,
+        { text: trimmedTask },
+        { withCredentials: true }
+      );
+      dispatch(addTodo(res.data));
+      setTask(""); // Clear input field
+      toast.success("Task added successfully!");
+    } catch (error) {
+      console.error(
+        "Error adding task:",
+        error.response?.data || error.message
+      );
+      toast.error(error.response?.data?.message || "Failed to add task.");
     }
   };
 
@@ -133,12 +145,11 @@ const ToDo = () => {
                   transition={{ duration: 0.2 }}
                   className="flex items-center justify-between bg-gray-100 p-3 rounded-lg cursor-pointer transition"
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={todo.completed}
                       onChange={() => toggleTask(todo._id)}
-                      className="cursor-pointer"
                     />
                     <span
                       className={`${

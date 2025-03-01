@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/authSlice";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const OAuth = () => {
   const dispatch = useDispatch();
@@ -35,9 +35,9 @@ const OAuth = () => {
         },
         { withCredentials: true }
       );
-      const { userProfile} = res.data;
-       dispatch(signInSuccess(res.data.userProfile));
-        navigate("/");
+      const { userProfile } = res.data;
+      dispatch(signInSuccess(res.data.userProfile));
+      navigate("/");
     } catch (error) {
       console.error("Google Sign In error", error);
     }

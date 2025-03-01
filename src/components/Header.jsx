@@ -14,7 +14,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import axios from "axios";
-const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Header = () => {
   const dispatch = useDispatch();

@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Profile = () => {
   const dispatch = useDispatch();

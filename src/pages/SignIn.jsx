@@ -9,7 +9,7 @@ import {
 } from "../redux/user/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
@@ -39,16 +39,12 @@ const SignIn = () => {
       const res = await axios.post(`${API_URL}/api/auth/signin`, formData, {
         withCredentials: true,
       });
-
-      console.log("Response:", res.data);
+     
 
       dispatch(signInSuccess(res.data.userProfile)); // Store user in Redux
       navigate("/"); // Redirect after login
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.error ||
-        "An unexpected error occurred. Please try again.";
-      dispatch(signInFailure(errorMessage));
+      dispatch(signInFailure(error.response?.data?.error || "An unexpected error occurred."));
     }
   };
 

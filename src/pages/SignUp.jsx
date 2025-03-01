@@ -2,9 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import OAuth from "../components/OAuth";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/authSlice";
 
-const API_URL = "https://aspirant-arena-backend-production.up.railway.app";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -15,16 +20,15 @@ const SignUp = () => {
     confirmPassword: "",
   });
 
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const { currentUser, loading, error } = useSelector((state) => state.user);
 
   // 🚀 Redirect if user is already logged in
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token || currentUser) {
-      navigate("/"); // Redirect to home or dashboard
+    console.log("Current User:", currentUser);
+    if (currentUser) {
+      navigate("/");
     }
   }, [currentUser, navigate]);
 
@@ -37,30 +41,26 @@ const SignUp = () => {
 
     // Client-side validation: Check if passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+      dispatch(signInFailure("Passwords do not match."));
       return;
     }
 
     try {
-      setLoading(true);
-      const res = await axios.post(
-        `
-        ${API_URL}/api/auth/signup`,
-        formData
-      );
+      dispatch(signInStart());
+      const res = await axios.post(`${API_URL}/api/auth/signup`, formData, {
+        withCredentials: true,
+      });
+      console.log("API Response:", res);
+      console.log("User Data:", res.data.user);
 
-      console.log("Sign Up success!", res.data.message);
-      setLoading(false);
-      setError(""); // Clear error if successful
-
-      navigate("/signin"); // Redirect to sign-in page after successful sign-up
+      dispatch(signInSuccess(res.data.userProfile)); // Store user in Redux
+      navigate("/");
     } catch (error) {
-      setLoading(false);
-      if (error.response && error.response.data.error) {
-        setError(error.response.data.error); // Show backend error message
-      } else {
-        setError("An unexpected error occurred. Please try again.");
-      }
+      dispatch(
+        signInFailure(
+          error.response?.data?.error || "An unexpected error occurred."
+        )
+      );
     }
   };
 
