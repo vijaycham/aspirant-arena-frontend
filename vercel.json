@@ -1,7 +1,7 @@
 {
   "redirects": [
     {
-      "source": "https://www.aspirantarena.in",
+      "source": "/",
       "destination": "https://aspirantarena.in",
       "permanent": true
     }
