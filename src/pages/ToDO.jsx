@@ -79,7 +79,7 @@ const ToDo = () => {
     try {
       const res = await axios.patch(
         `${API_URL}/api/todo/${id}`,
-        {},
+        { completed: true },
         { withCredentials: true }
       );
 
