@@ -75,18 +75,21 @@ const ToDo = () => {
     }
   };
 
-  const toggleTask = async (id) => {
+  const toggleTask = async (id , currentStatus) => {
     try {
       const res = await axios.patch(
         `${API_URL}/api/todo/${id}`,
-        { completed: true },
+        { completed:!currentStatus },
         { withCredentials: true }
       );
 
       dispatch(toggleTodo(res.data));
       toast.success("Task status updated!");
     } catch (error) {
-      console.error("Error toggling task:", error);
+      console.error(
+        "Error toggling task:",
+        error.response?.data || error.message
+      );
       toast.error("Failed to update task.");
     }
   };
