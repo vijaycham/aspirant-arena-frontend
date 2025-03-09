@@ -35,7 +35,6 @@ const OAuth = () => {
         },
         { withCredentials: true }
       );
-      const { userProfile } = res.data;
       dispatch(signInSuccess(res.data.userProfile));
       navigate("/");
     } catch (error) {
@@ -47,16 +46,9 @@ const OAuth = () => {
       <button
         type="button"
         onClick={handleGoogleSignIn}
-        className=" flex gap-16 h-10 overflow-hidden items-center text-black p-3 rounded-lg uppercase shadow-sm border border-gray-100 hover:shadow-xl transition duration-300 w-full"
+        className="bg-red-700 text-white p-2 rounded-lg uppercase hover:bg-red-600 w-full"
       >
-        <div className="bg-white p-2">
-          <img
-            className=" w-10 h-10 object-contain"
-            src="https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png"
-            alt="Google logo"
-          />
-        </div>
-        <span className="font-medium text-gray-700">Continue with Google</span>
+        continue with google
       </button>
     </div>
   );

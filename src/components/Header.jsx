@@ -174,7 +174,7 @@ const Header = () => {
               location.pathname === "/signin" ? (
                 <Link
                   to="/signup"
-                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition duration-300 text-sm font-semibold"
+                  className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition duration-300 text-sm font-semibold"
                 >
                   Sign Up
                 </Link>
