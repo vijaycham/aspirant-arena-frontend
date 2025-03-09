@@ -49,7 +49,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className="p-3 max-w-lg mx-auto my-20 rounded-lg bg-white shadow-2xl ">
+    <div className="p-3 max-w-lg mx-auto my-16 rounded-lg bg-white shadow-2xl ">
       <h1 className="text-3xl text-center font-semibold mt-8 mb-4">
         Welcome back
       </h1>
@@ -61,7 +61,7 @@ const SignIn = () => {
           type="email"
           placeholder="Email"
           id="emailId"
-          className=" shadow-sm border border-gray-300 text-black p-2 rounded-lg w-full outline-none focus:ring-2 focus:ring-orange-400"
+          className=" shadow-sm border border-gray-300 text-black p-2 rounded-lg w-full outline-none focus:ring-2"
           required
           onChange={handleChange}
         />
@@ -70,7 +70,7 @@ const SignIn = () => {
           type="password"
           placeholder="Password"
           id="password"
-          className= " shadow-sm border border-gray-300  p-2 rounded-lg w-full outline-none focus:ring-2 focus:ring-orange-400"
+          className= " shadow-sm border border-gray-300  p-2 rounded-lg w-full outline-none focus:ring-2"
           required
           onChange={handleChange}
         />

@@ -216,7 +216,7 @@ const Profile = () => {
               type="text"
               name="firstName"
               placeholder="First Name"
-              className="bg-gray-50 rounded-lg w-1/2 p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              className="shadow-sm border border-gray-300 rounded-lg w-1/2 p-2 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
               value={formData.firstName}
               onChange={handleChange}
               required
@@ -225,7 +225,7 @@ const Profile = () => {
               type="text"
               name="lastName"
               placeholder="Last Name"
-              className="bg-gray-50 rounded-lg w-1/2 p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              className=" shadow-sm border border-gray-300 rounded-lg w-1/2 p-2 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
               value={formData.lastName}
               onChange={handleChange}
             />
@@ -234,7 +234,7 @@ const Profile = () => {
             type="email"
             name="emailId"
             placeholder="Email"
-            className="bg-gray-200 rounded-lg w-full p-3 outline-none cursor-not-allowed"
+            className="bg-gray-100 rounded-lg w-full p-2 outline-none cursor-not-allowed"
             value={formData.emailId}
             disabled
           />
@@ -243,13 +243,13 @@ const Profile = () => {
               type="number"
               name="age"
               placeholder="Age"
-              className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              className="shadow-sm border border-gray-300 rounded-lg w-full p-2 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
               value={formData.age}
               onChange={handleChange}
             />
             <select
               name="gender"
-              className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              className="shadow-sm border border-gray-300 rounded-lg w-full p-2 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
               value={formData.gender}
               onChange={handleChange}
             >

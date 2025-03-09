@@ -62,7 +62,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="p-3 max-w-lg mx-auto">
+    <div className="p-3 max-w-lg mx-auto my-16 rounded-lg bg-white shadow-2xl ">
       <h1 className="text-3xl text-center font-semibold mt-8 mb-4">Sign Up</h1>
       <form
         onSubmit={handleSubmit}
@@ -73,7 +73,7 @@ const SignUp = () => {
             type="text"
             placeholder="First Name"
             id="firstName"
-            className="bg-orange-50 p-2 rounded-lg w-full sm:w-1/2 outline-none focus:ring-2 focus:ring-orange-400"
+            className="shadow-sm border border-gray-300 p-2 rounded-lg w-full outline-none focus:ring-2"
             required
             onChange={handleChange}
           />
@@ -81,7 +81,7 @@ const SignUp = () => {
             type="text"
             placeholder="Last Name"
             id="lastName"
-            className="bg-orange-50 p-2 rounded-lg w-full sm:w-1/2 outline-none focus:ring-2 focus:ring-orange-400"
+            className="shadow-sm border border-gray-300 p-2 rounded-lg w-full outline-none focus:ring-2"
             required
             onChange={handleChange}
           />
@@ -91,7 +91,7 @@ const SignUp = () => {
           type="email"
           placeholder="Email"
           id="emailId"
-          className="bg-orange-50 p-2 rounded-lg w-full outline-none focus:ring-2 focus:ring-orange-400"
+          className="shadow-sm border border-gray-300 p-2 rounded-lg w-full outline-none focus:ring-2"
           required
           onChange={handleChange}
         />
@@ -100,7 +100,7 @@ const SignUp = () => {
           type="password"
           placeholder="Password"
           id="password"
-          className="bg-orange-50 p-2 rounded-lg w-full outline-none focus:ring-2 focus:ring-orange-400"
+          className="shadow-sm border border-gray-300 p-2 rounded-lg w-full outline-none focus:ring-2"
           required
           onChange={handleChange}
         />
@@ -109,7 +109,7 @@ const SignUp = () => {
           type="password"
           placeholder="Confirm Password"
           id="confirmPassword"
-          className="bg-orange-50 p-2 rounded-lg w-full outline-none focus:ring-2 focus:ring-orange-400"
+          className="shadow-sm border border-gray-300 p-2 rounded-lg w-full outline-none focus:ring-2"
           required
           onChange={handleChange}
         />
@@ -117,7 +117,7 @@ const SignUp = () => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-orange-500 text-white p-2 rounded-lg uppercase hover:bg-orange-600 w-full"
+          className="bg-gray-700 text-white p-2 rounded-lg uppercase hover:bg-gray-600 w-full"
         >
           {loading ? "Loading..." : "Sign Up"}
         </button>
