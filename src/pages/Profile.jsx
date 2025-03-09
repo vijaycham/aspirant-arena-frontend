@@ -1,47 +1,58 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useState, useEffect } from "react";
-import { updateProfile } from "../redux/user/profileSlice";
+import { useState, useEffect, useRef } from "react";
+import { updateProfile } from "../redux/user/authSlice";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { app } from "../firebase";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Profile = () => {
-  const dispatch = useDispatch();
+  const fileRef = useRef(null);
+  const [image, setImage] = useState(undefined);
+  const [imagePercentage, setImagePercentage] = useState(0);
+  const [imageError, setImageError] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
-
+  const [previewImage, setPreviewImage] = useState(currentUser?.photoUrl || "");
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     emailId: "",
     age: "",
-    gender: "male",
+    gender: "Other",
     password: "",
     confirmPassword: "",
+    photoUrl: "",
   });
-
-  const [showPasswordFields, setShowPasswordFields] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("token");
         const response = await axios.get(`${API_URL}/api/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
-
         dispatch(updateProfile(response.data.user));
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
     };
 
-    fetchProfile();
-  }, [dispatch]);
+    if (!currentUser) {
+      fetchProfile();
+    }
+  }, []);
 
+  // Update form data when currentUser changes
   useEffect(() => {
     if (currentUser) {
       setFormData({
@@ -49,12 +60,58 @@ const Profile = () => {
         lastName: currentUser.lastName || "",
         emailId: currentUser.emailId || "",
         age: currentUser.age || "",
-        gender: currentUser.gender || "male",
+        gender: currentUser.gender || "Other",
         password: "",
         confirmPassword: "",
+        photoUrl: currentUser.photoUrl || "",
       });
     }
   }, [currentUser]);
+
+  const handleFileUpload = async (image) => {
+    if (!image) return;
+    setImageError(false);
+
+    if (image.size > 2 * 1024 * 1024) {
+      setImageError(true);
+      return;
+    }
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + image.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, image);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImagePercentage(Math.round(progress));
+      },
+      (error) => {
+        setImageError(true);
+        console.error("Upload Error:", error);
+      },
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+
+          setPreviewImage(downloadURL);
+          // Update formData state
+          setFormData((prev) => ({ ...prev, photoUrl: downloadURL }));
+        } catch (error) {
+          console.error("Error updating profile with new image:", error);
+          setImageError(true);
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (image) {
+      handleFileUpload(image);
+    }
+  }, [image]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -62,31 +119,34 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    if (showPasswordFields && formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-
       const updateData = {
         ...formData,
-        password: showPasswordFields ? formData.password : undefined,
       };
+      if (!showPasswordFields) {
+        delete updateData.password;
+      }
 
-      await axios.put(`${API_URL}/api/profile`, updateData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.put(`${API_URL}/api/profile`, updateData, {
         withCredentials: true,
       });
 
-      const response = await axios.get(`${API_URL}/api/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-
-      dispatch(updateProfile(response.data.user));
-      toast.success("Profile updated successfully!");
+      if (response.data.success) {
+        dispatch(updateProfile(response.data.user)); // ✅ Update Redux only on success
+        setFormData((prev) => ({ ...prev, ...response.data.user })); // ✅ Update local state
+        toast.success("Profile updated successfully!");
+        setImagePercentage(0);
+      } else {
+        throw new Error(response.data.message || "Update failed.");
+      }
     } catch (error) {
       toast.error(error.response?.data?.error || "An error occurred.");
     } finally {
@@ -102,29 +162,74 @@ const Profile = () => {
           onSubmit={handleSubmit}
           className="flex flex-col items-center gap-4"
         >
+          <input
+            type="file"
+            ref={fileRef}
+            hidden
+            accept="image/*"
+            onChange={(e) => setImage(e.target.files[0])}
+          />
           <img
-            src={currentUser?.photoUrl || "/default-profile.png"}
+            src={
+              previewImage || currentUser?.photoUrl || "/default-profile.png"
+            }
             alt="profile"
             className="h-24 w-24 rounded-full cursor-pointer object-cover border-2 border-gray-300 shadow-md hover:shadow-lg transition-all"
+            onClick={() => fileRef.current.click()}
           />
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
+          <p className="text-sm self-ceq">
+            {imageError ? (
+              <span className="text-red-700">
+                Error uploading image(file size must be less than 2MB)
+              </span>
+            ) : imagePercentage > 0 && imagePercentage < 100 ? (
+              <span className="text-slate-700">{`Uploading: ${imagePercentage}%`}</span>
+            ) : imagePercentage === 100 ? (
+              <span className="text-green-700">
+                Image uploaded successfully
+              </span>
+            ) : (
+              // ) : previewImage === "" ? (
+              //   <span className="text-green-700">Image removed successfully</span>
+              " "
+            )}
+          </p>
+          {/* {previewImage && (
+            <button
+              type="button"
+              onClick={() => {
+                setPreviewImage("");
+                setFormData((prev) => ({
+                  ...prev,
+                  photoUrl: "",
+                }));
+                fileRef.current.value = null;
+              }}
+              className="text-red-600 underline text-sm hover:text-red-800"
+            >
+              Remove Picture
+            </button>
+          )} */}
+
+          <div className="flex w-full gap-3 rounded-lg">
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              className="bg-gray-50 rounded-lg w-1/2 p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              className="bg-gray-50 rounded-lg w-1/2 p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              value={formData.lastName}
+              onChange={handleChange}
+            />
+          </div>
           <input
             type="email"
             name="emailId"
@@ -133,25 +238,26 @@ const Profile = () => {
             value={formData.emailId}
             disabled
           />
-          <input
-            type="number"
-            name="age"
-            placeholder="Age"
-            className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            value={formData.age}
-            onChange={handleChange}
-          />
-          <select
-            name="gender"
-            className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-            value={formData.gender}
-            onChange={handleChange}
-          >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-
+          <div className="flex w-full gap-3 rounded-lg">
+            <input
+              type="number"
+              name="age"
+              placeholder="Age"
+              className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              value={formData.age}
+              onChange={handleChange}
+            />
+            <select
+              name="gender"
+              className="bg-gray-50 rounded-lg w-full p-3 outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              value={formData.gender}
+              onChange={handleChange}
+            >
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
           <button
             type="button"
             className="text-blue-600 underline focus:outline-none transition-all hover:text-blue-800"
@@ -159,7 +265,6 @@ const Profile = () => {
           >
             {showPasswordFields ? "Cancel Password Update" : "Change Password"}
           </button>
-
           {showPasswordFields && (
             <>
               <input
@@ -180,16 +285,30 @@ const Profile = () => {
               />
             </>
           )}
-
-          <button
-            type="submit"
-            className={`bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={loading}
-          >
-            {loading ? "Updating..." : "Update Profile"}
-          </button>
+          <div className="flex gap-10 ">
+            <button
+              type="submit"
+              className={`bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={
+                loading ||
+                imageError ||
+                JSON.stringify(formData) === JSON.stringify(currentUser)
+              }
+            >
+              {loading ? "Updating..." : "Update Profile"}
+            </button>
+            {/* <button
+              type="submit"
+              className={`bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-all ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={loading}
+            >
+              Delete Account
+            </button> */}
+          </div>
         </form>
       </div>
     </div>

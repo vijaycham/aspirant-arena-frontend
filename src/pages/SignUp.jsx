@@ -26,7 +26,6 @@ const SignUp = () => {
 
   // 🚀 Redirect if user is already logged in
   useEffect(() => {
-    console.log("Current User:", currentUser);
     if (currentUser) {
       navigate("/");
     }
@@ -50,8 +49,6 @@ const SignUp = () => {
       const res = await axios.post(`${API_URL}/api/auth/signup`, formData, {
         withCredentials: true,
       });
-      console.log("API Response:", res);
-      console.log("User Data:", res.data.user);
 
       dispatch(signInSuccess(res.data.userProfile)); // Store user in Redux
       navigate("/");

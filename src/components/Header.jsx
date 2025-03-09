@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.png";
 import { useSelector, useDispatch } from "react-redux";
 import { persistor } from "../redux/store";
 import {
@@ -13,6 +14,7 @@ import {
   FaBars,
   FaTimes,
 } from "react-icons/fa";
+import { signOut } from "../redux/user/authSlice";
 import axios from "axios";
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -33,7 +35,6 @@ const Header = () => {
 
   // 🏁 Sign Out Handler
   const handleSignOut = async () => {
-    console.log("Logging out..."); // Debugging log
     try {
       await axios.post(
         `${API_URL}/api/auth/signout`,
@@ -41,16 +42,11 @@ const Header = () => {
         { withCredentials: true }
       );
       // Dispatch Redux action to clear user state
-      dispatch({ type: "USER_SIGN_OUT" });
+      dispatch(signOut());
 
       // Ensure persistor is cleared properly
       await persistor.purge();
       await persistor.flush();
-
-      // Remove stored authentication data
-      localStorage.removeItem("token");
-      localStorage.removeItem("user"); // Ensure user is also cleared
-      sessionStorage.clear();
 
       // Manually clear the authentication cookie
       document.cookie =
@@ -59,10 +55,6 @@ const Header = () => {
       // Redirect to Sign In page
       navigate("/signin");
 
-      // Delay navigation to ensure UI updates
-      setTimeout(() => {
-        navigate("/signin");
-      }, 300);
     } catch (error) {
       console.error("Logout Error:", error);
     }
@@ -72,14 +64,15 @@ const Header = () => {
     <header className="bg-peach-200 text-gray-800 shadow-md">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <h1 className="text-2xl font-bold">
-          <Link
-            to="/"
-            className="hover:text-orange-600 transition duration-300"
-          >
-            Aspirant Arena
+        <div className="w-40 h-12 rounded-2xl overflow-hidden flex items-center">
+          <Link to="/">
+            <img
+              src={logo}
+              alt="Aspirant Arena Logo"
+              className="w-full object-cover scale-110 rounded-2xl transition-transform duration-300"
+            />
           </Link>
-        </h1>
+        </div>
 
         {/* 📱 Mobile Menu Button */}
         <button
@@ -181,7 +174,7 @@ const Header = () => {
               location.pathname === "/signin" ? (
                 <Link
                   to="/signup"
-                  className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition duration-300 text-sm font-semibold"
+                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition duration-300 text-sm font-semibold"
                 >
                   Sign Up
                 </Link>

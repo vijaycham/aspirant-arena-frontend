@@ -24,7 +24,6 @@ const ToDo = () => {
       const res = await axios.get(`${API_URL}/api/todo`, {
         withCredentials: true,
       });
-      console.log("Fetched todos:", res.data);
 
       if (Array.isArray(res.data)) {
         dispatch(setTodos(res.data));

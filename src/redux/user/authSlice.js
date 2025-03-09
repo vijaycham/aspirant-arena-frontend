@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  currentUser:null, 
+  currentUser: null,
   loading: false,
   error: null,
 };
 
-const userSlice = createSlice({
-  name: "user",
+const authSlice = createSlice({
+  name: "auth",
   initialState,
   reducers: {
     signInStart: (state) => {
@@ -16,10 +16,8 @@ const userSlice = createSlice({
     signInSuccess: (state, action) => {
       console.log("Sign-in successful", action.payload);
       state.currentUser = action.payload;
-      localStorage.setItem("currentUser", JSON.stringify(action.payload)); 
       state.loading = false;
       state.error = null;
-     
     },
     signInFailure: (state, action) => {
       state.loading = false;
@@ -27,13 +25,22 @@ const userSlice = createSlice({
     },
     signOut: (state) => {
       state.currentUser = null;
-      localStorage.removeItem("currentUser");
       state.loading = false;
       state.error = null;
+    },
+    updateProfile: (state, action) => {
+      if (state.currentUser) {
+        state.currentUser = { ...state.currentUser, ...action.payload };
+      }
     },
   },
 });
 
-export const { signInStart, signInSuccess, signInFailure, signOut } =
-  userSlice.actions;
-export default userSlice.reducer;
+export const {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  signOut,
+  updateProfile,
+} = authSlice.actions;
+export default authSlice.reducer;
