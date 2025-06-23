@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import { signOut } from "../redux/user/authSlice";
 import axios from "axios";
+//import SearchBar from "./SearchBar";
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Header = () => {
@@ -24,6 +25,7 @@ const Header = () => {
   const location = useLocation();
   const user = useSelector((state) => state.user.currentUser);
   const isAuthenticated = !!user;
+  //const [searchQuery, SetSearchQuery] = useState("");
 
   // 📱 Mobile Menu State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -54,11 +56,15 @@ const Header = () => {
       //  dispatch({ type: "RESET_AUTH" });
       // Redirect to Sign In page
       navigate("/signin");
-
     } catch (error) {
       console.error("Logout Error:", error);
     }
   };
+
+  // const handleSearch = () => {};
+  // const onClearSearch = () => {
+  //   SetSearchQuery("");
+  // };
 
   return (
     <header className="bg-peach-200 text-gray-800 shadow-md">
@@ -73,6 +79,14 @@ const Header = () => {
             />
           </Link>
         </div>
+        {/* <SearchBar
+          value={searchQuery}
+          onChange={({ target }) => {
+            SetSearchQuery(target.value);
+          }}
+          handleSearch={handleSearch }
+          onClearSearch={onClearSearch}
+        /> */}
 
         {/* 📱 Mobile Menu Button */}
         <button
