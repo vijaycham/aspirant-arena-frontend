@@ -109,121 +109,159 @@ const ToDo = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="bg-white shadow-xl rounded-3xl p-8 w-full max-w-2xl border border-gray-100">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8 flex items-center justify-center gap-3">
-          <span className="text-4xl">📝</span> Your Aspirations
-        </h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col pt-20 px-4 sm:px-6 lg:px-8 font-outfit relative">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[30%] -right-[10%] w-[70%] h-[70%] rounded-full bg-primary-200/20 blur-3xl opacity-60 mix-blend-multiply animate-blob"></div>
+        <div className="absolute top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-rose-200/20 blur-3xl opacity-60 mix-blend-multiply animate-blob animation-delay-2000"></div>
+      </div>
 
-        <div className="flex flex-col gap-4 mb-8 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="What needs to be done?"
-              className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all shadow-sm"
-            />
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-600">Priority:</span>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-                className="p-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
+      <div className="relative z-10 w-full max-w-3xl mx-auto space-y-8 pb-20">
+        <div className="text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter flex items-center justify-center md:justify-start gap-4 uppercase">
+            Your <span className="text-primary-600 italic">Aspirations</span> 🚀
+          </h1>
+          <p className="text-gray-500 font-bold text-xs md:text-sm mt-2 uppercase tracking-widest opacity-70">
+            Strategic task management for high-performance prep
+          </p>
+        </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-600">Due Date:</span>
+        {/* Input Area */}
+        <div className="glass-card p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-white">
+          <div className="flex flex-col gap-6">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Task Description</label>
               <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="p-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                type="text"
+                value={task}
+                onChange={(e) => setTask(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="What needs to be done?"
+                className="w-full p-4 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-700 placeholder:text-gray-300 shadow-sm"
               />
             </div>
+            
+            <div className="flex flex-col md:flex-row items-end gap-6">
+              <div className="grid grid-cols-2 gap-4 flex-1 w-full">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Priority</label>
+                  <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="w-full p-3 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-xl outline-none transition-all font-bold text-gray-700 text-sm appearance-none shadow-sm"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
 
-            <button
-              onClick={addTask}
-              className="ml-auto bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-200 font-semibold"
-            >
-              Add Task
-            </button>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Due Date</label>
+                  <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className="w-full p-3 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-xl outline-none transition-all font-bold text-gray-700 text-sm shadow-sm"
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={addTask}
+                className="w-full md:w-auto px-10 py-3.5 bg-gray-900 text-white font-black rounded-2xl hover:bg-black hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-gray-200 uppercase tracking-widest text-xs"
+              >
+                Add Task
+              </button>
+            </div>
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-3">
-             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-             <p className="text-gray-500 animate-pulse">Loading your tasks...</p>
+        {/* List Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Roadmap</h3>
+             <span className="text-[10px] font-black text-primary-600 bg-primary-50 px-3 py-1 rounded-full uppercase italic">
+               {todos.length} Focus Points
+             </span>
           </div>
-        ) : todos.length === 0 ? (
-          <div className="text-center py-12 px-6 border-2 border-dashed border-gray-100 rounded-2xl">
-            <p className="text-gray-400 text-lg">No tasks yet. Start by adding one above!</p>
-          </div>
-        ) : (
-          <ul className="space-y-4">
-            <AnimatePresence initial={false}>
-              {todos.map((todo) => (
-                <motion.li
-                  key={todo._id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.2 }}
-                  className={`flex items-center justify-between p-4 rounded-2xl border transition-all hover:shadow-md ${
-                    todo.completed ? "bg-gray-50 border-gray-100" : "bg-white border-gray-100"
-                  }`}
-                >
-                  <div className="flex items-center gap-4 flex-1">
-                    <input
-                      type="checkbox"
-                      checked={todo.completed}
-                      onChange={() => toggleTask(todo._id, todo.completed)}
-                      className="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                    />
-                    <div className="flex flex-col gap-1">
-                      <span
-                        className={`text-lg transition-all ${
-                          todo.completed ? "line-through text-gray-400" : "text-gray-700 font-medium"
-                        }`}
-                      >
-                        {todo.text}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${getPriorityColor(todo.priority)}`}>
-                          {todo.priority}
+
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+               <div className="w-12 h-12 border-4 border-gray-100 border-t-primary-600 rounded-full animate-spin"></div>
+               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest animate-pulse">Synchronizing Workspace...</p>
+            </div>
+          ) : todos.length === 0 ? (
+            <div className="text-center py-20 px-8 bg-white/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center gap-4">
+              <span className="text-4xl">🏝️</span>
+              <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">Your agenda is clear. Ready for deep work?</p>
+            </div>
+          ) : (
+            <ul className="space-y-3 md:space-y-4">
+              <AnimatePresence initial={false}>
+                {todos.map((todo) => (
+                  <motion.li
+                    key={todo._id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className={`flex items-center justify-between p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 transition-all group ${
+                      todo.completed 
+                        ? "bg-gray-50/50 border-transparent opacity-60" 
+                        : "bg-white border-white shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-primary-100"
+                    }`}
+                  >
+                    <div className="flex items-center gap-4 md:gap-6 flex-1 min-w-0">
+                      <div className="relative flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={todo.completed}
+                          onChange={() => toggleTask(todo._id, todo.completed)}
+                          className="w-6 h-6 rounded-lg border-2 border-gray-200 text-primary-600 focus:ring-primary-500 cursor-pointer transition-all peer opacity-0 absolute z-10"
+                        />
+                        <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                          todo.completed ? "bg-primary-600 border-primary-600" : "bg-white border-gray-200 peer-hover:border-primary-300"
+                        }`}>
+                          {todo.completed && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-1 min-w-0">
+                        <span
+                          className={`text-sm md:text-base transition-all truncate ${
+                            todo.completed ? "line-through text-gray-400" : "text-gray-900 font-black tracking-tight"
+                          }`}
+                        >
+                          {todo.text}
                         </span>
-                        {todo.dueDate && (
-                          <span className="text-xs text-gray-400 flex items-center gap-1">
-                            📅 {new Date(todo.dueDate).toLocaleDateString()}
+                        <div className="flex items-center gap-3">
+                          <span className={`text-[8px] uppercase font-black px-2.5 py-1 rounded-[0.75rem] border-2 shadow-sm ${getPriorityColor(todo.priority)}`}>
+                            {todo.priority}
                           </span>
-                        )}
+                          {todo.dueDate && (
+                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                              <span className="text-xs opacity-50">📅</span> {new Date(todo.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <button
-                    onClick={() => removeTask(todo._id)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                    title="Delete task"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </motion.li>
-              ))}
-            </AnimatePresence>
-          </ul>
-        )}
+                    
+                    <button
+                      onClick={() => removeTask(todo._id)}
+                      className="ml-4 p-3 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all group-hover:opacity-100 opacity-0 lg:opacity-30"
+                      title="Archive task"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -43,8 +43,14 @@ describe("StatsGrid Component", () => {
     expect(trend).toHaveClass("bg-emerald-100");
   });
 
-  it("should return null if quickStats is missing", () => {
-    const { container } = render(<StatsGrid quickStats={null} selectedSubject="All" />);
+  it("should render shimmer loaders when loading", () => {
+    render(<StatsGrid quickStats={null} selectedSubject="All" loading={true} />);
+    const shimmers = screen.getAllByRole("generic").filter(el => el.className.includes("animate-shimmer"));
+    expect(shimmers.length).toBeGreaterThan(0);
+  });
+
+  it("should return null if quickStats is missing and not loading", () => {
+    const { container } = render(<StatsGrid quickStats={null} selectedSubject="All" loading={false} />);
     expect(container.firstChild).toBeNull();
   });
 });

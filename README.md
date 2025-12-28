@@ -27,9 +27,10 @@ The sleek, modern, and highly interactive frontend for **Aspirant Arena**. Built
   - **Subject Analytics**: Filter trends by subject and set custom targets for automatic status highlighting (Green/Red bars).
   - **Smart Tallying**: Real-time feedback in the entry form to ensure all lost marks are accounted for.
   - **Avg Error Tracking**: Scalable performance metrics showing average mistakes per test instead of cumulative totals.
-- **Smart Revision Loop**: Automatically creates high-priority To-Do tasks for conceptual errors, intelligently grouping them by subject to prevent list bloat.
+- **Smart Strategy Coach**: "Performance-based tips" that analyze your mock data to identify specific bottlenecks (e.g., "Revision Bottleneck" or "Panic Mode").
 - **Dynamic To-Do List**: Manage tasks with priority levels (Low/Medium/High) and due dates.
-- **Premium UI**: Custom "Outfit" typography, glassmorphism effects, and vibrant gradient themes.
+- **Aura Design System**: A cohesive, dark-themed UI featuring glassmorphism, animated blobs, and a "Slate-950" premium aesthetic across all pages (Login, Profile, Dashboard).
+- **Feedback & Support Central**: Dedicated hub for users to Contact Developer, Report Bugs, or Request Features, integrated with **Nodemailer** for real-time email dispatch.
 - **Vercel Optimized**: Integrated with `@vercel/speed-insights` for performance tracking.
 - **Google OAuth**: One-tap sign-in integrated with Firebase and the custom backend.
 - **Production-Ready Communication**: Centralized API utility with automatic response interceptors for clean data handling.

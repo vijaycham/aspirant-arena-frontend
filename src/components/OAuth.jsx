@@ -42,16 +42,14 @@ const OAuth = () => {
       <button
         type="button"
         onClick={handleGoogleSignIn}
-        className=" flex gap-16 h-10 overflow-hidden items-center text-black p-3 rounded-lg uppercase shadow-sm border border-gray-100 hover:shadow-xl transition duration-300 w-full"
+        className="flex items-center justify-center gap-3 w-full py-3 rounded-xl bg-white text-slate-900 font-bold border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all active:scale-95"
       >
-        <div className="bg-white p-2">
-          <img
-            className=" w-10 h-10 object-contain"
-            src="https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png"
-            alt="Google logo"
-          />
-        </div>
-        <span className="font-medium text-gray-700">Continue with Google</span>
+        <img
+          className="w-5 h-5 object-contain"
+          src="https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png"
+          alt="Google logo"
+        />
+        <span className="text-sm">Continue with Google</span>
       </button>
     </div>
   );

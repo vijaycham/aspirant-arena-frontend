@@ -2,6 +2,45 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../utils/api";
 import { useSelector } from "react-redux";
+import Shimmer from "../components/Shimmer";
+
+const getStrategyNote = (stats) => {
+  if (!stats) return null;
+
+  if (stats.pendingRevisions > 5) {
+    return {
+      title: "Revision Bottleneck",
+      text: "You have many pending revision loops. Pause new mocks and clear conceptual errors first.",
+      color: "from-rose-600 to-orange-600",
+      icon: "⚠️"
+    };
+  }
+
+  if (stats.accuracy < 50) {
+    return {
+      title: "Foundation Alert ",
+      text: "Accuracy is low. Focus on error analysis instead of increasing mock frequency.",
+      color: "from-amber-500 to-orange-600",
+      icon: "🧐"
+    };
+  }
+
+  if (stats.accuracy >= 70) {
+    return {
+      title: "Strong Momentum ",
+      text: "Accuracy is strong. Increase mock frequency and focus on time optimization.",
+      color: "from-emerald-500 to-teal-600",
+      icon: "🚀"
+    };
+  }
+
+  return {
+    title: "Consistency Tip ",
+    text: "Daily analysis of mistakes compounds into major score improvement.",
+    color: "from-indigo-600 to-primary-700",
+    icon: "💡"
+  };
+};
 
 const Home = () => {
   const { currentUser: user } = useSelector((state) => state.user);
@@ -46,8 +85,10 @@ const Home = () => {
     }
   }, [user]);
 
+  const strategy = getStrategyNote(stats);
+
   return (
-    <div className="min-h-screen relative bg-gray-50 flex flex-col pt-20 px-4 sm:px-6 lg:px-8 font-outfit">
+    <div className="min-h-screen relative bg-gray-50 flex flex-col pt-12 md:pt-20 px-4 sm:px-6 lg:px-8 font-outfit">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary-200/30 blur-3xl opacity-60 mix-blend-multiply animate-blob"></div>
@@ -55,37 +96,37 @@ const Home = () => {
         <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-purple-200/30 blur-3xl opacity-60 mix-blend-multiply animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         
         {/* Hero Section */}
-        <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm">
+        <div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/50 shadow-sm">
             <span className="flex h-2 w-2 rounded-full bg-primary-500 animate-pulse"></span>
-            <span className="text-xs font-black text-gray-500 uppercase tracking-widest">Aspirant Workspace 2.0</span>
+            <span className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest">Aspirant Workspace 2.0</span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black text-gray-900 leading-[1.1] tracking-tighter">
-            Where Ambition Meets <br />
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 leading-[1.1] tracking-tighter">
+            Where Ambition Meets <br className="hidden lg:block" />
             <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">
               High Performance
             </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-gray-500 max-w-2xl font-medium leading-relaxed">
+          <p className="text-base md:text-lg lg:text-xl text-gray-500 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0">
             The all-in-one strategic hub for UPSC aspirants. Track mock tests, 
             automate revision loops, and master your syllabus with data-driven precision.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
             <Link
               to="/test-tracker"
-              className="px-8 py-4 rounded-[2rem] bg-gray-900 text-white font-black shadow-2xl shadow-gray-300 hover:bg-black hover:scale-[1.05] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3"
+              className="px-8 py-4 rounded-[2rem] bg-gray-900 text-white font-black shadow-2xl shadow-gray-200 hover:bg-black hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base"
             >
               Analyze Your Performance 📈
             </Link>
             <Link
               to="/todo"
-              className="px-8 py-4 rounded-[2rem] bg-white text-gray-900 font-black border border-gray-100 shadow-sm hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 flex items-center justify-center gap-2"
+              className="px-8 py-4 rounded-[2rem] bg-white text-gray-900 font-black border border-gray-100 shadow-sm hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 flex items-center justify-center gap-2 text-sm md:text-base"
             >
               Manage Tasks 📝
             </Link>
@@ -106,11 +147,23 @@ const Home = () => {
                 <div className="grid grid-cols-2 gap-8">
                   <div>
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Overall Accuracy</span>
-                    <span className="text-4xl font-black text-primary-600">{stats?.accuracy || 0}%</span>
+                    {stats ? (
+                      <span className="text-4xl font-black text-primary-600 animate-fade-in">
+                        {stats.accuracy}%
+                      </span>
+                    ) : (
+                      <Shimmer variant="stats" className="mt-1" />
+                    )}
                   </div>
                   <div>
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Tests Logged</span>
-                    <span className="text-4xl font-black text-gray-900">{stats?.count || 0}</span>
+                    {stats ? (
+                      <span className="text-4xl font-black text-gray-900 animate-fade-in">
+                        {stats.count}
+                      </span>
+                    ) : (
+                      <Shimmer variant="stats" className="mt-1" />
+                    )}
                   </div>
                 </div>
 
@@ -121,32 +174,56 @@ const Home = () => {
                   </div>
                 )}
                 
-                <div className="mt-10 pt-8 border-t border-gray-50">
+                <div className="mt-10 pt-8 border-t border-gray-100/50">
                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Urgent Revision Tasks</span>
                    <div className="space-y-3">
-                     {todos.length > 0 ? todos.map(t => (
-                        <Link 
-                          key={t._id} 
-                          to={t.text.includes("conceptual errors") ? "/test-tracker" : "/todo"}
-                          className="flex items-center gap-3 bg-gray-50 p-3 rounded-2xl border border-gray-100 hover:bg-gray-100 hover:scale-[1.02] active:scale-95 transition-all group"
-                        >
-                          <div className={`w-2 h-2 rounded-full shrink-0 ${t.priority === 'high' ? 'bg-rose-500 shadow-sm shadow-rose-200' : 'bg-primary-500 shadow-sm shadow-primary-200'}`}></div>
-                          <span className="text-xs font-bold text-gray-600 truncate group-hover:text-gray-900">{t.text}</span>
-                        </Link>
-                     )) : (
-                        <p className="text-xs font-bold text-gray-300 italic uppercase">No pending revisions. Great job!</p>
+                     {!stats ? (
+                       <>
+                         <Shimmer variant="bar" className="h-12" />
+                         <Shimmer variant="bar" className="h-12 w-5/6" />
+                       </>
+                     ) : todos.length > 0 ? (
+                       todos.map((t) => (
+                         <Link
+                           key={t._id}
+                           to={t.text.includes("conceptual errors") ? "/test-tracker" : "/todo"}
+                           className="flex items-center gap-3 bg-white/50 hover:bg-white backdrop-blur-sm p-3 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-100 hover:scale-[1.02] active:scale-95 transition-all group"
+                         >
+                           <div
+                             className={`w-2 h-2 rounded-full shrink-0 ${
+                               t.priority === "high"
+                                 ? "bg-rose-500 shadow-sm shadow-rose-200"
+                                 : "bg-primary-500 shadow-sm shadow-primary-200"
+                             }`}
+                           ></div>
+                           <span className="text-xs font-bold text-gray-600 truncate group-hover:text-gray-900">
+                             {t.text}
+                           </span>
+                         </Link>
+                       ))
+                     ) : (
+                       <p className="text-xs font-bold text-gray-300 italic uppercase">
+                         No pending revisions. Great job!
+                       </p>
                      )}
                    </div>
                 </div>
               </div>
 
-              {/* Quick Info Card */}
-              <div className="bg-gradient-to-br from-indigo-600 to-primary-700 p-8 rounded-[3rem] shadow-xl text-white">
-                <h4 className="font-black text-lg mb-2">Strategy Note 💡</h4>
-                <p className="text-xs font-medium opacity-80 leading-relaxed">
-                  Consistent analysis of &quot;Unattended&quot; questions is the fastest way to increase your prelims score. Check your Mistake Pie Chart today!
-                </p>
-              </div>
+              {/* Dynamic Strategy Card */}
+              {strategy && (
+                <div 
+                  className={`bg-gradient-to-br ${strategy.color} p-8 rounded-[3rem] shadow-xl text-white relative overflow-hidden group`}
+                >
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                  <h4 className="font-black text-lg mb-2 flex items-center gap-2">
+                    {strategy.icon} {strategy.title}
+                  </h4>
+                  <p className="text-xs font-medium opacity-90 leading-relaxed">
+                    {strategy.text}
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-white p-12 rounded-[4rem] shadow-2xl shadow-gray-200 border border-gray-100 text-center space-y-6">

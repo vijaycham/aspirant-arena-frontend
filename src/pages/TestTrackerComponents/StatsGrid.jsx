@@ -1,6 +1,19 @@
-import React from "react";
+import Shimmer from "../../components/Shimmer";
 
-const StatsGrid = ({ quickStats, selectedSubject }) => {
+const StatsGrid = ({ quickStats, selectedSubject, loading }) => {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-slate-50/50 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2.5rem] border border-gray-100 flex flex-col justify-center">
+            <Shimmer variant="bar" className="w-16 mb-3" />
+            <Shimmer variant="stats" className="w-24" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (!quickStats) return null;
 
   const cards = [
@@ -18,7 +31,7 @@ const StatsGrid = ({ quickStats, selectedSubject }) => {
       color: "text-indigo-600", 
       bg: "bg-indigo-50" 
     },
-    { label: "Avg Errors / Test", value: quickStats.avgMistakes, color: "text-rose-600", bg: "bg-rose-50" },
+    { label: "Avg Errors / Test", value: quickStats?.avgMistakes, color: "text-rose-600", bg: "bg-rose-50" },
   ];
 
   return (
