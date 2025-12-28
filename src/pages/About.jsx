@@ -71,8 +71,8 @@ const AboutUs = () => {
                     <h2 className="text-3xl font-black text-gray-900 leading-tight mt-1">Built with ❤️ by Vijay</h2>
                  </div>
                  <p className="text-gray-500 font-medium max-w-xl leading-relaxed">
-                    "I built Aspirant Arena to solve the chaos of preparation. 
-                    Merging technology with discipline, my goal is to give every serious aspirant the digital infrastructure they deserve to succeed."
+                    &quot;I built Aspirant Arena to solve the chaos of preparation. 
+                    Merging technology with discipline, my goal is to give every serious aspirant the digital infrastructure they deserve to succeed.&quot;
                  </p>
                  <div className="flex flex-wrap items-center gap-4 pt-2">
                     <Link to="/feedback" className="px-5 py-2 rounded-xl bg-primary-100 text-primary-700 font-black text-xs uppercase tracking-widest hover:bg-primary-200 transition-colors">
@@ -93,6 +93,10 @@ const AboutUs = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-[80px] -mr-32 -mt-32"></div>
           <div className="relative z-10 space-y-8">
             <h2 className="text-3xl font-black tracking-tight">Ready to conquer the Arena?</h2>
+            <p className="text-gray-400 italic mb-4">
+              &quot;The difference between a successful person and others is not a lack of strength, not a lack of knowledge, but rather a lack in will.&quot; 
+              <span className="block text-primary-400 font-bold mt-2">- Vince Lombardi</span>
+            </p>
             <p className="text-gray-400 font-medium max-w-xl mx-auto leading-relaxed">
               Join thousands of aspirants who are already using data to optimize
               their daily routine and maximize their scores.

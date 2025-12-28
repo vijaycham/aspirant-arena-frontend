@@ -48,8 +48,10 @@ describe("Feedback Component", () => {
 
     const subjectInput = screen.getByPlaceholderText(/Summary of your message/i);
     const messageInput = screen.getByPlaceholderText(/Tell us more/i);
+    const emailInput = screen.getByPlaceholderText(/your@email.com/i);
     const submitBtn = screen.getByRole("button", { name: /Send Feedback/i });
 
+    await userEvent.type(emailInput, "user@example.com");
     await userEvent.type(subjectInput, "Great App");
     await userEvent.type(messageInput, "I love the design.");
     await userEvent.click(submitBtn);
@@ -77,8 +79,10 @@ describe("Feedback Component", () => {
 
     const subjectInput = screen.getByPlaceholderText(/Summary of your message/i);
     const messageInput = screen.getByPlaceholderText(/Tell us more/i);
+    const emailInput = screen.getByPlaceholderText(/your@email.com/i);
     const submitBtn = screen.getByRole("button", { name: /Send Feedback/i });
 
+    await userEvent.type(emailInput, "test@example.com");
     await userEvent.type(subjectInput, "Crash Test");
     await userEvent.type(messageInput, "Boom");
     await userEvent.click(submitBtn);

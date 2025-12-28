@@ -29,10 +29,22 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
+      'react/prop-types': 'off', // Disable prop-types validation
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
+      'no-unused-vars': ['warn', { varsIgnorePattern: '^React$' }], // Start warning on unused vars but ignore React import
+    },
+  },
+  {
+    files: ['src/__tests__/**/*.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.jest, // Use Jest globals for tests
+        vi: 'readonly', // Vitest global
+      },
     },
   },
 ]

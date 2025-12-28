@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaPaperPlane, FaBug, FaLightbulb, FaEnvelope } from "react-icons/fa";
+import { FaPaperPlane, FaBug, FaLightbulb, FaEnvelope, FaLock } from "react-icons/fa";
 import { toast } from "react-toastify";
 import api from "../utils/api";
 
@@ -53,14 +53,14 @@ const Feedback = () => {
         <div className="text-center mb-12 space-y-4">
           <div className="inline-flex items-center gap-2 bg-slate-900/50 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 shadow-sm">
             <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs font-black text-gray-400 uppercase tracking-widest">We're Listening</span>
+            <span className="text-xs font-black text-gray-400 uppercase tracking-widest">We&apos;re Listening</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
             Help us build the <br/>
             <span className="bg-gradient-to-r from-primary-400 to-indigo-400 bg-clip-text text-transparent">Perfect Arena</span>
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto font-medium">
-            Whether it's a glitch, a brilliant idea, or just a hello — we want to hear from you.
+            Whether it&apos;s a glitch, a brilliant idea, or just a hello — we want to hear from you.
           </p>
         </div>
 
@@ -120,15 +120,20 @@ const Feedback = () => {
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Your Email (Optional)</label>
-                        <input 
-                            type="email" 
-                            name="email"
-                            placeholder="To verify or reply..."
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">
+                            We&apos;ll get back to you at:
+                        </label>
+                        <input
+                            type="email"
+                            required
+                            className="w-full p-3 md:p-4 bg-slate-950/50 border border-white/5 rounded-xl md:rounded-2xl focus:border-primary-500 focus:bg-slate-950 outline-none transition-all font-bold text-sm text-white placeholder:text-gray-600"
+                            placeholder="your@email.com"
                             value={formData.email}
-                            onChange={handleChange}
-                            className="w-full px-5 py-4 rounded-xl bg-slate-950/50 border border-white/10 text-white placeholder-gray-600 focus:bg-slate-950 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-all"
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
+                        <p className="text-[10px] text-gray-500 mt-1 ml-1 flex items-center gap-1">
+                            <FaLock size={8} /> We&apos;ll never share your email.
+                        </p>
                     </div>
 
                     <div className="space-y-2">

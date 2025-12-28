@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/3.png";
 import { useSelector, useDispatch } from "react-redux";
 import { persistor } from "../redux/store";
@@ -10,7 +10,6 @@ import {
   FaStickyNote,
   FaClock,
   FaHome,
-  FaInfoCircle,
   FaBars,
   FaTimes,
   FaChartLine,
@@ -24,17 +23,12 @@ import { motion, AnimatePresence } from "framer-motion";
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation(); // Unused
   const user = useSelector((state) => state.user.currentUser);
   const isAuthenticated = !!user;
 
   // 📱 Mobile Menu State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // 📱 Toggle Mobile Menu
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
 
   const handleSignOut = async () => {
     try {
