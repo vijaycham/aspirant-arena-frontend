@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../utils/api";
 import {
@@ -7,6 +7,7 @@ import {
   removeTodo,
   toggleTodo,
 } from "../redux/slice/todoSlice";
+import { useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
@@ -19,7 +20,7 @@ const ToDo = () => {
   const [priority, setPriority] = useState("medium");
   const [dueDate, setDueDate] = useState("");
 
-  const fetchTodos = async () => {
+  const fetchTodos = useCallback(async () => {
     try {
       const res = await api.get("/todo");
       // res is { status: "success", results: ..., data: { todos: [...] } }
@@ -33,13 +34,13 @@ const ToDo = () => {
       console.error("Error fetching tasks:", error);
       toast.error(error.response?.data?.message || "Failed to load tasks.");
     }
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     if (user && !loading) {
       fetchTodos();
     }
-  }, [user, loading]);
+  }, [user, loading, fetchTodos]);
 
   const addTask = async () => {
     const trimmedTask = task.trim();

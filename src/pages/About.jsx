@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { FaCheckCircle, FaLightbulb, FaClock } from "react-icons/fa";
 
@@ -7,7 +6,7 @@ const AboutUs = () => {
     <div className="min-h-screen bg-peach-100 flex flex-col items-center py-12 px-6 text-gray-800">
       <div className="max-w-3xl text-center">
         <h1 className="text-4xl font-bold text-peach-600 mb-4">
-          About Aspirant Arena
+            Who&apos;s behind Aspirant Arena?
         </h1>
         <p className="text-lg mb-6">
           Welcome to Aspirant Arena, your ultimate productivity companion
@@ -29,7 +28,7 @@ const AboutUs = () => {
           <FaLightbulb className="text-peach-500 text-4xl mx-auto mb-3" />
           <h2 className="text-xl font-semibold">Future Enhancements</h2>
           <p className="text-sm mt-2">
-            We're adding study planners, analytics, and more!
+            We&apos;re adding study planners, analytics, and more!
           </p>
         </div>
 

@@ -47,7 +47,7 @@ const Profile = () => {
     if (!currentUser) {
       fetchProfile();
     }
-  }, []);
+  }, [currentUser, dispatch]);
 
   // Update form data when currentUser changes
   useEffect(() => {

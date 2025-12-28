@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import OAuth from "../components/OAuth";
@@ -9,7 +9,6 @@ import {
   signInFailure,
 } from "../redux/user/authSlice";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const SignUp = () => {
   const [formData, setFormData] = useState({

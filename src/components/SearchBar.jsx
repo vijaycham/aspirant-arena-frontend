@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable react/prop-types */
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { IoMdClose } from "react-icons/io";
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import OAuth from "../components/OAuth";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../utils/api";
@@ -115,7 +115,7 @@ const SignIn = () => {
         )}
 
         <div className="flex justify-center gap-2 mt-8 text-sm text-gray-600">
-          <p>Don't have an account?</p>
+          <p>Don&apos;t have an account?</p>
           <Link to="/signup">
             <span className="text-primary-600 font-semibold hover:underline">Create Account</span>
           </Link>
