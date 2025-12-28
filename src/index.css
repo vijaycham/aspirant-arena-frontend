@@ -11,3 +11,9 @@
   }
 }
 
+/* Remove intrusive focus outlines on charts and SVGs */
+.recharts-surface:focus, 
+.recharts-wrapper:focus, 
+svg:focus {
+  outline: none !important;
+}

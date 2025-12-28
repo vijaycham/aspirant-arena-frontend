@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/3.png";
 import { useSelector, useDispatch } from "react-redux";
 import { persistor } from "../redux/store";
 import {
@@ -13,6 +13,7 @@ import {
   FaInfoCircle,
   FaBars,
   FaTimes,
+  FaChartLine,
 } from "react-icons/fa";
 import { signOut } from "../redux/user/authSlice";
 import api from "../utils/api";
@@ -62,7 +63,7 @@ const Header = () => {
   // };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/80 dark:border-gray-800 transition-all duration-300">
+    <header className="sticky top-0 z-50 bg-[#f8fafc]/95 backdrop-blur-md border-b border-slate-200 dark:bg-gray-900/95 dark:border-slate-800 transition-all duration-300">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
@@ -94,7 +95,7 @@ const Header = () => {
               : "hidden lg:flex"
           }`}
         >
-          <ul className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-8 text-gray-600 font-medium">
+          <ul className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-8 text-white font-medium">
             {/* 🏠 Home */}
             {isAuthenticated && (
               <li>
@@ -116,6 +117,19 @@ const Header = () => {
                   className="flex items-center gap-2 hover:text-primary-600 transition-colors duration-300 relative group"
                 >
                   <FaTasks className="text-lg" /> <span>To-Do</span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
+                </Link>
+              </li>
+            )}
+
+            {/* 📊 Performance */}
+            {isAuthenticated && (
+              <li>
+                <Link
+                  to="/test-tracker"
+                  className="flex items-center gap-2 hover:text-primary-600 transition-colors duration-300 relative group"
+                >
+                  <FaChartLine className="text-lg" /> <span>Performance</span>
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
                 </Link>
               </li>

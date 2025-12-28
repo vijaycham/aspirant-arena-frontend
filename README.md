@@ -15,11 +15,19 @@ The sleek, modern, and highly interactive frontend for **Aspirant Arena**. Built
 - **Toasts**: [React Hot Toast](https://react-hot-toast.com/) & [React Toastify](https://fkhadra.github.io/react-toastify/)
 - **HTTP Client**: [Axios](https://axios-http.com/) (Centralized instance in `src/utils/api.js`)
 - **Routing**: [React Router v7](https://reactrouter.com/)
+- **Testing**: [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 
 ---
 
 ## 🪐 Key Features
 
+- **Advanced Performance Suite**: High-fidelity dashboard for UPSC aspirants.
+  - **Mistake Logger**: Track *Conceptual Errors*, *Silly Mistakes*, and *Time Pressure*.
+  - **Unattended Tracker**: Log skipped questions to see the full "Lost Marks" profile.
+  - **Subject Analytics**: Filter trends by subject and set custom targets for automatic status highlighting (Green/Red bars).
+  - **Smart Tallying**: Real-time feedback in the entry form to ensure all lost marks are accounted for.
+  - **Avg Error Tracking**: Scalable performance metrics showing average mistakes per test instead of cumulative totals.
+- **Smart Revision Loop**: Automatically creates high-priority To-Do tasks for conceptual errors, intelligently grouping them by subject to prevent list bloat.
 - **Dynamic To-Do List**: Manage tasks with priority levels (Low/Medium/High) and due dates.
 - **Premium UI**: Custom "Outfit" typography, glassmorphism effects, and vibrant gradient themes.
 - **Vercel Optimized**: Integrated with `@vercel/speed-insights` for performance tracking.
@@ -46,6 +54,10 @@ The sleek, modern, and highly interactive frontend for **Aspirant Arena**. Built
    ```bash
    npm run dev
    ```
+5. Run tests:
+   ```bash
+   npm run test:run
+   ```
 
 ---
 
@@ -65,6 +77,8 @@ We maintain a clean and scalable project structure using the **Feature Branch Wo
 ## 📦 Project Structure
 
 - `src/utils/api.js`: Centralized Axios instance for all v1 API calls.
-- `src/pages/`: Contains all main view components (ToDo, Profile, Home, etc.).
+- `src/pages/`: Contains all main view components.
+- `src/pages/TestTrackerComponents/`: Modular UI components for the performance suite.
+- `src/hooks/`: Custom hooks like `useTestTracker.js` for clean state management.
 - `src/redux/`: Global state management logic.
 - `src/components/`: Reusable UI elements (Header, OAuth, etc.).

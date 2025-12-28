@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import ToDO from "./pages/ToDO";
 import Notes from "./pages/Notes";
 import Timer from "./pages/Timer";
+import TestTracker from "./pages/TestTracker";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/todo" element={<ToDO />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/timer" element={<Timer />} />
+          <Route path="/test-tracker" element={<TestTracker />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
