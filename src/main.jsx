@@ -6,6 +6,8 @@ import { store, persistor } from "./redux/store.js";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 const router = createBrowserRouter([
   { path: "/*", element: <App /> }, // All routes are handled inside App.jsx
 ]);
@@ -15,6 +17,7 @@ root.render(
   <Provider store={store}>
     <PersistGate persistor={persistor} loading={null}>
       <RouterProvider router={router} />
+      <SpeedInsights />
     </PersistGate>
   </Provider>
 );
