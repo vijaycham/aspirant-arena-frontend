@@ -1,11 +1,10 @@
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 import { app } from "../firebase";
-import axios from "axios";
+import api from "../utils/api";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/authSlice";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const OAuth = () => {
   const dispatch = useDispatch();
@@ -24,19 +23,15 @@ const OAuth = () => {
       const firstName = nameParts.at(0)?.trim() || "User"; // Ensure a fallback first name
       const lastName = nameParts.slice(1).join(" ").trim() || ""; // Optional last name
 
-      const res = await axios.post(
-        `${API_URL}/api/auth/google`,
-        {
-          idToken,
-          firstName,
-          lastName,
-          emailId: result.user.email,
-          photoURL: result.user.photoURL,
-        },
-        { withCredentials: true }
-      );
-      const { userProfile } = res.data;
-      dispatch(signInSuccess(res.data.userProfile));
+      const res = await api.post("/auth/google", {
+        idToken,
+        firstName,
+        lastName,
+        emailId: result.user.email,
+        photoURL: result.user.photoURL,
+      });
+
+      dispatch(signInSuccess(res.userProfile));
       navigate("/");
     } catch (error) {
       console.error("Google Sign In error", error);

@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect, useRef } from "react";
 import { updateProfile } from "../redux/user/authSlice";
-import axios from "axios";
+import api from "../utils/api";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -12,7 +12,6 @@ import {
 } from "firebase/storage";
 import { app } from "../firebase";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Profile = () => {
   const fileRef = useRef(null);
@@ -38,10 +37,8 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/profile`, {
-          withCredentials: true,
-        });
-        dispatch(updateProfile(response.data.user));
+        const res = await api.get("/profile");
+        dispatch(updateProfile(res.data.user));
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -135,20 +132,18 @@ const Profile = () => {
         delete updateData.password;
       }
 
-      const response = await axios.put(`${API_URL}/api/profile`, updateData, {
-        withCredentials: true,
-      });
+      const res = await api.put("/profile", updateData);
 
-      if (response.data.success) {
-        dispatch(updateProfile(response.data.user)); // ✅ Update Redux only on success
-        setFormData((prev) => ({ ...prev, ...response.data.user })); // ✅ Update local state
+      if (res.status === "success") {
+        dispatch(updateProfile(res.data.user)); // ✅ Update Redux only on success
+        setFormData((prev) => ({ ...prev, ...res.data.user })); // ✅ Update local state
         toast.success("Profile updated successfully!");
         setImagePercentage(0);
       } else {
-        throw new Error(response.data.message || "Update failed.");
+        throw new Error(res.message || "Update failed.");
       }
     } catch (error) {
-      toast.error(error.response?.data?.error || "An error occurred.");
+      toast.error(error.response?.data?.message || error.response?.data?.error || "An error occurred.");
     } finally {
       setLoading(false);
     }

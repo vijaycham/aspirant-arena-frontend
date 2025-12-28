@@ -15,9 +15,8 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { signOut } from "../redux/user/authSlice";
-import axios from "axios";
+import api from "../utils/api";
 //import SearchBar from "./SearchBar";
-const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -38,11 +37,7 @@ const Header = () => {
   // 🏁 Sign Out Handler
   const handleSignOut = async () => {
     try {
-      await axios.post(
-        `${API_URL}/api/auth/signout`,
-        {},
-        { withCredentials: true }
-      );
+      await api.post("/auth/signout", {});
       // Dispatch Redux action to clear user state
       dispatch(signOut());
 
@@ -67,52 +62,48 @@ const Header = () => {
   // };
 
   return (
-    <header className="bg-peach-200 text-gray-800 shadow-md">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/80 dark:border-gray-800 transition-all duration-300">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <div className="w-40 h-12 rounded-2xl overflow-hidden flex items-center">
-          <Link to="/">
-            <img
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-lg group-hover:shadow-primary/50 transition-all duration-300">
+             <img
               src={logo}
               alt="Aspirant Arena Logo"
-              className="w-full object-cover scale-110 rounded-2xl transition-transform duration-300"
+              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
             />
-          </Link>
-        </div>
-        {/* <SearchBar
-          value={searchQuery}
-          onChange={({ target }) => {
-            SetSearchQuery(target.value);
-          }}
-          handleSearch={handleSearch }
-          onClearSearch={onClearSearch}
-        /> */}
+          </div>
+          <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent hidden sm:block">
+            Aspirant Arena
+          </span>
+        </Link>
 
         {/* 📱 Mobile Menu Button */}
         <button
           onClick={toggleMobileMenu}
-          className="lg:hidden text-2xl focus:outline-none"
+          className="lg:hidden text-2xl text-gray-700 hover:text-primary-600 focus:outline-none transition-colors"
         >
           {mobileMenuOpen ? <FaTimes /> : <FaBars />}
         </button>
 
         {/* 🌍 Navigation Menu */}
         <nav
-          className={`lg:flex items-center space-x-6 ${
+          className={`lg:flex items-center space-x-8 ${
             mobileMenuOpen
-              ? "block absolute top-16 left-48 w-full bg-peach-200 py-4 px-6"
+              ? "absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-b border-gray-100 py-6 px-6 flex flex-col shadow-xl"
               : "hidden lg:flex"
           }`}
         >
-          <ul className="flex flex-col lg:flex-row lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
+          <ul className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-8 text-gray-600 font-medium">
             {/* 🏠 Home */}
             {isAuthenticated && (
               <li>
                 <Link
                   to="/"
-                  className="flex items-center space-x-2 hover:text-orange-600 transition duration-300"
+                  className="flex items-center gap-2 hover:text-primary-600 transition-colors duration-300 relative group"
                 >
-                  <FaHome /> <span>Home</span>
+                  <FaHome className="text-lg" /> <span>Home</span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
                 </Link>
               </li>
             )}
@@ -122,39 +113,42 @@ const Header = () => {
               <li>
                 <Link
                   to="/todo"
-                  className="flex items-center space-x-2 hover:text-orange-600 transition duration-300"
+                  className="flex items-center gap-2 hover:text-primary-600 transition-colors duration-300 relative group"
                 >
-                  <FaTasks /> <span>To-Do</span>
+                  <FaTasks className="text-lg" /> <span>To-Do</span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></span>
                 </Link>
               </li>
             )}
 
             {/* 📝 Notes (Coming Soon) */}
             {isAuthenticated && (
-              <li className="opacity-50 cursor-not-allowed">
-                <div className="flex items-center space-x-2">
-                  <FaStickyNote className="text-gray-500" /> <span>Notes</span>
+              <li className="opacity-50 cursor-not-allowed group relative">
+                <div className="flex items-center gap-2">
+                  <FaStickyNote /> <span>Notes</span>
                 </div>
+                 <span className="absolute -top-3 -right-3 text-[10px] bg-gray-200 px-1.5 py-0.5 rounded text-gray-500">Soon</span>
               </li>
             )}
 
             {/* ⏳ Timer (Coming Soon) */}
             {isAuthenticated && (
-              <li className="opacity-50 cursor-not-allowed">
-                <div className="flex items-center space-x-2">
-                  <FaClock className="text-gray-500" /> <span>Timer</span>
+              <li className="opacity-50 cursor-not-allowed group relative">
+                <div className="flex items-center gap-2">
+                  <FaClock /> <span>Timer</span>
                 </div>
+                <span className="absolute -top-3 -right-3 text-[10px] bg-gray-200 px-1.5 py-0.5 rounded text-gray-500">Soon</span>
               </li>
             )}
 
-            {/* ℹ️ About Us - Only on Sign In / Sign Up pages */}
+            {/* ℹ️ About Us */}
             {!isAuthenticated &&
               (location.pathname === "/signin" ||
                 location.pathname === "/signup") && (
                 <li>
                   <Link
                     to="/about"
-                    className="flex items-center space-x-2 hover:text-orange-600 transition duration-300"
+                    className="flex items-center gap-2 hover:text-primary-600 transition-colors duration-300"
                   >
                     <FaInfoCircle /> <span>About Us</span>
                   </Link>
@@ -166,16 +160,16 @@ const Header = () => {
               <li>
                 <Link
                   to="/profile"
-                  className="hover:text-orange-600 transition duration-300"
+                  className="block p-0.5 rounded-full border-2 border-transparent hover:border-primary-500 transition-all"
                 >
                   {user.photoUrl ? (
                     <img
                       src={user.photoUrl}
                       alt="User"
-                      className="w-10 h-10 object-cover rounded-full border-2"
+                      className="w-9 h-9 object-cover rounded-full"
                     />
                   ) : (
-                    <FaUserCircle className="text-3xl text-gray-700" />
+                    <FaUserCircle className="text-3xl text-gray-400 hover:text-primary-600 transition-colors" />
                   )}
                 </Link>
               </li>
@@ -183,19 +177,19 @@ const Header = () => {
           </ul>
 
           {/* 🔑 Sign In / Out Buttons */}
-          <div className="mt-4 lg:mt-0">
+          <div className="mt-6 lg:mt-0 flex flex-col lg:flex-row gap-4">
             {!isAuthenticated ? (
               location.pathname === "/signin" ? (
                 <Link
                   to="/signup"
-                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition duration-300 text-sm font-semibold"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-secondary-600 text-white font-medium shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 hover:scale-[1.02] active:scale-95 transition-all duration-300 text-center"
                 >
-                  Sign Up
+                  Get Started
                 </Link>
               ) : (
                 <Link
                   to="/signin"
-                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition duration-300 text-sm font-semibold"
+                  className="px-6 py-2.5 rounded-xl bg-white text-gray-700 border border-gray-200 font-medium hover:bg-gray-50 hover:text-primary-600 transition-all duration-300 text-center"
                 >
                   Sign In
                 </Link>
@@ -203,7 +197,7 @@ const Header = () => {
             ) : (
               <button
                 onClick={handleSignOut}
-                className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300 text-sm font-semibold"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-all duration-300 font-medium"
               >
                 <FaSignOutAlt />
                 <span>Sign Out</span>
