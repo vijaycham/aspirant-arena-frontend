@@ -66,7 +66,7 @@ const Header = () => {
             <nav className="hidden lg:flex items-center gap-8 font-bold text-sm tracking-tight text-white/80">
               <Link to="/" className="hover:text-primary-400 transition-colors">Home</Link>
               <Link to="/test-tracker" className="hover:text-primary-400 transition-colors">Analytics</Link>
-              <Link to="/todo" className="hover:text-primary-400 transition-colors">Tasks</Link>
+              <Link to="/tasks" className="hover:text-primary-400 transition-colors">Tasks</Link>
               <div className="h-4 w-px bg-white/10 mx-2" />
               <Link
                 to="/profile"
@@ -169,7 +169,7 @@ const Header = () => {
                   </div>
                 </Link>
 
-                <Link to="/todo" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
+                <Link to="/tasks" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
                   <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-secondary-500/10 text-secondary-400 group-hover:bg-secondary-500 group-hover:text-white transition-all shadow-lg shadow-secondary-500/10">
                     <FaTasks />
                   </div>

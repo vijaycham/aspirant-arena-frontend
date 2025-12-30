@@ -60,7 +60,7 @@ const Footer = () => {
                 <Link to="/test-tracker" className="text-sm font-bold text-gray-400 hover:text-white flex items-center justify-center md:justify-start gap-3 transition-colors group">
                   <FaChartLine className="opacity-40 group-hover:opacity-100 transition-opacity" /> Analytics
                 </Link>
-                <Link to="/todo" className="text-sm font-bold text-gray-400 hover:text-white flex items-center justify-center md:justify-start gap-3 transition-colors group">
+                <Link to="/tasks" className="text-sm font-bold text-gray-400 hover:text-white flex items-center justify-center md:justify-start gap-3 transition-colors group">
                   <FaTasks className="opacity-40 group-hover:opacity-100 transition-opacity" /> Task Manager
                 </Link>
               </nav>

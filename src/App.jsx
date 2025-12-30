@@ -6,7 +6,7 @@ import Feedback from "./pages/Feedback";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
-import ToDO from "./pages/ToDO";
+import Tasks from "./pages/Tasks";
 import Notes from "./pages/Notes";
 import Timer from "./pages/Timer";
 import TestTracker from "./pages/TestTracker";
@@ -36,7 +36,7 @@ const App = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
 
-          <Route path="/todo" element={<ToDO />} />
+          <Route path="/tasks" element={<Tasks />} />
           <Route path="/notes" element={<Notes />} />
           <Route path="/timer" element={<Timer />} />
           <Route path="/test-tracker" element={<TestTracker />} />

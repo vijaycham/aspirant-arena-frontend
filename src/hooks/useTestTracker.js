@@ -99,10 +99,10 @@ const useTestTracker = () => {
         if (payload.conceptualErrors > 0) {
           try {
             // Smart Consolidation Logic
-            const todosRes = await api.get("/todo");
-            const existingTodos = todosRes.data.todos || [];
+            const tasksRes = await api.get("/tasks");
+            const existingTasks = tasksRes.data.tasks || [];
             
-            const existingRevision = existingTodos.find(t => 
+            const existingRevision = existingTasks.find(t => 
               !t.completed && t.text.startsWith(`Revise conceptual errors: ${payload.subject}`)
             );
 
@@ -112,11 +112,11 @@ const useTestTracker = () => {
                 ? existingRevision.text 
                 : `${existingRevision.text}, ${payload.testName}`;
               
-              await api.put(`/todo/${existingRevision._id}`, { text: newText });
+              await api.put(`/tasks/${existingRevision._id}`, { text: newText });
               toast.success(`Updated ${payload.subject} revision task! 📚`);
             } else {
               // Create new task if none exists
-              await api.post("/todo", {
+              await api.post("/tasks", {
                 text: `Revise conceptual errors: ${payload.subject} (${payload.testName})`,
                 priority: "high",
                 dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),

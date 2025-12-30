@@ -45,18 +45,18 @@ const getStrategyNote = (stats) => {
 const Home = () => {
   const { currentUser: user } = useSelector((state) => state.user);
   const [stats, setStats] = useState(null);
-  const [todos, setTodos] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
     if (user) {
       const fetchHomeStats = async () => {
         try {
-          const [testsRes, todosRes] = await Promise.all([
+          const [testsRes, tasksRes] = await Promise.all([
             api.get("/test"),
-            api.get("/todo")
+            api.get("/tasks")
           ]);
           
-          const todoItems = todosRes?.data?.todos || [];
+          const taskItems = tasksRes?.data?.tasks || [];
           const tests = testsRes?.data?.tests || [];
           
           const avgAcc = tests.length > 0 
@@ -66,17 +66,17 @@ const Home = () => {
           setStats({
             count: tests.length,
             accuracy: avgAcc,
-            pendingRevisions: todoItems.filter(t => !t.completed && t.text.includes("Revise conceptual errors")).length
+            pendingRevisions: taskItems.filter(t => !t.completed && t.text.includes("Revise conceptual errors")).length
           });
           const priorityWeight = { high: 3, medium: 2, low: 1 };
-          const sortedTodos = todoItems
+          const sortedTasks = taskItems
             .filter(t => !t.completed)
             .sort((a, b) => {
               const weightA = priorityWeight[a.priority] || 0;
               const weightB = priorityWeight[b.priority] || 0;
               return weightB - weightA;
             });
-          setTodos(sortedTodos.slice(0, 3));
+          setTasks(sortedTasks.slice(0, 3));
         } catch (err) {
           console.error("Failed to load dashboard stats", err);
         }
@@ -125,7 +125,7 @@ const Home = () => {
               Analyze Your Performance 📈
             </Link>
             <Link
-              to="/todo"
+              to="/tasks"
               className="px-8 py-4 rounded-[2rem] bg-white text-gray-900 font-black border border-gray-100 shadow-sm hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 flex items-center justify-center gap-2 text-sm md:text-base"
             >
               Manage Tasks 📝
@@ -182,11 +182,11 @@ const Home = () => {
                          <Shimmer variant="bar" className="h-12" />
                          <Shimmer variant="bar" className="h-12 w-5/6" />
                        </>
-                     ) : todos.length > 0 ? (
-                       todos.map((t) => (
+                     ) : tasks.length > 0 ? (
+                       tasks.map((t) => (
                          <Link
                            key={t._id}
-                           to={t.text.includes("conceptual errors") ? "/test-tracker" : "/todo"}
+                           to={t.text.includes("conceptual errors") ? "/test-tracker" : "/tasks"}
                            className="flex items-center gap-3 bg-white/50 hover:bg-white backdrop-blur-sm p-3 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-100 hover:scale-[1.02] active:scale-95 transition-all group"
                          >
                            <div

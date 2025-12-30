@@ -2,33 +2,33 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import api from "../utils/api";
 import {
-  setTodos,
-  addTodo,
-  removeTodo,
-  toggleTodo,
-} from "../redux/slice/todoSlice";
+  setTasks,
+  addTask as addTaskAction,
+  removeTask as removeTaskAction,
+  toggleTask as toggleTaskAction,
+} from "../redux/slice/taskSlice";
 import { useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
-const ToDo = () => {
+const Tasks = () => {
   const dispatch = useDispatch();
-  const todos = useSelector((state) => state.todo.todos || []);
+  const tasks = useSelector((state) => state.task.tasks || []);
   const user = useSelector((state) => state.user.currentUser);
   const loading = useSelector((state) => state.user.loading);
   const [task, setTask] = useState("");
   const [priority, setPriority] = useState("medium");
   const [dueDate, setDueDate] = useState("");
 
-  const fetchTodos = useCallback(async () => {
+  const fetchTasks = useCallback(async () => {
     try {
-      const res = await api.get("/todo");
-      // res is { status: "success", results: ..., data: { todos: [...] } }
-      if (res.data && res.data.todos && Array.isArray(res.data.todos)) {
-        dispatch(setTodos(res.data.todos));
+      const res = await api.get("/tasks");
+      // res is { status: "success", results: ..., data: { tasks: [...] } }
+      if (res.data && res.data.tasks && Array.isArray(res.data.tasks)) {
+        dispatch(setTasks(res.data.tasks));
       } else {
         console.error("Unexpected API response:", res);
-        dispatch(setTodos([]));
+        dispatch(setTasks([]));
       }
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -38,21 +38,21 @@ const ToDo = () => {
 
   useEffect(() => {
     if (user && !loading) {
-      fetchTodos();
+      fetchTasks();
     }
-  }, [user, loading, fetchTodos]);
+  }, [user, loading, fetchTasks]);
 
   const addTask = async () => {
     const trimmedTask = task.trim();
     if (!trimmedTask) return;
     try {
-      const res = await api.post("/todo", {
+      const res = await api.post("/tasks", {
         text: trimmedTask,
         priority,
         dueDate: dueDate || undefined,
       });
-      // backend returns { status: "success", data: { todo: ... } }
-      dispatch(addTodo(res.data.todo));
+      // backend returns { status: "success", data: { task: ... } }
+      dispatch(addTaskAction(res.data.task));
       setTask("");
       setPriority("medium");
       setDueDate("");
@@ -72,11 +72,11 @@ const ToDo = () => {
 
   const toggleTask = async (id, currentStatus) => {
     try {
-      const res = await api.patch(`/todo/${id}`, {
+      const res = await api.patch(`/tasks/${id}`, {
         completed: !currentStatus,
       });
-      // backend returns { status: "success", data: { todo: ... } }
-      dispatch(toggleTodo(res.data.todo));
+      // backend returns { status: "success", data: { task: ... } }
+      dispatch(toggleTaskAction(res.data.task));
       toast.success("Task status updated!");
     } catch (error) {
       console.error("Error toggling task:", error);
@@ -86,8 +86,8 @@ const ToDo = () => {
 
   const removeTask = async (id) => {
     try {
-      await api.delete(`/todo/${id}`);
-      dispatch(removeTodo(id));
+      await api.delete(`/tasks/${id}`);
+      dispatch(removeTaskAction(id));
       toast.success("Task removed!");
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -182,7 +182,7 @@ const ToDo = () => {
           <div className="flex items-center justify-between px-2">
              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Roadmap</h3>
              <span className="text-[10px] font-black text-primary-600 bg-primary-50 px-3 py-1 rounded-full uppercase italic">
-               {todos.length} Focus Points
+               {tasks.length} Focus Points
              </span>
           </div>
 
@@ -191,7 +191,7 @@ const ToDo = () => {
                <div className="w-12 h-12 border-4 border-gray-100 border-t-primary-600 rounded-full animate-spin"></div>
                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest animate-pulse">Synchronizing Workspace...</p>
             </div>
-          ) : todos.length === 0 ? (
+          ) : tasks.length === 0 ? (
             <div className="text-center py-20 px-8 bg-white/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center gap-4">
               <span className="text-4xl">🏝️</span>
               <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">Your agenda is clear. Ready for deep work?</p>
@@ -199,14 +199,14 @@ const ToDo = () => {
           ) : (
             <ul className="space-y-3 md:space-y-4">
               <AnimatePresence initial={false}>
-                {todos.map((todo) => (
+                {tasks.map((taskItem) => (
                   <motion.li
-                    key={todo._id}
+                    key={taskItem._id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     className={`flex items-center justify-between p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 transition-all group ${
-                      todo.completed 
+                      taskItem.completed 
                         ? "bg-gray-50/50 border-transparent opacity-60" 
                         : "bg-white border-white shadow-sm hover:shadow-xl hover:shadow-gray-200/50 hover:border-primary-100"
                     }`}
@@ -215,32 +215,32 @@ const ToDo = () => {
                       <div className="relative flex items-center justify-center">
                         <input
                           type="checkbox"
-                          checked={todo.completed}
-                          onChange={() => toggleTask(todo._id, todo.completed)}
+                          checked={taskItem.completed}
+                          onChange={() => toggleTask(taskItem._id, taskItem.completed)}
                           className="w-6 h-6 rounded-lg border-2 border-gray-200 text-primary-600 focus:ring-primary-500 cursor-pointer transition-all peer opacity-0 absolute z-10"
                         />
                         <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
-                          todo.completed ? "bg-primary-600 border-primary-600" : "bg-white border-gray-200 peer-hover:border-primary-300"
+                          taskItem.completed ? "bg-primary-600 border-primary-600" : "bg-white border-gray-200 peer-hover:border-primary-300"
                         }`}>
-                          {todo.completed && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}
+                          {taskItem.completed && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}
                         </div>
                       </div>
                       
                       <div className="flex flex-col gap-1 min-w-0">
                         <span
                           className={`text-sm md:text-base transition-all truncate ${
-                            todo.completed ? "line-through text-gray-400" : "text-gray-900 font-black tracking-tight"
+                            taskItem.completed ? "line-through text-gray-400" : "text-gray-900 font-black tracking-tight"
                           }`}
                         >
-                          {todo.text}
+                          {taskItem.text}
                         </span>
                         <div className="flex items-center gap-3">
-                          <span className={`text-[8px] uppercase font-black px-2.5 py-1 rounded-[0.75rem] border-2 shadow-sm ${getPriorityColor(todo.priority)}`}>
-                            {todo.priority}
+                          <span className={`text-[8px] uppercase font-black px-2.5 py-1 rounded-[0.75rem] border-2 shadow-sm ${getPriorityColor(taskItem.priority)}`}>
+                            {taskItem.priority}
                           </span>
-                          {todo.dueDate && (
+                          {taskItem.dueDate && (
                             <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                              <span className="text-xs opacity-50">📅</span> {new Date(todo.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                              <span className="text-xs opacity-50">📅</span> {new Date(taskItem.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                             </span>
                           )}
                         </div>
@@ -248,7 +248,7 @@ const ToDo = () => {
                     </div>
                     
                     <button
-                      onClick={() => removeTask(todo._id)}
+                      onClick={() => removeTask(taskItem._id)}
                       className="ml-4 p-3 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all group-hover:opacity-100 opacity-0 lg:opacity-30"
                       title="Archive task"
                     >
@@ -267,4 +267,4 @@ const ToDo = () => {
   );
 };
 
-export default ToDo;
+export default Tasks;
