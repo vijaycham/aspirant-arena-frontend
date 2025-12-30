@@ -44,6 +44,7 @@ export default [
         ...globals.browser,
         ...globals.jest, // Use Jest globals for tests
         vi: 'readonly', // Vitest global
+        global: 'readonly', // Global object
       },
     },
   },

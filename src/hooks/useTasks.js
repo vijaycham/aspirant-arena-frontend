@@ -72,7 +72,7 @@ export const useTasks = () => {
       setTask("");
       setPriority("medium");
       setDueDate("");
-    } catch (error) {
+    } catch {
       toast.error("Operation failed.");
     }
   };
@@ -107,7 +107,7 @@ export const useTasks = () => {
       });
       dispatch(toggleTaskAction(res.data.task));
       toast.success(!currentStatus ? "Task completed & archived! 🎯" : "Task restored!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update status.");
     }
   };
@@ -129,7 +129,7 @@ export const useTasks = () => {
       dispatch(clearArchived());
       toast.success("Archive cleared!");
       setShowDeleteModal(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to clear archive.");
       setShowDeleteModal(false);
     }

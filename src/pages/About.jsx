@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaCheckCircle, FaLightbulb, FaClock, FaRocket, FaShieldAlt, FaChartBar } from "react-icons/fa";
+import {FaRocket, FaShieldAlt, FaChartBar } from "react-icons/fa";
 
 const AboutUs = () => {
   return (
