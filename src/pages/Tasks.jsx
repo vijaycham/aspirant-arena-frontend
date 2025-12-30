@@ -3,9 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import api from "../utils/api";
 import {
   setTasks,
+  setArchivedTasks,
   addTask as addTaskAction,
   removeTask as removeTaskAction,
   toggleTask as toggleTaskAction,
+  updateTask,
+  clearArchived,
 } from "../redux/slice/taskSlice";
 import { useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,25 +17,27 @@ import toast from "react-hot-toast";
 const Tasks = () => {
   const dispatch = useDispatch();
   const tasks = useSelector((state) => state.task.tasks || []);
+  const archivedTasks = useSelector((state) => state.task.archivedTasks || []);
   const user = useSelector((state) => state.user.currentUser);
   const loading = useSelector((state) => state.user.loading);
   const [task, setTask] = useState("");
   const [priority, setPriority] = useState("medium");
   const [dueDate, setDueDate] = useState("");
+  const [editingTask, setEditingTask] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const fetchTasks = useCallback(async () => {
     try {
-      const res = await api.get("/tasks");
-      // res is { status: "success", results: ..., data: { tasks: [...] } }
-      if (res.data && res.data.tasks && Array.isArray(res.data.tasks)) {
-        dispatch(setTasks(res.data.tasks));
-      } else {
-        console.error("Unexpected API response:", res);
-        dispatch(setTasks([]));
-      }
+      const [activeRes, archivedRes] = await Promise.all([
+        api.get("/tasks"),
+        api.get("/tasks/archived")
+      ]);
+      if (activeRes.data?.tasks) dispatch(setTasks(activeRes.data.tasks));
+      if (archivedRes.data?.tasks) dispatch(setArchivedTasks(archivedRes.data.tasks));
     } catch (error) {
       console.error("Error fetching tasks:", error);
-      toast.error(error.response?.data?.message || "Failed to load tasks.");
+      toast.error("Failed to load tasks.");
     }
   }, [dispatch]);
 
@@ -46,21 +51,45 @@ const Tasks = () => {
     const trimmedTask = task.trim();
     if (!trimmedTask) return;
     try {
-      const res = await api.post("/tasks", {
-        text: trimmedTask,
-        priority,
-        dueDate: dueDate || undefined,
-      });
-      // backend returns { status: "success", data: { task: ... } }
-      dispatch(addTaskAction(res.data.task));
+      if (editingTask) {
+        const res = await api.patch(`/tasks/${editingTask._id}`, {
+          text: trimmedTask,
+          priority,
+          dueDate: dueDate || undefined,
+        });
+        dispatch(updateTask(res.data.task));
+        toast.success("Task updated!");
+        setEditingTask(null);
+      } else {
+        const res = await api.post("/tasks", {
+          text: trimmedTask,
+          priority,
+          dueDate: dueDate || undefined,
+        });
+        dispatch(addTaskAction(res.data.task));
+        toast.success("Task added!");
+      }
       setTask("");
       setPriority("medium");
       setDueDate("");
-      toast.success("Task added successfully!");
     } catch (error) {
-      console.error("Error adding task:", error);
-      toast.error(error.response?.data?.message || "Failed to add task.");
+      toast.error("Operation failed.");
     }
+  };
+
+  const startEditing = (taskItem) => {
+    setEditingTask(taskItem);
+    setTask(taskItem.text);
+    setPriority(taskItem.priority);
+    setDueDate(taskItem.dueDate ? new Date(taskItem.dueDate).toISOString().split("T")[0] : "");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const cancelEditing = () => {
+    setEditingTask(null);
+    setTask("");
+    setPriority("medium");
+    setDueDate("");
   };
 
   const handleKeyDown = (event) => {
@@ -74,13 +103,12 @@ const Tasks = () => {
     try {
       const res = await api.patch(`/tasks/${id}`, {
         completed: !currentStatus,
+        isArchived: !currentStatus, // Automatically archive on completion
       });
-      // backend returns { status: "success", data: { task: ... } }
       dispatch(toggleTaskAction(res.data.task));
-      toast.success("Task status updated!");
+      toast.success(!currentStatus ? "Task completed & archived! 🎯" : "Task restored!");
     } catch (error) {
-      console.error("Error toggling task:", error);
-      toast.error(error.response?.data?.message || "Failed to update task.");
+      toast.error("Failed to update status.");
     }
   };
 
@@ -97,16 +125,36 @@ const Tasks = () => {
 
   const getPriorityColor = (p) => {
     switch (p) {
-      case "high":
-        return "text-red-500 bg-red-50 border-red-100";
-      case "medium":
-        return "text-amber-500 bg-amber-50 border-amber-100";
-      case "low":
-        return "text-green-500 bg-green-50 border-green-100";
-      default:
-        return "text-gray-500 bg-gray-50 border-gray-100";
+      case "high": return "text-red-500 bg-red-50 border-red-100";
+      case "medium": return "text-amber-500 bg-amber-50 border-amber-100";
+      case "low": return "text-green-500 bg-green-50 border-green-100";
+      default: return "text-gray-500 bg-gray-50 border-gray-100";
     }
   };
+
+  const confirmClearArchive = async () => {
+    try {
+      await api.delete("/tasks/archived");
+      dispatch(clearArchived());
+      toast.success("Archive cleared!");
+      setShowDeleteModal(false);
+    } catch (error) {
+      toast.error("Failed to clear archive.");
+      setShowDeleteModal(false);
+    }
+  };
+
+  const clearAllArchived = () => {
+    setShowDeleteModal(true);
+  };
+
+  const sortedTasks = [...tasks].sort((a, b) => {
+    const pWeight = { high: 1, medium: 2, low: 3 };
+    if (pWeight[a.priority] !== pWeight[b.priority]) {
+      return pWeight[a.priority] - pWeight[b.priority];
+    }
+    return new Date(a.dueDate || "9999") - new Date(b.dueDate || "9999");
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pt-20 px-4 sm:px-6 lg:px-8 font-outfit relative">
@@ -171,8 +219,16 @@ const Tasks = () => {
                 onClick={addTask}
                 className="w-full md:w-auto px-10 py-3.5 bg-gray-900 text-white font-black rounded-2xl hover:bg-black hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-gray-200 uppercase tracking-widest text-xs"
               >
-                Add Task
+                {editingTask ? "Update Task" : "Add Task"}
               </button>
+              {editingTask && (
+                <button
+                  onClick={cancelEditing}
+                  className="w-full md:w-auto px-10 py-3.5 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-all uppercase tracking-widest text-xs"
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -199,7 +255,7 @@ const Tasks = () => {
           ) : (
             <ul className="space-y-3 md:space-y-4">
               <AnimatePresence initial={false}>
-                {tasks.map((taskItem) => (
+                {sortedTasks.map((taskItem) => (
                   <motion.li
                     key={taskItem._id}
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -247,22 +303,130 @@ const Tasks = () => {
                       </div>
                     </div>
                     
-                    <button
-                      onClick={() => removeTask(taskItem._id)}
-                      className="ml-4 p-3 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all group-hover:opacity-100 opacity-0 lg:opacity-30"
-                      title="Archive task"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => startEditing(taskItem)}
+                        className="p-3 text-gray-300 hover:text-primary-600 hover:bg-primary-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                        title="Edit task"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => removeTask(taskItem._id)}
+                        className="p-3 text-gray-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100"
+                        title="Delete task"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </motion.li>
                 ))}
               </AnimatePresence>
             </ul>
           )}
         </div>
+
+        {/* Archived Section */}
+        {archivedTasks.length > 0 && (
+          <div className="space-y-4 pt-8 border-t border-gray-100">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setShowArchived(!showArchived)}
+                className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors"
+              >
+                {showArchived ? "▼" : "▶"} Archived Tasks ({archivedTasks.length})
+              </button>
+              
+              {showArchived && (
+                <button
+                  onClick={clearAllArchived}
+                  className="text-[10px] font-black text-rose-500 hover:text-rose-600 uppercase tracking-widest bg-rose-50 px-3 py-1 rounded-lg transition-all"
+                >
+                  Clear Archive
+                </button>
+              )}
+            </div>
+            
+            <AnimatePresence>
+              {showArchived && (
+                <motion.ul
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="space-y-3 overflow-hidden"
+                >
+                  {archivedTasks.map((taskItem) => (
+                    <li
+                      key={taskItem._id}
+                      className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 border border-transparent opacity-60"
+                    >
+                      <div className="flex items-center gap-4">
+                        <span className="text-emerald-500 italic">✓</span>
+                        <span className="text-sm text-gray-500 line-through font-medium">{taskItem.text}</span>
+                      </div>
+                      <button
+                        onClick={() => toggleTask(taskItem._id, true)}
+                        className="text-[10px] font-black text-primary-600 hover:underline uppercase tracking-widest"
+                      >
+                        Restore
+                      </button>
+                    </li>
+                  ))}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
+
+      {/* Custom Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowDeleteModal(false)}
+              className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl border border-gray-100 text-center space-y-6"
+            >
+              <div className="w-16 h-16 bg-rose-50 rounded-2xl mx-auto flex items-center justify-center text-2xl">
+                ⚠️
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter">Arena Cleanup</h3>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                  Are you sure you want to permanently delete all archived tasks? This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={confirmClearArchive}
+                  className="w-full py-4 bg-gray-900 text-white font-black rounded-2xl hover:bg-black transition-all uppercase tracking-widest text-xs"
+                >
+                  Yes, Clear Everything
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="w-full py-4 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-all uppercase tracking-widest text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
