@@ -1,9 +1,7 @@
-import React from "react";
-import { Link } from "react-router-dom";
 import { HiLockClosed, HiShieldCheck } from "react-icons/hi";
 import { motion } from "framer-motion";
 
-const LockedOverlay = ({ message, variantHeight = "full" }) => {
+const LockedOverlay = ({ message }) => {
   return (
     <motion.div 
       initial={{ opacity: 0 }}

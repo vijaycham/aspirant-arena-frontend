@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { HiOutlineMail, HiInformationCircle, HiCheckCircle } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../utils/api";
@@ -99,7 +99,7 @@ const VerificationBanner = () => {
                 <span className="text-rose-600 font-bold"> Grace period expired! Features are locked.</span>
               )} 
               <span className="block text-[10px] opacity-70 italic font-bold uppercase tracking-wider mt-1">
-                (Don't forget to check your Spam folder! 📥)
+                (Don&apos;t forget to check your Spam folder! 📥)
               </span>
             </p>
           </div>

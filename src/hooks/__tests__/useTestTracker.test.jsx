@@ -1,7 +1,25 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
 import useTestTracker from "../useTestTracker";
+import authReducer from "../../redux/user/authSlice";
 import api from "../../utils/api";
+
+const createMockStore = (currentUser = { _id: "123", isEmailVerified: true }) => {
+  return configureStore({
+    reducer: {
+      user: authReducer,
+    },
+    preloadedState: {
+      user: { currentUser, loading: false, error: null },
+    },
+  });
+};
+
+const wrapper = ({ children, store }) => (
+  <Provider store={store}>{children}</Provider>
+);
 
 // Mock API
 vi.mock("../../utils/api", () => ({
@@ -48,7 +66,10 @@ describe("useTestTracker hook", () => {
   });
 
   it("should fetch data on mount", async () => {
-    const { result } = renderHook(() => useTestTracker());
+    const store = createMockStore();
+    const { result } = renderHook(() => useTestTracker(), {
+      wrapper: (props) => wrapper({ ...props, store })
+    });
 
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
@@ -59,7 +80,10 @@ describe("useTestTracker hook", () => {
   });
 
   it("should calculate quickStats correctly", async () => {
-    const { result } = renderHook(() => useTestTracker());
+    const store = createMockStore();
+    const { result } = renderHook(() => useTestTracker(), {
+      wrapper: (props) => wrapper({ ...props, store })
+    });
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -70,7 +94,10 @@ describe("useTestTracker hook", () => {
   });
 
   it("should handle subject filter changes", async () => {
-    const { result } = renderHook(() => useTestTracker());
+    const store = createMockStore();
+    const { result } = renderHook(() => useTestTracker(), {
+      wrapper: (props) => wrapper({ ...props, store })
+    });
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
@@ -83,7 +110,10 @@ describe("useTestTracker hook", () => {
   });
 
   it("should calculate marksLost and accountedMarks correctly", async () => {
-    const { result } = renderHook(() => useTestTracker());
+    const store = createMockStore();
+    const { result } = renderHook(() => useTestTracker(), {
+      wrapper: (props) => wrapper({ ...props, store })
+    });
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 

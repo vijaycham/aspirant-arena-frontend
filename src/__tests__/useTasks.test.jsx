@@ -26,7 +26,7 @@ const createMockStore = (initialState = {}) => {
       user: authReducer,
     },
     preloadedState: {
-      user: { currentUser: { _id: '123' }, loading: false },
+      user: { currentUser: { _id: '123', isEmailVerified: true }, loading: false },
       ...initialState,
     },
   });
