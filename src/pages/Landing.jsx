@@ -1,8 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { FaRocket, FaShieldAlt, FaChartBar, FaAngleRight, FaCheck } from "react-icons/fa";
 import logo from "../../assets/3.png";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 const Landing = () => {
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "true") {
+      toast.success("Email verified successfully! You can now sign in to your account.", {
+        id: "verify-success-landing",
+        duration: 6000,
+      });
+    }
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen relative bg-gray-50 flex flex-col font-outfit overflow-x-hidden">
       {/* Background Decor */}

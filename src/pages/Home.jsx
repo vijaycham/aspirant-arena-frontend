@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../utils/api";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { updateProfile } from "../redux/user/authSlice";
+import toast from "react-hot-toast";
 import Shimmer from "../components/Shimmer";
 import LockedOverlay from "../components/LockedOverlay";
 import { hasAccess } from "../utils/auth/verifyHelpers";
@@ -46,6 +48,8 @@ const getStrategyNote = (stats) => {
 
 const Home = () => {
   const { currentUser: user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   const [stats, setStats] = useState(null);
   const [tasks, setTasks] = useState([]);
 
@@ -87,6 +91,29 @@ const Home = () => {
       fetchHomeStats();
     }
   }, [user]);
+
+  // Handle successful verification redirect
+  useEffect(() => {
+    if (searchParams.get("verified") === "true") {
+      toast.success("Email verified successfully! Welcome to the Arena.", {
+        id: "verify-success",
+        duration: 5000,
+      });
+      // Sync profile to remove banner/unlock features if state is stale
+      const syncProfile = async () => {
+        if (!user) return;
+        try {
+          const res = await api.get("/profile");
+          if (res.status === "success" && res.data.user) {
+            dispatch(updateProfile(res.data.user));
+          }
+        } catch (err) {
+          console.error("Sync failed", err);
+        }
+      };
+      syncProfile();
+    }
+  }, [searchParams, dispatch, user]);
 
   const strategy = getStrategyNote(stats);
 

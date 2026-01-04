@@ -5,9 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import api from "../utils/api";
 import toast from "react-hot-toast";
 import { getRemainingGraceHours } from "../utils/auth/verifyHelpers";
+import { useDispatch } from "react-redux";
+import { updateProfile } from "../redux/user/authSlice";
 
 const VerificationBanner = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
@@ -55,6 +58,13 @@ const VerificationBanner = () => {
     try {
       setLoading(true);
       const res = await api.post("/auth/resend-verification");
+      
+      if (res.status === "synced") {
+        dispatch(updateProfile(res.userProfile));
+        toast.success("Your email is already verified! Welcome back.");
+        return;
+      }
+
       toast.success(res.message || "Verification link sent to your email!");
 
       const expiry = Date.now() + 60000;
