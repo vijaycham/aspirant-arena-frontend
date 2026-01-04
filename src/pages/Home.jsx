@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import api from "../utils/api";
 import { useSelector } from "react-redux";
 import Shimmer from "../components/Shimmer";
+import LockedOverlay from "../components/LockedOverlay";
+import { hasAccess } from "../utils/auth/verifyHelpers";
 
 const getStrategyNote = (stats) => {
   if (!stats) return null;
@@ -48,7 +50,8 @@ const Home = () => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    if (user) {
+    // 🛡️ Only fetch if user has access (verified or within grace period)
+    if (user && hasAccess(user)) {
       const fetchHomeStats = async () => {
         try {
           const [testsRes, tasksRes] = await Promise.all([
@@ -138,7 +141,13 @@ const Home = () => {
           {user ? (
             <div className="space-y-6">
               {/* Stats Card */}
-              <div className="bg-white p-8 rounded-[3rem] shadow-2xl shadow-gray-200 border border-gray-100 scale-100 lg:scale-105 transition-transform hover:rotate-1">
+              <div className={`relative bg-white p-8 rounded-[3rem] shadow-2xl shadow-gray-200 border border-gray-100 scale-100 lg:scale-105 transition-transform hover:rotate-1 overflow-hidden`}>
+                
+                {/* 🔒 Locked State only if grace period EXPIRED and unverified */}
+                {user && !hasAccess(user) && (
+                   <LockedOverlay />
+                )}
+
                 <div className="flex justify-between items-start mb-8">
                   <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter">Live Progress</h3>
                   <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-black italic">!</div>
@@ -151,6 +160,8 @@ const Home = () => {
                       <span className="text-4xl font-black text-primary-600 animate-fade-in">
                         {stats.accuracy}%
                       </span>
+                    ) : user && !hasAccess(user) ? (
+                      <span className="text-4xl font-black text-gray-200">0%</span>
                     ) : (
                       <Shimmer variant="stats" className="mt-1" />
                     )}
@@ -161,6 +172,8 @@ const Home = () => {
                       <span className="text-4xl font-black text-gray-900 animate-fade-in">
                         {stats.count}
                       </span>
+                    ) : user && !hasAccess(user) ? (
+                      <span className="text-4xl font-black text-gray-200">0</span>
                     ) : (
                       <Shimmer variant="stats" className="mt-1" />
                     )}
@@ -177,7 +190,7 @@ const Home = () => {
                 <div className="mt-10 pt-8 border-t border-gray-100/50">
                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Urgent Revision Tasks</span>
                    <div className="space-y-3">
-                     {!stats ? (
+                     {!stats && (!user || hasAccess(user)) ? (
                        <>
                          <Shimmer variant="bar" className="h-12" />
                          <Shimmer variant="bar" className="h-12 w-5/6" />

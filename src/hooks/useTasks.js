@@ -12,6 +12,7 @@ import {
 } from "../redux/slice/taskSlice";
 import toast from "react-hot-toast";
 import { sortTasks } from "../utils/tasks/taskHelpers";
+import { hasAccess } from "../utils/auth/verifyHelpers";
 
 export const useTasks = () => {
   const dispatch = useDispatch();
@@ -42,7 +43,8 @@ export const useTasks = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (user && !loading) {
+    // 🛡️ Guard: Only fetch if user has access (verified or within grace period)
+    if (user && !loading && hasAccess(user)) {
       fetchTasks();
     }
   }, [user, loading, fetchTasks]);

@@ -10,8 +10,12 @@ import TaskItem from "../components/tasks/TaskItem";
 
 // Utils
 import { getPriorityColor } from "../utils/tasks/taskHelpers";
+import LockedOverlay from "../components/LockedOverlay";
+import { useSelector } from "react-redux";
+import { hasAccess } from "../utils/auth/verifyHelpers";
 
 const Tasks = () => {
+  const { currentUser: user } = useSelector((state) => state.user);
   const {
     tasks,
     archivedTasks,
@@ -47,6 +51,18 @@ const Tasks = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-3xl mx-auto space-y-8 pb-20">
+        
+        {/* 🔒 Full Page Lock ONLY if grace period EXPIRED and unverified */}
+        {user && !hasAccess(user) && (
+          <div className="fixed inset-0 z-[100] mt-16 backdrop-blur-md flex items-center justify-center p-6">
+             <div className="bg-white/80 p-10 rounded-[3rem] shadow-2xl border border-white max-w-md w-full relative">
+                <LockedOverlay message="Grace period expired. Strategic task management is now locked. Please verify your email to continue organizing your preparation journey." />
+                {/* Add a spacer so the overlay content is visible since LockedOverlay is absolute */}
+                <div className="h-[300px]"></div>
+             </div>
+          </div>
+        )}
+        
         <div className="text-center md:text-left">
           <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter flex items-center justify-center md:justify-start gap-4 uppercase">
             Your <span className="text-primary-600 italic">Aspirations</span> 🚀

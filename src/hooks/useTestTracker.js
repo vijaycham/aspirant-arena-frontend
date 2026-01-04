@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import api from "../utils/api";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { hasAccess } from "../utils/auth/verifyHelpers";
 
 const useTestTracker = () => {
+  const user = useSelector((state) => state.user.currentUser);
   const [tests, setTests] = useState([]);
   const [stats, setStats] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -51,8 +54,12 @@ const useTestTracker = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (user && hasAccess(user)) {
+      fetchData();
+    } else if (user && !hasAccess(user)) {
+      setLoading(false); // Stop shimmering for unverified outside grace period
+    }
+  }, [fetchData, user]);
 
   const resetForm = useCallback(() => {
     setFormData({

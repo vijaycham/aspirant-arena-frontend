@@ -8,8 +8,12 @@ import AnalyticsSection from "./TestTrackerComponents/AnalyticsSection";
 import SessionArchive from "./TestTrackerComponents/SessionArchive";
 import InsightModal from "./TestTrackerComponents/Modals/InsightModal";
 import DeleteConfirmModal from "./TestTrackerComponents/Modals/DeleteConfirmModal";
+import LockedOverlay from "../components/LockedOverlay";
+import { useSelector } from "react-redux";
+import { hasAccess } from "../utils/auth/verifyHelpers";
 
 const TestTracker = () => {
+  const { currentUser: user } = useSelector((state) => state.user);
   const {
     stats,
     subjects,
@@ -83,8 +87,18 @@ const TestTracker = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-6 md:mt-8 space-y-6 md:space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-6 md:mt-8 space-y-6 md:space-y-8 relative">
         
+        {/* 🔒 Full Page Lock ONLY if grace period EXPIRED and unverified */}
+        {user && !hasAccess(user) && (
+          <div className="fixed inset-0 z-[100] mt-[88px] md:mt-[112px] backdrop-blur-md flex items-center justify-center p-6">
+             <div className="bg-white/90 p-10 rounded-[4rem] shadow-2xl border border-white max-w-lg w-full relative">
+                <LockedOverlay message="Grace period expired. Advanced data analytics and mock test tracking are now locked. Please verify your email to continue accessing your preparation metrics." />
+                <div className="h-[350px]"></div>
+             </div>
+          </div>
+        )}
+
         {/* Quick Stats Grid */}
         <StatsGrid 
           quickStats={quickStats} 
