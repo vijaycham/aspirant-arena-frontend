@@ -21,6 +21,10 @@ The sleek, modern, and highly interactive frontend for **Aspirant Arena**. Built
 
 ## 🪐 Key Features
 
+- **Trust-Based Verification Flow**: 
+  - **24-Hour Grace Period**: New users get full access for 24 hours to explore the platform before verification is required.
+  - **Locked State UI**: "Premium" blurred overlays and status badges (Verified / Grace Period / Unverified) managed via centralized auth logic.
+  - **Persistent Cooldown**: Smart "Resend Verification" button with a persistent 60s cooldown that survives page refreshes.
 - **Advanced Performance Suite**: High-fidelity dashboard for UPSC aspirants.
   - **Mistake Logger**: Track *Conceptual Errors*, *Silly Mistakes*, and *Time Pressure*.
   - **Unattended Tracker**: Log skipped questions to see the full "Lost Marks" profile.

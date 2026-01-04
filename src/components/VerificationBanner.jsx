@@ -11,7 +11,9 @@ const VerificationBanner = () => {
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
-  // Persistence Key
+  const graceHours = getRemainingGraceHours(currentUser);
+  // Urgent or Expired (Red) if 2 hours or less remains
+  const isUrgent = graceHours <= 2; 
   const storageKey = `resend_cooldown_${currentUser?._id}`;
 
   // Initialize countdown from localStorage on mount
@@ -54,7 +56,7 @@ const VerificationBanner = () => {
       setLoading(true);
       const res = await api.post("/auth/resend-verification");
       toast.success(res.message || "Verification link sent to your email!");
-      
+
       const expiry = Date.now() + 60000;
       localStorage.setItem(storageKey, expiry.toString());
       setCountdown(60); // 60 seconds cooldown
@@ -80,17 +82,19 @@ const VerificationBanner = () => {
         initial={{ height: 0, opacity: 0 }}
         animate={{ height: "auto", opacity: 1 }}
         exit={{ height: 0, opacity: 0 }}
-        className="bg-amber-50 border-b border-amber-100 overflow-hidden font-outfit"
+        className={`border-b overflow-hidden font-outfit relative ${
+          isUrgent ? "bg-rose-50 border-rose-100" : "bg-amber-50 border-amber-100"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-lg text-amber-600">
+            <div className={`p-2 rounded-lg ${isUrgent ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"}`}>
               <HiOutlineMail className="h-5 w-5" />
             </div>
-            <p className="text-sm font-medium text-amber-800">
-              Please <span className="font-bold uppercase tracking-tight text-amber-900">check your inbox</span> at <span className="font-semibold underline">{currentUser.emailId}</span> for the verification link. 
-              {getRemainingGraceHours(currentUser) > 0 ? (
-                <span> You have <span className="font-bold underline">{getRemainingGraceHours(currentUser)} hours</span> left to verify before features are locked.</span>
+            <p className={`text-sm font-medium ${isUrgent ? "text-rose-800" : "text-amber-800"}`}>
+              Please <span className={`font-bold uppercase tracking-tight ${isUrgent ? "text-rose-900" : "text-amber-900"}`}>check your inbox</span> at <span className="font-semibold underline">{currentUser.emailId}</span> for the verification link. 
+              {graceHours > 0 ? (
+                <span> You have <span className="font-bold underline">{graceHours} hours</span> left to verify before features are locked.</span>
               ) : (
                 <span className="text-rose-600 font-bold"> Grace period expired! Features are locked.</span>
               )} 

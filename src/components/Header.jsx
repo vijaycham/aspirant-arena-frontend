@@ -14,9 +14,10 @@ import {
   FaTimes,
   FaChartLine,
 } from "react-icons/fa";
+import { HiCheckCircle, HiXCircle, HiClock } from "react-icons/hi";
 import { signOut } from "../redux/user/authSlice";
 import api from "../utils/api";
-//import SearchBar from "./SearchBar";
+import { getRemainingGraceHours } from "../utils/auth/verifyHelpers";
 
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -67,6 +68,25 @@ const Header = () => {
               <Link to="/" className="hover:text-primary-400 transition-colors">Home</Link>
               <Link to="/test-tracker" className="hover:text-primary-400 transition-colors">Analytics</Link>
               <Link to="/tasks" className="hover:text-primary-400 transition-colors">Tasks</Link>
+              
+              {/* Verification Status Badge */}
+              <div className="flex items-center">
+                {user.isEmailVerified ? (
+                  <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/5">
+                    <HiCheckCircle className="text-sm" /> Verified
+                  </div>
+                ) : (
+                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-lg ${
+                    getRemainingGraceHours(user) > 0 
+                      ? "bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-amber-500/5" 
+                      : "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-rose-500/5"
+                  }`}>
+                    {getRemainingGraceHours(user) > 0 ? <HiClock className="text-sm" /> : <HiXCircle className="text-sm" />}
+                    {getRemainingGraceHours(user) > 0 ? "Grace Period" : "Unverified"}
+                  </div>
+                )}
+              </div>
+
               <div className="h-4 w-px bg-white/10 mx-2" />
               <Link
                 to="/profile"
@@ -204,7 +224,15 @@ const Header = () => {
                       </div>
                     )}
                     <div className="flex flex-col">
-                      <span className="text-sm font-black text-white">{user.firstName || "Aspirant"}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-black text-white">{user.firstName || "Aspirant"}</span>
+                        {/* Mobile Badge */}
+                        {user.isEmailVerified ? (
+                           <HiCheckCircle className="text-emerald-500 text-sm" />
+                        ) : (
+                           <HiClock className={getRemainingGraceHours(user) > 0 ? "text-amber-500 text-sm" : "text-rose-500 text-sm"} />
+                        )}
+                      </div>
                       <span className="text-[10px] text-primary-400 font-black uppercase tracking-widest group-hover:text-primary-300 transition-colors">View Profile &rarr;</span>
                     </div>
                  </Link>
