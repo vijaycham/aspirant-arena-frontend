@@ -5,11 +5,17 @@
  */
 export const hasAccess = (user) => {
   if (!user) return false;
-  if (user.isEmailVerified || user.isVerified) return true;
+  if (user.isEmailVerified) return true;
 
-  // 24-hour grace period
+  // 1. Legacy Support (Grandfathering)
+  const LEGACY_CUTOFF = new Date("2026-01-01T00:00:00Z");
+  const accountCreated = new Date(user.createdAt);
+
+  if (accountCreated < LEGACY_CUTOFF) return true;
+
+  // 2. 24-hour grace period for new users
   const GRACE_PERIOD_MS = 24 * 60 * 60 * 1000;
-  const accountAge = Date.now() - new Date(user.createdAt).getTime();
+  const accountAge = Date.now() - accountCreated.getTime();
 
   return accountAge < GRACE_PERIOD_MS;
 };
@@ -20,10 +26,15 @@ export const hasAccess = (user) => {
  * @returns {Number}
  */
 export const getRemainingGraceHours = (user) => {
-  if (!user || user.isEmailVerified || user.isVerified) return 0;
+  if (!user || user.isEmailVerified) return 0;
+
+  const LEGACY_CUTOFF = new Date("2026-01-01T00:00:00Z");
+  const accountCreated = new Date(user.createdAt);
+
+  if (accountCreated < LEGACY_CUTOFF) return -1; // -1 indicates legacy status (exempt)
   
   const GRACE_PERIOD_MS = 24 * 60 * 60 * 1000;
-  const accountAge = Date.now() - new Date(user.createdAt).getTime();
+  const accountAge = Date.now() - accountCreated.getTime();
   const remaining = GRACE_PERIOD_MS - accountAge;
   
   return Math.max(0, Math.ceil(remaining / (1000 * 60 * 60)));

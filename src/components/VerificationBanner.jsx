@@ -15,8 +15,10 @@ const VerificationBanner = () => {
   const [countdown, setCountdown] = useState(0);
 
   const graceHours = getRemainingGraceHours(currentUser);
-  // Urgent or Expired (Red) if 2 hours or less remains
-  const isUrgent = graceHours <= 2; 
+  // Urgent or Expired (Red) if 2 hours or less remains, but NOT for legacy users (-1)
+  const isUrgent = graceHours > 0 && graceHours <= 2; 
+  const isExpired = graceHours === 0;
+  const isLegacy = graceHours === -1;
   const storageKey = `resend_cooldown_${currentUser?._id}`;
 
   // Initialize countdown from localStorage on mount
@@ -31,6 +33,22 @@ const VerificationBanner = () => {
       }
     }
   }, [currentUser?._id, storageKey]);
+
+  // 🔄 Sync user profile on mount to catch cross-device verification
+  useEffect(() => {
+    const syncProfile = async () => {
+      if (!currentUser || currentUser.isEmailVerified) return;
+      try {
+        const res = await api.get("/profile");
+        if (res.status === "success" && res.data.user) {
+          dispatch(updateProfile(res.data.user));
+        }
+      } catch (err) {
+        console.error("Banner mount sync failed:", err);
+      }
+    };
+    syncProfile();
+  }, [currentUser?.isEmailVerified, dispatch]);
 
   // Handle countdown timer
   useEffect(() => {
@@ -93,17 +111,25 @@ const VerificationBanner = () => {
         animate={{ height: "auto", opacity: 1 }}
         exit={{ height: 0, opacity: 0 }}
         className={`border-b overflow-hidden font-outfit relative ${
-          isUrgent ? "bg-rose-50 border-rose-100" : "bg-amber-50 border-amber-100"
+          (isUrgent || isExpired) ? "bg-rose-50 border-rose-100" : "bg-amber-50 border-amber-100"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isUrgent ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"}`}>
+            <div className={`p-2 rounded-lg ${
+              (isUrgent || isExpired) ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"
+            }`}>
               <HiOutlineMail className="h-5 w-5" />
             </div>
-            <p className={`text-sm font-medium ${isUrgent ? "text-rose-800" : "text-amber-800"}`}>
-              Please <span className={`font-bold uppercase tracking-tight ${isUrgent ? "text-rose-900" : "text-amber-900"}`}>check your inbox</span> at <span className="font-semibold underline">{currentUser.emailId}</span> for the verification link. 
-              {graceHours > 0 ? (
+            <p className={`text-sm font-medium ${
+              (isUrgent || isExpired) ? "text-rose-800" : "text-amber-800"
+            }`}>
+              Please <span className={`font-bold uppercase tracking-tight ${
+                (isUrgent || isExpired) ? "text-rose-900" : "text-amber-900"
+              }`}>check your inbox</span> at <span className="font-semibold underline">{currentUser.emailId}</span> for the verification link. 
+              {isLegacy ? (
+                <span> 🔓 Your features are currently <span className="font-bold underline">unlocked</span>, but please verify for full security.</span>
+              ) : graceHours > 0 ? (
                 <span> You have <span className="font-bold underline">{graceHours} hours</span> left to verify before features are locked.</span>
               ) : (
                 <span className="text-rose-600 font-bold"> Grace period expired! Features are locked.</span>
