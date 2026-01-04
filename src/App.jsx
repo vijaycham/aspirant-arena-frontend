@@ -16,6 +16,7 @@ import Header from "./components/Header";
 import VerificationBanner from "./components/VerificationBanner";
 import Footer from "./components/Footer";
 import PrivateRoute from "./components/PrivateRoute";
+import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -25,6 +26,7 @@ const App = () => {
 
   return (
     <>
+      <ScrollToTop />
       <ToastContainer position="top-right" autoClose={3000} />
       <VerificationBanner />
       <Header />

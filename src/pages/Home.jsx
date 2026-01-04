@@ -243,7 +243,7 @@ const Home = () => {
                <div className="w-20 h-20 bg-gray-50 rounded-[2rem] mx-auto flex items-center justify-center text-4xl">🚀</div>
                <h3 className="text-2xl font-black text-gray-900">Join the Arena</h3>
                <p className="text-sm text-gray-500 font-medium">Create your free workspace to start tracking your journey to the Civil Services.</p>
-               <Link to="/auth" className="block w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all">Get Started</Link>
+               <Link to="/signup" className="block w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all">Get Started</Link>
             </div>
           )}
         </div>

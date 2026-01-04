@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPaperPlane, FaBug, FaLightbulb, FaEnvelope, FaLock } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import api from "../utils/api";
 
 const Feedback = () => {
+  const { currentUser } = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("contact");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -12,6 +14,12 @@ const Feedback = () => {
     type: "contact", // contact, bug, feature
     email: "" // Optional if user wants to be contacted
   });
+
+  useEffect(() => {
+    if (currentUser?.emailId) {
+      setFormData(prev => ({ ...prev, email: currentUser.emailId }));
+    }
+  }, [currentUser]);
 
   const tabs = [
     { id: "contact", label: "Contact Developer", icon: <FaEnvelope /> },
@@ -32,7 +40,12 @@ const Feedback = () => {
       
       if (res.status === "success") {
         toast.success("Message sent successfully! We'll get back to you soon.");
-        setFormData({ subject: "", message: "", type: activeTab, email: "" });
+        setFormData({ 
+          subject: "", 
+          message: "", 
+          type: activeTab, 
+          email: currentUser?.emailId || "" 
+        });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to send message. Please try again.");
@@ -94,9 +107,9 @@ const Feedback = () => {
               <div className="mt-8 pt-8 border-t border-white/5 px-4 hidden md:block">
                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Direct Connect</p>
                  <div className="space-y-3">
-                    <a href="mailto:support@aspirantarena.com" className="flex items-center gap-3 text-sm font-medium text-gray-400 hover:text-white transition-colors">
+                    <a href="mailto:support@aspirantarena.in" className="flex items-center gap-3 text-sm font-medium text-gray-400 hover:text-white transition-colors">
                         <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">📧</span>
-                        support@aspirantarena.com
+                        support@aspirantarena.in
                     </a>
                  </div>
               </div>
@@ -121,16 +134,25 @@ const Feedback = () => {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">
-                            We&apos;ll get back to you at:
+                            {currentUser ? "Replying to:" : "We'll get back to you at:"}
                         </label>
-                        <input
-                            type="email"
-                            required
-                            className="w-full p-3 md:p-4 bg-slate-950/50 border border-white/5 rounded-xl md:rounded-2xl focus:border-primary-500 focus:bg-slate-950 outline-none transition-all font-bold text-sm text-white placeholder:text-gray-600"
-                            placeholder="your@email.com"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        />
+                        {currentUser ? (
+                          <div className="w-full p-3 md:p-4 bg-slate-900/40 border border-primary-500/20 rounded-xl md:rounded-2xl transition-all font-bold text-sm text-primary-400 flex items-center gap-3">
+                             <div className="p-2 bg-primary-500/10 rounded-lg">
+                                <FaEnvelope className="text-primary-500" />
+                             </div>
+                             {currentUser.emailId}
+                          </div>
+                        ) : (
+                          <input
+                              type="email"
+                              required
+                              className="w-full p-3 md:p-4 bg-slate-950/50 border border-white/5 rounded-xl md:rounded-2xl focus:border-primary-500 focus:bg-slate-950 outline-none transition-all font-bold text-sm text-white placeholder:text-gray-600"
+                              placeholder="your@email.com"
+                              value={formData.email}
+                              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          />
+                        )}
                         <p className="text-[10px] text-gray-500 mt-1 ml-1 flex items-center gap-1">
                             <FaLock size={8} /> We&apos;ll never share your email.
                         </p>

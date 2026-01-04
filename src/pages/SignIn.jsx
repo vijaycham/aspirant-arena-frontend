@@ -6,6 +6,7 @@ import {
   signInStart,
   signInSuccess,
   signInFailure,
+  clearError,
 } from "../redux/user/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -20,10 +21,11 @@ const SignIn = () => {
   const { loading, error, currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
+    dispatch(clearError());
     if (currentUser) {
       navigate("/"); // Redirect if user is already logged in
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, dispatch]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });

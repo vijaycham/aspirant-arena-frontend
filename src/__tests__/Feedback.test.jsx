@@ -1,7 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
 import Feedback from "../pages/Feedback";
+import authReducer from "../redux/user/authSlice";
 import api from "../utils/api";
 import { toast } from "react-toastify";
 
@@ -14,19 +17,29 @@ vi.mock("react-toastify", () => ({
   },
 }));
 
+const renderWithRedux = (ui, { initialState } = {}) => {
+  const store = configureStore({
+    reducer: { user: authReducer },
+    preloadedState: {
+      user: { currentUser: null, ...initialState }
+    }
+  });
+  return render(<Provider store={store}>{ui}</Provider>);
+};
+
 describe("Feedback Component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders the feedback form correctly", () => {
-    render(<Feedback />);
+    renderWithRedux(<Feedback />);
     expect(screen.getByText(/Help us build the/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Summary of your message/i)).toBeInTheDocument();
   });
 
   it("switches tabs correctly", async () => {
-    render(<Feedback />);
+    renderWithRedux(<Feedback />);
     const bugTab = screen.getByText("Report Bug");
     await userEvent.click(bugTab);
     
@@ -44,7 +57,7 @@ describe("Feedback Component", () => {
     
     api.post.mockResolvedValue({ status: "success" });
 
-    render(<Feedback />);
+    renderWithRedux(<Feedback />);
 
     const subjectInput = screen.getByPlaceholderText(/Summary of your message/i);
     const messageInput = screen.getByPlaceholderText(/Tell us more/i);
@@ -75,7 +88,7 @@ describe("Feedback Component", () => {
     };
     api.post.mockRejectedValue(error);
 
-    render(<Feedback />);
+    renderWithRedux(<Feedback />);
 
     const subjectInput = screen.getByPlaceholderText(/Summary of your message/i);
     const messageInput = screen.getByPlaceholderText(/Tell us more/i);
@@ -90,5 +103,14 @@ describe("Feedback Component", () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("Server Error");
     });
+  });
+
+  it("auto-fills email for logged-in users and hides input", () => {
+    const user = { emailId: "logged@example.com", firstName: "Test" };
+    renderWithRedux(<Feedback />, { initialState: { currentUser: user } });
+    
+    expect(screen.queryByPlaceholderText(/your@email.com/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Replying to:/i)).toBeInTheDocument();
+    expect(screen.getByText("logged@example.com")).toBeInTheDocument();
   });
 });

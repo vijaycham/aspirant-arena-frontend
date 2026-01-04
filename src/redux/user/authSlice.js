@@ -32,6 +32,9 @@ const authSlice = createSlice({
         state.currentUser = { ...state.currentUser, ...action.payload };
       }
     },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
 });
 
@@ -41,5 +44,6 @@ export const {
   signInFailure,
   signOut,
   updateProfile,
+  clearError,
 } = authSlice.actions;
 export default authSlice.reducer;
