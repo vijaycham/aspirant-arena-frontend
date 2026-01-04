@@ -10,8 +10,10 @@ import Tasks from "./pages/Tasks";
 import Notes from "./pages/Notes";
 import Timer from "./pages/Timer";
 import TestTracker from "./pages/TestTracker";
+import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
+import VerificationBanner from "./components/VerificationBanner";
 import Footer from "./components/Footer";
 import PrivateRoute from "./components/PrivateRoute";
 import { Toaster } from "react-hot-toast";
@@ -24,6 +26,7 @@ const App = () => {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
+      <VerificationBanner />
       <Header />
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
@@ -32,6 +35,7 @@ const App = () => {
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
