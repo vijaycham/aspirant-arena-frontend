@@ -104,28 +104,30 @@ const VerificationBanner = () => {
             </p>
           </div>
           
-          <button
-            onClick={handleResend}
-            disabled={loading || countdown > 0}
-            className={`flex items-center gap-2 px-5 py-2 rounded-xl text-white text-xs font-black uppercase tracking-wider transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg ${
-              countdown > 0 
-                ? "bg-emerald-600 shadow-emerald-200" 
-                : "bg-amber-600 hover:bg-amber-700 shadow-amber-200"
-            }`}
-          >
-            {loading ? (
-              <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : countdown > 0 ? (
-              <HiCheckCircle className="h-4 w-4" />
-            ) : (
-              <HiInformationCircle className="h-4 w-4" />
-            )}
-            {loading 
-              ? "Sending..." 
-              : countdown > 0 
-                ? `Email Sent (${countdown}s)` 
-                : "Resend Verification Link"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+                onClick={handleResend}
+                disabled={loading || countdown > 0}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl text-white text-xs font-black uppercase tracking-wider transition-all disabled:opacity-70 disabled:cursor-not-allowed shadow-lg ${
+                countdown > 0 
+                    ? "bg-emerald-600 shadow-emerald-200" 
+                    : "bg-amber-600 hover:bg-amber-700 shadow-amber-200"
+                }`}
+            >
+                {loading ? (
+                <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : countdown > 0 ? (
+                <HiCheckCircle className="h-4 w-4" />
+                ) : (
+                <HiInformationCircle className="h-4 w-4" />
+                )}
+                {loading 
+                ? "Sending..." 
+                : countdown > 0 
+                    ? `Email Sent (${countdown}s)` 
+                    : "Resend Verification Link"}
+            </button>
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>

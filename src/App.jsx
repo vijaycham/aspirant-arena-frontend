@@ -19,10 +19,32 @@ import PrivateRoute from "./components/PrivateRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { updateProfile } from "./redux/user/authSlice";
+import api from "./utils/api";
+import { useEffect } from "react";
 
 const App = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
+  // 🔄 Sync user profile (especially verification status) when window gains focus
+  useEffect(() => {
+    const syncProfile = async () => {
+      if (!currentUser) return;
+      try {
+        const res = await api.get("/profile");
+        if (res.status === "success" && res.data.user) {
+          dispatch(updateProfile(res.data.user));
+        }
+      } catch (err) {
+        console.error("Profile sync failed:", err);
+      }
+    };
+
+    window.addEventListener("focus", syncProfile);
+    return () => window.removeEventListener("focus", syncProfile);
+  }, [currentUser, dispatch]);
 
   return (
     <>
