@@ -38,16 +38,18 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/profile");
-        dispatch(updateProfile(res.data.user));
+        if (res.status === "success") {
+          dispatch(updateProfile(res.data.user));
+        }
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
     };
 
-    if (!currentUser) {
+    if (currentUser) {
       fetchProfile();
     }
-  }, [currentUser, dispatch]);
+  }, [dispatch]); // Only on mount
 
   // Update form data when currentUser changes
   useEffect(() => {
@@ -264,9 +266,9 @@ const Profile = () => {
                   value={formData.gender}
                   onChange={handleChange}
                 >
-                  <option value="male" className="bg-slate-900">Male</option>
-                  <option value="female" className="bg-slate-900">Female</option>
-                  <option value="other" className="bg-slate-900">Other</option>
+                  <option value="Male" className="bg-slate-900">Male</option>
+                  <option value="Female" className="bg-slate-900">Female</option>
+                  <option value="Other" className="bg-slate-900">Other</option>
                 </select>
               </div>
             </div>
@@ -279,12 +281,14 @@ const Profile = () => {
               >
                  {showPasswordFields ? (
                    <>
-                     <span className="text-rose-400">Cancel Password Update</span>
+                     <span className="text-rose-400">
+                       Cancel {currentUser?.hasPassword ? "Password Update" : "Password Setup"}
+                     </span>
                    </>
                  ) : (
                    <>
                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                     Change Password
+                     {currentUser?.hasPassword ? "Change Password" : "Set Password"}
                    </>
                  )}
               </button>

@@ -40,7 +40,7 @@ const VerificationBanner = () => {
       if (!currentUser || currentUser.isEmailVerified) return;
       try {
         const res = await api.get("/profile");
-        if (res.status === "success" && res.data.user) {
+        if (res?.status === "success" && res?.data?.user) {
           dispatch(updateProfile(res.data.user));
         }
       } catch (err) {
