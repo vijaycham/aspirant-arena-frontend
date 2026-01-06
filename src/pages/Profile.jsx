@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { updateProfile } from "../redux/user/authSlice";
 import api from "../utils/api";
 import { toast } from "react-toastify";
@@ -11,6 +11,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import imageCompression from "browser-image-compression";
 
 
 const Profile = () => {
@@ -49,7 +50,7 @@ const Profile = () => {
     if (currentUser) {
       fetchProfile();
     }
-  }, [dispatch]); // Only on mount
+  }, [dispatch, currentUser?._id]); 
 
   // Update form data when currentUser changes
   useEffect(() => {
@@ -64,53 +65,73 @@ const Profile = () => {
         confirmPassword: "",
         photoUrl: currentUser.photoUrl || "",
       });
+      setPreviewImage(currentUser.photoUrl || "");
     }
   }, [currentUser]);
 
-  const handleFileUpload = async (image) => {
-    if (!image) return;
+  const handleFileUpload = useCallback(async (file) => {
+    if (!file) return;
     setImageError(false);
+    setImagePercentage(0);
 
-    if (image.size > 2 * 1024 * 1024) {
-      setImageError(true);
-      return;
-    }
-    const storage = getStorage(app);
-    const fileName = new Date().getTime() + image.name;
-    const storageRef = ref(storage, fileName);
-    const uploadTask = uploadBytesResumable(storageRef, image);
+    try {
+      const options = {
+        maxSizeMB: 0.3,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
+      };
 
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setImagePercentage(Math.round(progress));
-      },
-      (error) => {
-        setImageError(true);
-        console.error("Upload Error:", error);
-      },
-      async () => {
-        try {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-          setPreviewImage(downloadURL);
-          // Update formData state
-          setFormData((prev) => ({ ...prev, photoUrl: downloadURL }));
-        } catch (error) {
-          console.error("Error updating profile with new image:", error);
-          setImageError(true);
-        }
+      const compressedFile = await imageCompression(file, options);
+      const storage = getStorage(app);
+      const userId = currentUser?._id || currentUser?.id;
+      
+      if (!userId) {
+        toast.error("User ID not found. Please log in again.");
+        return;
       }
-    );
-  };
+
+      const fileName = `profile-${userId}.jpg`;
+      const storageRef = ref(storage, `profile-pictures/${userId}/${fileName}`);
+      
+      const uploadTask = uploadBytesResumable(storageRef, compressedFile, {
+        contentType: "image/jpeg",
+      });
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setImagePercentage(Math.round(progress));
+        },
+        (error) => {
+          setImageError(true);
+          console.error("Upload Error:", error);
+          toast.error("Image upload failed. Please try again.");
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setPreviewImage(downloadURL);
+            setFormData((prev) => ({ ...prev, photoUrl: downloadURL }));
+            setImagePercentage(100);
+          } catch (error) {
+            console.error("Error getting download URL:", error);
+            setImageError(true);
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Compression Error:", error);
+      setImageError(true);
+      toast.error("Failed to process image.");
+    }
+  }, [currentUser?._id, currentUser?.id, dispatch]);
 
   useEffect(() => {
     if (image) {
       handleFileUpload(image);
     }
-  }, [image]);
+  }, [image, handleFileUpload]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));

@@ -48,7 +48,7 @@ const VerificationBanner = () => {
       }
     };
     syncProfile();
-  }, [currentUser?.isEmailVerified, dispatch]);
+  }, [currentUser?._id, currentUser?.isEmailVerified, dispatch]);
 
   // Handle countdown timer
   useEffect(() => {
