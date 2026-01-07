@@ -68,6 +68,17 @@ const Header = () => {
               <Link to="/" className="hover:text-primary-400 transition-colors">Home</Link>
               <Link to="/test-tracker" className="hover:text-primary-400 transition-colors">Analytics</Link>
               <Link to="/tasks" className="hover:text-primary-400 transition-colors">Tasks</Link>
+              <Link to="/timer" className="relative group/timer hover:text-primary-400 transition-all flex items-center gap-1.5">
+                Focus Arena
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="bg-primary-500 text-[8px] px-1.5 py-0.5 rounded-full text-white font-black"
+                >
+                  NEW
+                </motion.span>
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all group-hover/timer:w-full" />
+              </Link>
               
               {/* Verification Status Badge */}
               <div className="flex items-center">
@@ -199,12 +210,27 @@ const Header = () => {
                   </div>
                 </Link>
 
+                <Link to="/timer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg shadow-primary-500/10 relative">
+                    <FaClock />
+                    <motion.div
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary-500 rounded-full border-2 border-slate-900"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                       <span className="text-sm">Focus Arena</span>
+                       <span className="bg-primary-500 text-[7px] px-1.5 py-0.5 rounded-full text-white font-black animate-pulse">NEW</span>
+                    </div>
+                    <span className="text-[10px] text-gray-500 font-medium">Deep Work Timer</span>
+                  </div>
+                </Link>
+
                 <div className="mt-4 pt-6 border-t border-white/5 space-y-4 opacity-40 grayscale pointer-events-none">
                   <div className="px-4 flex items-center gap-4">
                     <FaStickyNote className="text-lg" /> <span className="text-sm font-bold">Cloud Notes (Soon)</span>
-                  </div>
-                  <div className="px-4 flex items-center gap-4">
-                    <FaClock className="text-lg" /> <span className="text-sm font-bold">Focus Timer (Soon)</span>
                   </div>
                 </div>
               </div>
