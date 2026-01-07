@@ -1,12 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 import { toast } from "react-hot-toast";
-
-const DEFAULT_MODES = {
-  FOCUS: { label: "Focus", time: 25 * 60 },
-  SHORT_BREAK: { label: "Short Break", time: 5 * 60 },
-  LONG_BREAK: { label: "Long Break", time: 15 * 60 },
-};
+import { DEFAULT_MODES, TIMER_STORAGE_KEYS } from "../utils/timer/timerConstants";
 
 export const useTimer = () => {
   /* ------------------ HELPERS ------------------ */
@@ -20,23 +15,23 @@ export const useTimer = () => {
   };
 
   /* ------------------ STATE ------------------ */
-  const [mode, setMode] = useState(() => localStorage.getItem("timer-mode") || "FOCUS");
-  const [modeTimings, setModeTimings] = useState(() => loadJSON("timer-modeTimings", DEFAULT_MODES));
+  const [mode, setMode] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS");
+  const [modeTimings, setModeTimings] = useState(() => loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES));
   
   const [timeLeft, setTimeLeft] = useState(() => {
-    const saved = localStorage.getItem("timer-timeLeft");
+    const saved = localStorage.getItem(TIMER_STORAGE_KEYS.TIME_LEFT);
     if (saved) return parseInt(saved, 10);
-    const timings = loadJSON("timer-modeTimings", DEFAULT_MODES);
-    const currentMode = localStorage.getItem("timer-mode") || "FOCUS";
+    const timings = loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES);
+    const currentMode = localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS";
     return (timings[currentMode] || DEFAULT_MODES.FOCUS).time;
   });
 
   const [isActive, setIsActive] = useState(false);
-  const [cycleNumber, setCycleNumber] = useState(() => parseInt(localStorage.getItem("timer-cycle"), 10) || 1);
-  const [sessionsCompleted, setSessionsCompleted] = useState(() => parseInt(localStorage.getItem("timer-sessions"), 10) || 0);
+  const [cycleNumber, setCycleNumber] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.CYCLE), 10) || 1);
+  const [sessionsCompleted, setSessionsCompleted] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.SESSIONS), 10) || 0);
   const [totalMinutesToday, setTotalMinutesToday] = useState(0);
-  const [subject, setSubject] = useState(() => localStorage.getItem("timer-subject") || "");
-  const [selectedTaskId, setSelectedTaskId] = useState(() => localStorage.getItem("timer-taskId") || "");
+  const [subject, setSubject] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.SUBJECT) || "");
+  const [selectedTaskId, setSelectedTaskId] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.TASK_ID) || "");
   
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
@@ -57,13 +52,13 @@ export const useTimer = () => {
 
   /* ------------------ LOCAL STORAGE SYNC ------------------ */
   useEffect(() => {
-    localStorage.setItem("timer-mode", mode);
-    localStorage.setItem("timer-timeLeft", timeLeft.toString());
-    localStorage.setItem("timer-cycle", cycleNumber.toString());
-    localStorage.setItem("timer-sessions", sessionsCompleted.toString());
-    localStorage.setItem("timer-subject", subject);
-    localStorage.setItem("timer-taskId", selectedTaskId);
-    localStorage.setItem("timer-modeTimings", JSON.stringify(modeTimings));
+    localStorage.setItem(TIMER_STORAGE_KEYS.MODE, mode);
+    localStorage.setItem(TIMER_STORAGE_KEYS.TIME_LEFT, timeLeft.toString());
+    localStorage.setItem(TIMER_STORAGE_KEYS.CYCLE, cycleNumber.toString());
+    localStorage.setItem(TIMER_STORAGE_KEYS.SESSIONS, sessionsCompleted.toString());
+    localStorage.setItem(TIMER_STORAGE_KEYS.SUBJECT, subject);
+    localStorage.setItem(TIMER_STORAGE_KEYS.TASK_ID, selectedTaskId);
+    localStorage.setItem(TIMER_STORAGE_KEYS.MODE_TIMINGS, JSON.stringify(modeTimings));
   }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings]);
 
   /* ------------------ ACTIONS ------------------ */

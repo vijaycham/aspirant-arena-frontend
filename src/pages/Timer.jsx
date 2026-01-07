@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { useTimer } from "../hooks/useTimer";
 import { useTasks } from "../hooks/useTasks";
+import { UPSC_PRESETS } from "../utils/timer/timerConstants";
 
 const Timer = () => {
   const {
@@ -66,14 +67,7 @@ const Timer = () => {
     }
   };
 
-  /* ------------------ PRESETS ------------------ */
-  const upscPresets = [
-    { name: "Mains Sprint", focus: 90, short: 15, long: 30, icon: "✍️" },
-    { name: "Prelims Mock", focus: 120, short: 20, long: 40, icon: "📝" },
-    { name: "Answer Writing", focus: 30, short: 5, long: 15, icon: "⏱️" },
-    { name: "Standard Pomo", focus: 25, short: 5, long: 15, icon: "🍅" },
-  ];
-
+  /* ------------------ RENDER ------------------ */
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4 font-outfit relative overflow-hidden">
       {/* Background Decor */}
@@ -323,11 +317,10 @@ const Timer = () => {
               </div>
             </div>
 
-            {/* Presets Grid */}
             <div className="space-y-3">
               <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-2">Quick Strategy</h3>
               <div className="grid grid-cols-2 gap-3">
-                {upscPresets.map((preset) => (
+                {UPSC_PRESETS.map((preset) => (
                   <button
                     key={preset.name}
                     onClick={() => applyPreset(preset.name, preset.focus, preset.short, preset.long)}
