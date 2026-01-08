@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 ARENA_LOGS.md
+FOCUS_ARENA_PLAN.md
 .agent/
-
