@@ -40,7 +40,7 @@ Detailed architecture and roadmap for the premium Pomodoro & Deep Work system.
 ### Phase 3: Advanced Deep Work Features (IN PROGRESS 🏗️)
 - [x] **Commit 10: Persistence 2.0 (Smart Resume)**: Pick up exactly where left off if tab is closed using `LAST_UPDATE` timestamps.
 - [x] **Commit 11: Web Worker Support**: Battery-accurate background timing for mobile/minimized tabs.
-- [ ] **Commit 12: Focus Intensity Score**: Post-session 1-5 star rating & feedback notes stored in DB.
+- [x] **Commit 12: Focus Intensity Score**: Post-session 1-5 star rating & feedback notes stored in DB.
 - [ ] **Commit 13: Ambient Focus Sounds**: Built-in Royalty-Free White Noise (Rain, Library, Lo-fi).
 - [ ] **Commit 14: Fullscreen Zen Mode**: Minimalist, distraction-free UI toggle.
 
@@ -54,8 +54,10 @@ Detailed architecture and roadmap for the premium Pomodoro & Deep Work system.
 
 ## 🗒️ Changelog
 
-### [2026-01-08] - Phase 3 Kickoff: Survival Mode
-- **Starting Persistence 2.0**: Implementing timestamp-based "catch-up" logic to prevent time loss on tab close.
+### [2026-01-08] - Focus Intensity & Background Reliability
+- **Focus Intensity Score**: Implemented a post-session rating system (1-5 stars) and notes to capture study quality.
+- **Web Worker Support**: Added a background worker for millisecond-perfect timing even when the browser tab is minimized.
+- **Persistence 2.0**: Added "Smart Resume" logic—the timer now catches up if the tab was closed during an active session.
 
 ### [2026-01-08] - Phase 2 Final Polish & Header Launch
 - **Header Integration**: Added "Focus Arena" to the main site header with a pulsating "NEW" badge.

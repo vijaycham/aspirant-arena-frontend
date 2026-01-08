@@ -11,10 +11,13 @@ import {
   FaCalendarDay,
   FaEdit,
   FaTasks,
+  FaLightbulb,
+  FaInfoCircle,
 } from "react-icons/fa";
 import { useTimer } from "../hooks/useTimer";
 import { useTasks } from "../hooks/useTasks";
 import { UPSC_PRESETS } from "../utils/timer/timerConstants";
+import FocusRatingModal from "../components/timer/FocusRatingModal";
 
 const Timer = () => {
   const {
@@ -37,12 +40,18 @@ const Timer = () => {
     selectedTaskId,
     setSelectedTaskId,
     modes,
+    pendingSession,
+    completeRating,
+    setPendingSession,
+    reflectionEnabled,
+    setReflectionEnabled,
   } = useTimer();
 
   const { tasks = [] } = useTasks() || {};
   const [isEditing, setIsEditing] = useState(false);
   const [manualMin, setManualMin] = useState("");
   const [showTaskDropdown, setShowTaskDropdown] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   /* ------------------ FORMATTERS ------------------ */
   const formatTime = (seconds) => {
@@ -88,20 +97,51 @@ const Timer = () => {
             </h1>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={resetCycle}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm active:scale-95"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm active:scale-95 h-[34px]"
             >
               <FaSyncAlt /> Cycle
             </button>
 
             <button
-              onClick={resetDay}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-rose-600 hover:border-rose-100 transition-all shadow-sm active:scale-95"
+              onClick={() => setShowResetConfirm(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-rose-600 hover:border-rose-100 transition-all shadow-sm active:scale-95 h-[34px]"
             >
               <FaCalendarDay /> Day
             </button>
+
+            <div className="relative group/reflect flex items-center h-[34px]">
+              <button
+                disabled={isActive}
+                onClick={() => setReflectionEnabled(!reflectionEnabled)}
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 border rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 h-full ${
+                  isActive 
+                    ? "opacity-60 cursor-not-allowed bg-gray-50 border-gray-100 text-gray-400" 
+                    : reflectionEnabled 
+                      ? "bg-primary-50 border-primary-100 text-primary-600 hover:bg-primary-100" 
+                      : "bg-white border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                <div className="relative flex items-center">
+                  <FaLightbulb className={reflectionEnabled && !isActive ? "animate-pulse" : ""} />
+                  <div className={`absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full ${reflectionEnabled ? "bg-emerald-500" : "bg-gray-300"}`} />
+                </div>
+                <span className="hidden xs:inline">Reflect</span>
+              </button>
+
+              {/* Info Tooltip */}
+              <div className="absolute top-full right-0 mt-2 w-56 p-3 bg-gray-900 text-white text-[8px] font-bold leading-relaxed rounded-xl opacity-0 group-hover/reflect:opacity-100 pointer-events-none transition-all z-[60] shadow-xl border border-gray-800">
+                <p className="uppercase tracking-widest text-primary-400 mb-1">
+                  {isActive ? "⚠️ Reflection Locked" : "Self-Reflection"}
+                </p>
+                {isActive 
+                  ? "You cannot change reflection settings while a session is active. Please pause or reset the timer to modify." 
+                  : "When enabled, you'll be asked to rate your focus intensity and add notes after every focus session. Helps track quality, not just quantity."
+                }
+              </div>
+            </div>
           </div>
         </div>
 
@@ -345,6 +385,60 @@ const Timer = () => {
           </div>
         </div>
       </div>
+
+      {/* Post-Session Rating Modal */}
+      <FocusRatingModal
+        isOpen={!!pendingSession}
+        onClose={() => setPendingSession(null)}
+        onComplete={completeRating}
+        sessionData={pendingSession}
+      />
+
+      {/* Reset Confirmation Modal */}
+      <AnimatePresence>
+        {showResetConfirm && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+              onClick={() => setShowResetConfirm(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl p-8 border border-white z-10 text-center"
+            >
+              <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FaCalendarDay className="text-rose-500 text-2xl" />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter mb-2">Reset Analytics?</h3>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-8 px-4 leading-relaxed">
+                This will clear your focus minutes and sessions for today. Historical data is safe. Proceed?
+              </p>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    resetDay();
+                    setShowResetConfirm(false);
+                  }}
+                  className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-black transition-all"
+                >
+                  Yes, Reset Day
+                </button>
+                <button
+                  onClick={() => setShowResetConfirm(false)}
+                  className="w-full py-3 text-[9px] font-black uppercase text-gray-400 tracking-widest"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

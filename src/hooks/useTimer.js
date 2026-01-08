@@ -32,6 +32,9 @@ export const useTimer = () => {
   const [totalMinutesToday, setTotalMinutesToday] = useState(0);
   const [subject, setSubject] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.SUBJECT) || "");
   const [selectedTaskId, setSelectedTaskId] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.TASK_ID) || "");
+  const [reflectionEnabled, setReflectionEnabled] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.ENABLE_REFLECTION) !== "false");
+  
+  const [pendingSession, setPendingSession] = useState(null);
   
   const timerRef = useRef(null);
   const workerRef = useRef(null);
@@ -77,12 +80,19 @@ export const useTimer = () => {
     localStorage.setItem(TIMER_STORAGE_KEYS.MODE_TIMINGS, JSON.stringify(modeTimings));
     localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, isActive.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
-  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive]);
+    localStorage.setItem(TIMER_STORAGE_KEYS.ENABLE_REFLECTION, reflectionEnabled.toString());
+  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled]);
 
   /* ------------------ ACTIONS ------------------ */
-  const saveSession = useCallback(async (seconds, status = "completed") => {
+  const saveSession = useCallback(async (seconds, status = "completed", rating = 3, notes = "") => {
     if (seconds < 60) return;
     
+    // If no rating is provided yet, we store it as a pending session for the UI to handle
+    if (!rating && status === "completed") {
+      setPendingSession({ seconds, status });
+      return;
+    }
+
     // Optimistic Update
     const addedMinutes = Math.floor(seconds / 60);
     setTotalMinutesToday(prev => prev + addedMinutes);
@@ -101,22 +111,33 @@ export const useTimer = () => {
         type: "focus",
         cycleNumber,
         source: "pomodoro",
-        status
+        status,
+        focusRating: rating || 3,
+        notes
       });
 
       startTimeRef.current = null;
+      setPendingSession(null);
       toast.success("Focus logged 🎯");
     } catch (err) {
       console.error("Save failed", err);
     }
   }, [subject, selectedTaskId, cycleNumber]);
 
+  const completeRating = async (rating, notes) => {
+    if (!pendingSession) return;
+    await saveSession(pendingSession.seconds, pendingSession.status, rating, notes);
+  };
+
   const handleTimerComplete = useCallback((manual = false) => {
     setIsActive(false);
     const elapsed = modeTimings[mode].time - timeLeft;
 
     if (mode === "FOCUS") {
-      if (elapsed >= 60) saveSession(elapsed, manual ? "interrupted" : "completed");
+      if (elapsed >= 60) {
+        // Only trigger modal if reflection is enabled
+        saveSession(elapsed, manual ? "interrupted" : "completed", reflectionEnabled ? null : 3);
+      }
 
       if (cycleNumber < 4) {
         setCycleNumber(prev => prev + 1);
@@ -266,6 +287,11 @@ export const useTimer = () => {
     setSubject,
     selectedTaskId,
     setSelectedTaskId,
-    modes: modeTimings
+    modes: modeTimings,
+    pendingSession,
+    completeRating,
+    setPendingSession,
+    reflectionEnabled,
+    setReflectionEnabled
   };
 };

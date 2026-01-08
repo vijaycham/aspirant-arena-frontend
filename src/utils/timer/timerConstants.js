@@ -21,4 +21,5 @@ export const TIMER_STORAGE_KEYS = {
   MODE_TIMINGS: "timer-modeTimings",
   IS_ACTIVE: "timer-isActive",
   LAST_UPDATE: "timer-lastUpdate",
+  ENABLE_REFLECTION: "timer-enableReflection",
 };
