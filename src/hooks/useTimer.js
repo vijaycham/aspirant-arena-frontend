@@ -26,7 +26,7 @@ export const useTimer = () => {
     return (timings[currentMode] || DEFAULT_MODES.FOCUS).time;
   });
 
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true");
   const [cycleNumber, setCycleNumber] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.CYCLE), 10) || 1);
   const [sessionsCompleted, setSessionsCompleted] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.SESSIONS), 10) || 0);
   const [totalMinutesToday, setTotalMinutesToday] = useState(0);
@@ -34,6 +34,7 @@ export const useTimer = () => {
   const [selectedTaskId, setSelectedTaskId] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.TASK_ID) || "");
   
   const timerRef = useRef(null);
+  const workerRef = useRef(null);
   const startTimeRef = useRef(null);
 
   /* ------------------ API SYNC ------------------ */
@@ -50,6 +51,21 @@ export const useTimer = () => {
     fetchStats();
   }, []);
 
+  /* ------------------ CATCH UP LOGIC ------------------ */
+  // If the timer was active when the tab closed, calculate how much time passed
+  useEffect(() => {
+    const lastUpdate = localStorage.getItem(TIMER_STORAGE_KEYS.LAST_UPDATE);
+    const wasActive = localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true";
+    
+    if (wasActive && lastUpdate) {
+      const now = Date.now();
+      const gapSeconds = Math.floor((now - parseInt(lastUpdate, 10)) / 1000);
+      if (gapSeconds > 0) {
+        setTimeLeft(prev => Math.max(0, prev - gapSeconds));
+      }
+    }
+  }, []); // Run once on mount
+
   /* ------------------ LOCAL STORAGE SYNC ------------------ */
   useEffect(() => {
     localStorage.setItem(TIMER_STORAGE_KEYS.MODE, mode);
@@ -59,7 +75,9 @@ export const useTimer = () => {
     localStorage.setItem(TIMER_STORAGE_KEYS.SUBJECT, subject);
     localStorage.setItem(TIMER_STORAGE_KEYS.TASK_ID, selectedTaskId);
     localStorage.setItem(TIMER_STORAGE_KEYS.MODE_TIMINGS, JSON.stringify(modeTimings));
-  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings]);
+    localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, isActive.toString());
+    localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
+  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive]);
 
   /* ------------------ ACTIONS ------------------ */
   const saveSession = useCallback(async (seconds, status = "completed") => {
@@ -192,16 +210,38 @@ export const useTimer = () => {
   };
 
 
-  /* ------------------ REFINED INTERVAL ------------------ */
+  /* ------------------ REFINED WEB WORKER INTERVAL ------------------ */
+  useEffect(() => {
+    // Initialize Worker
+    workerRef.current = new Worker("/workers/timerWorker.js");
+    
+    workerRef.current.onmessage = (e) => {
+      if (e.data === "tick") {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            // We use 1 because the next tick will be 0, triggering handleTimerComplete
+            // But handleTimerComplete is called separately below to avoid dependency loops
+            return 0;
+          }
+          return prev - 1;
+        });
+      }
+    };
+
+    return () => {
+      workerRef.current.terminate();
+    };
+  }, []);
+
   useEffect(() => {
     if (isActive && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0 && isActive) {
-      handleTimerComplete();
+      workerRef.current.postMessage("start");
+    } else {
+      workerRef.current.postMessage("stop");
+      if (timeLeft === 0 && isActive) {
+        handleTimerComplete();
+      }
     }
-    return () => clearInterval(timerRef.current);
   }, [isActive, timeLeft, handleTimerComplete]);
 
   const progress = (modeTimings[mode].time - timeLeft) / modeTimings[mode].time * 100;

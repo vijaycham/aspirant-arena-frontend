@@ -13,6 +13,15 @@ vi.mock('react-hot-toast', () => ({
   },
 }));
 
+// Mock Web Worker
+global.Worker = class {
+  constructor() {
+    this.postMessage = vi.fn();
+    this.terminate = vi.fn();
+    this.onmessage = vi.fn();
+  }
+};
+
 describe('useTimer Hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -128,5 +137,18 @@ describe('useTimer Hook', () => {
       // We don't have a direct setTimeLeft exposed, but we have setManualTime
       // Wait, setManualTime updates modeTimings[mode].time AND timeLeft.
     });
+  });
+
+  it('should catch up time if was active when tab was closed', () => {
+    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+    localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, "true");
+    localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, fiveMinutesAgo.toString());
+    localStorage.setItem(TIMER_STORAGE_KEYS.TIME_LEFT, (25 * 60).toString()); // Start with 25 mins
+    
+    const { result } = renderHook(() => useTimer());
+    
+    // 25 mins - 5 mins = 20 mins = 1200 seconds
+    expect(result.current.timeLeft).toBe(20 * 60);
+    expect(result.current.isActive).toBe(true);
   });
 });

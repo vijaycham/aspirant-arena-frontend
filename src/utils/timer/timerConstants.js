@@ -19,4 +19,6 @@ export const TIMER_STORAGE_KEYS = {
   SUBJECT: "timer-subject",
   TASK_ID: "timer-taskId",
   MODE_TIMINGS: "timer-modeTimings",
+  IS_ACTIVE: "timer-isActive",
+  LAST_UPDATE: "timer-lastUpdate",
 };
