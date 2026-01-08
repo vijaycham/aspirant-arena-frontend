@@ -162,7 +162,9 @@ export const useTimer = () => {
   /* ------------------ NOTIFICATIONS ------------------ */
   useEffect(() => {
     if (typeof Notification !== "undefined" && Notification.permission === "default") {
-      Notification.requestPermission().then(setNotificationPermission);
+      Notification.requestPermission()
+        .then(setNotificationPermission)
+        .catch(err => console.error("Auto notification check failed:", err));
     }
   }, []);
 
@@ -171,21 +173,39 @@ export const useTimer = () => {
       toast.error("Notifications are not supported in this browser.");
       return;
     }
-    const permission = await Notification.requestPermission();
-    setNotificationPermission(permission);
-    if (permission === "granted") {
-      toast.success("Notifications enabled! 🔔");
-    } else if (permission === "denied") {
-      toast.error("Notifications are blocked by your browser settings.");
+    try {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+      if (permission === "granted") {
+        toast.success("Notifications enabled! 🔔");
+      } else if (permission === "denied") {
+        toast.error("Notifications are blocked by your browser settings.");
+      }
+    } catch (err) {
+      console.error("Notification permission request failed:", err);
     }
   };
 
   const sendNotification = (title, body) => {
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-      new Notification(title, { 
-        body, 
+      const options = {
+        body,
         icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
-      });
+      };
+
+      try {
+        // Standard Desktop way
+        new Notification(title, options);
+      } catch (err) {
+        // Mobile/Android fallback (Uses Service Worker)
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+          navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification(title, options);
+          }).catch(swErr => {
+            console.error("ServiceWorker notification failed:", swErr);
+          });
+        }
+      }
     }
   };
 
