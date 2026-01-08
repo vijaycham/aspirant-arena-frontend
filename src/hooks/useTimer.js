@@ -73,17 +73,35 @@ export const useTimer = () => {
   /* ------------------ CATCH UP LOGIC ------------------ */
   // If the timer was active when the tab closed, calculate how much time passed
   useEffect(() => {
-    const lastUpdate = localStorage.getItem(TIMER_STORAGE_KEYS.LAST_UPDATE);
-    const wasActive = localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true";
-    
-    if (wasActive && lastUpdate) {
-      const now = Date.now();
-      const gapSeconds = Math.floor((now - parseInt(lastUpdate, 10)) / 1000);
-      if (gapSeconds > 0) {
-        setTimeLeft(prev => Math.max(0, prev - gapSeconds));
+    const catchUp = () => {
+      const lastUpdate = localStorage.getItem(TIMER_STORAGE_KEYS.LAST_UPDATE);
+      const wasActive = localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true";
+      
+      if (wasActive && lastUpdate) {
+        const now = Date.now();
+        const gapSeconds = Math.floor((now - parseInt(lastUpdate, 10)) / 1000);
+        if (gapSeconds > 0) {
+          setTimeLeft(prev => {
+            const next = Math.max(0, prev - gapSeconds);
+            // If the timer should have finished while we were away, handleTimerComplete
+            // will be triggered by the timeLeft useEffect once this state updates.
+            return next;
+          });
+        }
       }
-    }
-  }, []); // Run once on mount
+    };
+
+    catchUp(); // Initial mount catch-up
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        catchUp();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []); // Run once on mount and setup listeners
 
   /* ------------------ LOCAL STORAGE SYNC ------------------ */
   useEffect(() => {
@@ -188,21 +206,33 @@ export const useTimer = () => {
 
   const sendNotification = (title, body) => {
     if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-      const options = {
+      const basicOptions = {
         body,
         icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
       };
 
+      const mobileOptions = {
+        ...basicOptions,
+        vibrate: [200, 100, 200],
+        tag: "timer-notification",
+        renotify: true,
+        requireInteraction: true,
+        actions: [{ action: "open", title: "OK" }]
+      };
+
+      // 1. Try Standard Desktop Notification first (Best for Localhost/Dev/Desktop)
       try {
-        // Standard Desktop way
-        new Notification(title, options);
+        // Desktop often doesn't support actions/vibrate in new Notification(), so use basic options
+        const notification = new Notification(title, basicOptions);
+        notification.onclick = () => window.focus();
       } catch (err) {
-        // Mobile/Android fallback (Uses Service Worker)
+        // 2. Mobile/Android Fallback (Service Worker)
+        console.warn("Standard notification failed, trying Service Worker:", err);
         if (navigator.serviceWorker && navigator.serviceWorker.ready) {
           navigator.serviceWorker.ready.then(registration => {
-            registration.showNotification(title, options);
+            registration.showNotification(title, mobileOptions);
           }).catch(swErr => {
-            console.error("ServiceWorker notification failed:", swErr);
+            console.error("ServiceWorker notification also failed:", swErr);
           });
         }
       }
@@ -211,9 +241,10 @@ export const useTimer = () => {
 
   const playChime = () => {
     if (!chimeRef.current) {
-      chimeRef.current = new Audio("https://actions.google.com/sounds/v1/alarms/notification_simple_01.ogg");
+      chimeRef.current = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
     }
-    chimeRef.current.play().catch(() => {});
+    chimeRef.current.currentTime = 0;
+    chimeRef.current.play().catch(e => console.warn("Chime blocked:", e));
   };
 
   /* ------------------ ACTIONS ------------------ */
@@ -309,8 +340,20 @@ export const useTimer = () => {
   }, [mode, timeLeft, cycleNumber, modeTimings, saveSession, reflectionEnabled]);
 
   const toggleTimer = () => {
-    if (!isActive && !startTimeRef.current) {
-      startTimeRef.current = new Date();
+    if (!isActive) {
+      if (!startTimeRef.current) {
+        startTimeRef.current = new Date();
+      }
+      // Prime audio on user gesture for mobile autoplay bypass
+      if (!chimeRef.current) {
+        chimeRef.current = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
+        chimeRef.current.load();
+      }
+      if (!ambientRef.current) {
+        ambientRef.current = new Audio();
+        ambientRef.current.loop = true;
+        ambientRef.current.load();
+      }
     }
     setIsActive(prev => !prev);
   };
