@@ -215,6 +215,7 @@ export const useTimer = () => {
     setSessionsCompleted(0);
     setTodaySessions([]);
     setSubject("");
+    setSelectedTaskId("");
     setTimeLeft(modeTimings[mode].time);
     startTimeRef.current = null;
     toast.success("Daily dash reset 📅");

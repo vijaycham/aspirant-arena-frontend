@@ -181,7 +181,7 @@ const Timer = () => {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-card p-6 md:p-12 rounded-[2.5rem] shadow-xl border border-white/60 text-center relative overflow-hidden h-full flex flex-col justify-center min-h-[500px]"
+              className="glass-card p-6 md:p-12 rounded-[2.5rem] shadow-xl border border-white/60 text-center relative h-full flex flex-col justify-center min-h-[500px]"
             >
               <div className="inline-flex p-1 bg-gray-100/50 backdrop-blur-md rounded-xl mb-12 self-center">
                 {Object.entries(modes || {}).map(([key, value]) => (
@@ -258,13 +258,16 @@ const Timer = () => {
               <div className="max-w-md mx-auto mb-10 w-full relative">
                 <div className="flex gap-2 mb-2 px-2 items-center justify-between">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Focus Mission</label>
-                  {tasks?.length > 0 && (
+                  {tasks?.length > 0 ? (
                     <button 
                       onClick={() => setShowTaskDropdown(!showTaskDropdown)}
-                      className="text-[10px] font-black text-primary-600 uppercase tracking-widest hover:underline flex items-center gap-1"
+                      className="text-[10px] font-black text-primary-600 uppercase tracking-widest hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-lg transition-all flex items-center gap-1.5"
                     >
-                      <FaTasks size={10} /> {selectedTaskId ? "Change Task" : "Choose Task"}
+                      <FaTasks className="text-primary-500" size={10} /> 
+                      {selectedTaskId ? "Change Task" : "Choose Task"}
                     </button>
+                  ) : (
+                    <span className="text-[9px] font-bold text-gray-300 uppercase tracking-widest italic">No tasks active</span>
                   )}
                 </div>
 
@@ -292,7 +295,7 @@ const Timer = () => {
                           initial={{ opacity: 0, y: 10, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          className="absolute bottom-full left-0 right-0 mb-4 bg-white/95 backdrop-blur-xl border border-gray-100 rounded-3xl shadow-2xl z-50 max-h-[300px] overflow-y-auto overflow-x-hidden p-3"
+                          className="absolute bottom-full left-0 right-0 mb-4 bg-white/98 backdrop-blur-2xl border border-gray-100 rounded-[2rem] shadow-2xl z-[100] max-h-[250px] overflow-y-auto overflow-x-hidden p-4 ring-1 ring-black/5"
                         >
                           <div className="p-2 border-b border-gray-50 mb-2">
                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Your Active Tasks</p>
@@ -359,9 +362,8 @@ const Timer = () => {
               {/* Focus Rhythm Chart - Improved alignment */}
               {todaySessions?.length > 0 && (
                 <div className="max-w-md mx-auto w-full px-2 border-t border-gray-100/50 pt-10">
-                  <div className="flex items-center justify-between mb-8 text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">
+                  <div className="flex items-center justify-center mb-8 text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">
                     <span>Focus Rhythm</span>
-                    <span>Recent Sessions</span>
                   </div>
                   <div className="overflow-x-auto pt-20 pb-4 scrollbar-hide -mt-20">
                     <div className={`flex items-end gap-2 h-28 min-w-full ${todaySessions.length <= 8 ? "justify-center" : "justify-start px-4"}`}>
