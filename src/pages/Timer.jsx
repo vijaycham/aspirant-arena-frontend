@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FaPlay,
@@ -15,10 +16,17 @@ import {
   FaBolt,
   FaChartLine,
   FaFire,
+  FaVolumeUp,
+  FaVolumeMute,
+  FaCloudRain,
+  FaMusic,
+  FaWater,
+  FaBell,
+  FaBellSlash,
 } from "react-icons/fa";
 import { useTimer } from "../hooks/useTimer";
 import { useTasks } from "../hooks/useTasks";
-import { UPSC_PRESETS } from "../utils/timer/timerConstants";
+import { UPSC_PRESETS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
 import FocusRatingModal from "../components/timer/FocusRatingModal";
 
 const Timer = () => {
@@ -51,6 +59,14 @@ const Timer = () => {
     effectiveMinutesToday,
     efficiencyScore,
     streak,
+    ambientEnabled,
+    setAmbientEnabled,
+    ambientType,
+    setAmbientType,
+    volume,
+    setVolume,
+    notificationPermission,
+    requestNotificationPermission,
   } = useTimer();
 
   const { tasks = [] } = useTasks() || {};
@@ -58,6 +74,13 @@ const Timer = () => {
   const [manualMin, setManualMin] = useState("");
   const [showTaskDropdown, setShowTaskDropdown] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isMobileOrTablet, setIsMobileOrTablet] = React.useState(typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobileOrTablet(window.innerWidth <= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   /* ------------------ FORMATTERS ------------------ */
   const formatTime = (seconds) => {
@@ -74,11 +97,17 @@ const Timer = () => {
 
   const handleManualSubmit = (e) => {
     e.preventDefault();
+    if (!manualMin) {
+      setIsEditing(false);
+      return;
+    }
     const mins = parseInt(manualMin);
     if (mins > 0 && mins <= 300) {
       setManualTime(mins);
       setIsEditing(false);
       setManualMin("");
+    } else {
+      toast.error("Please enter 1-300 mins");
     }
   };
 
@@ -104,6 +133,34 @@ const Timer = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Notification Control */}
+            <div className="relative group/notify h-[34px]">
+              <button
+                onClick={requestNotificationPermission}
+                className={`flex items-center justify-center w-[34px] h-full rounded-lg border transition-all shadow-sm active:scale-90 ${
+                  notificationPermission === "granted" 
+                    ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
+                    : notificationPermission === "denied"
+                    ? "bg-rose-50 border-rose-100 text-rose-600"
+                    : "bg-white border-gray-200 text-gray-400 hover:text-primary-600 hover:border-primary-100"
+                }`}
+              >
+                {notificationPermission === "denied" ? <FaBellSlash size={12} /> : <FaBell size={12} />}
+              </button>
+              
+              <div className="absolute top-full right-0 mt-3 w-44 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl opacity-0 group-hover/notify:opacity-100 pointer-events-none transition-all z-[60] shadow-2xl text-center">
+                <p className="text-[8px] font-black text-primary-400 uppercase tracking-widest mb-1">Notifications</p>
+                <p className="text-[10px] font-black text-white uppercase tracking-tighter">
+                  {notificationPermission === "granted" ? "Enabled! 🔔" : notificationPermission === "denied" ? "Blocked ❌" : "Click to Enable 🔔"}
+                </p>
+                {notificationPermission === "denied" && (
+                  <p className="text-[8px] text-gray-400 mt-2 leading-tight uppercase font-bold px-1">
+                    {isMobileOrTablet ? "Enable in Site/Phone Settings" : "Enable in Browser Address Bar"}
+                  </p>
+                )}
+              </div>
+            </div>
+
             {/* Streak Indicator */}
             {streak > 0 && (
               <div className="flex items-center gap-1.5 px-3 py-2 bg-orange-50 border border-orange-100 rounded-lg group/streak relative cursor-pointer mr-2 shadow-sm shadow-orange-100/50">
@@ -187,7 +244,10 @@ const Timer = () => {
                 {Object.entries(modes || {}).map(([key, value]) => (
                   <button
                     key={key}
-                    onClick={() => switchMode(key)}
+                    onClick={() => {
+                      switchMode(key);
+                      setIsEditing(false);
+                    }}
                     className={`px-6 md:px-8 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
                       mode === key ? "bg-white text-gray-900 shadow-sm scale-105" : "text-gray-400 hover:text-gray-600"
                     }`}
@@ -227,9 +287,16 @@ const Timer = () => {
                       <input 
                         autoFocus
                         type="number"
+                        min="1"
+                        max="300"
                         placeholder="Mins"
                         value={manualMin}
-                        onChange={(e) => setManualMin(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '' || (parseInt(val) >= 0 && parseInt(val) <= 300)) {
+                            setManualMin(val);
+                          }
+                        }}
                         className="text-6xl font-black w-40 text-center bg-transparent border-b-4 border-primary-500 outline-none"
                       />
                       <div className="flex gap-4 mt-4">
@@ -503,13 +570,83 @@ const Timer = () => {
                 </div>
               </div>
 
+              {/* Ambient Atmosphere */}
+              <div className="glass-card p-6 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden">
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <FaCloudRain className="text-primary-500" /> Ambient Focus
+                  </h3>
+                  <button 
+                    onClick={() => setAmbientEnabled(!ambientEnabled)}
+                    className={`w-10 h-[22px] rounded-full transition-all duration-300 relative ${ambientEnabled ? 'bg-primary-500' : 'bg-gray-200'} shadow-inner`}
+                  >
+                    <motion.div 
+                      layout
+                      animate={{ x: ambientEnabled ? 20 : 2 }}
+                      initial={false}
+                      className="absolute top-[2.5px] left-0 w-[17px] h-[17px] bg-white rounded-full shadow-sm"
+                    />
+                  </button>
+                </div>
+
+                <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-hide px-1">
+                  {AMBIENT_SOUNDS.filter(s => s.id !== 'none').map(sound => (
+                    <button
+                      key={sound.id}
+                      onClick={() => {
+                        setAmbientType(sound.id);
+                        if (!ambientEnabled) setAmbientEnabled(true);
+                      }}
+                      className={`flex-shrink-0 px-4 py-3 rounded-2xl border text-[9px] font-black uppercase tracking-tight transition-all flex items-center gap-2 relative overflow-hidden group/sbtn ${
+                        ambientType === sound.id && ambientEnabled 
+                          ? 'bg-primary-50/50 border-primary-200 text-primary-700 shadow-sm' 
+                          : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600'
+                      }`}
+                    >
+                      {ambientType === sound.id && ambientEnabled && (
+                        <motion.div 
+                          layoutId="activeSound"
+                          className="absolute inset-0 bg-primary-100/20"
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        />
+                      )}
+                      <span className="relative z-10 flex items-center gap-2">
+                        {sound.id === 'rain' && <FaCloudRain size={10} />}
+                        {sound.id === 'river' && <FaWater size={10} />}
+                        {sound.id === 'lofi' && <FaMusic size={10} />}
+                        {sound.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-3 px-1">
+                  <div className="text-gray-400 flex-shrink-0">
+                    {volume === 0 || !ambientEnabled ? <FaVolumeMute size={12} /> : <FaVolumeUp size={12} className="text-primary-500" />}
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.01" 
+                    value={volume}
+                    onChange={(e) => setVolume(parseFloat(e.target.value))}
+                    className="flex-1 h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                  />
+                  <span className="text-[10px] font-black text-gray-400 w-8 tabular-nums text-right">{Math.round(volume * 100)}%</span>
+                </div>
+              </div>
+
               <div className="space-y-3">
                 <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-2">Quick Strategy</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {UPSC_PRESETS.map((preset) => (
                     <button
                       key={preset.name}
-                      onClick={() => applyPreset(preset.name, preset.focus, preset.short, preset.long)}
+                      onClick={() => {
+                        applyPreset(preset.name, preset.focus, preset.short, preset.long);
+                        setIsEditing(false);
+                      }}
                       className="glass-card hover:bg-white p-4 rounded-2xl border border-white/60 text-left transition-all hover:shadow-md active:scale-95 group"
                     >
                       <span className="text-xl mb-1 block group-hover:scale-110 transition-transform">{preset.icon}</span>

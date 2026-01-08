@@ -90,7 +90,7 @@ const Home = () => {
       };
       fetchHomeStats();
     }
-  }, [user]);
+  }, [user?._id, user?.isEmailVerified]);
 
   // Handle successful verification redirect
   useEffect(() => {
@@ -99,9 +99,16 @@ const Home = () => {
         id: "verify-success",
         duration: 5000,
       });
+            
       // Sync profile to remove banner/unlock features if state is stale
+
+      // Clear the "verified" param from URL so this doesn't run again on re-render/user sync
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("verified");
+      window.history.replaceState({}, "", `${window.location.pathname}?${newParams.toString()}`);
+
       const syncProfile = async () => {
-        if (!user) return;
+        if (!user || user.isEmailVerified) return;
         try {
           const res = await api.get("/profile");
           if (res.status === "success" && res.data.user) {
@@ -113,7 +120,7 @@ const Home = () => {
       };
       syncProfile();
     }
-  }, [searchParams, dispatch, user]);
+  }, [searchParams, dispatch, user?._id, user?.isEmailVerified]);
 
   const strategy = getStrategyNote(stats);
 

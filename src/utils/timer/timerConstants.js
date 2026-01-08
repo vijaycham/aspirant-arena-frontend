@@ -22,4 +22,26 @@ export const TIMER_STORAGE_KEYS = {
   IS_ACTIVE: "timer-isActive",
   LAST_UPDATE: "timer-lastUpdate",
   ENABLE_REFLECTION: "timer-enableReflection",
+  AMBIENT_SOUND_ENABLED: "timer-ambientEnabled",
+  AMBIENT_SOUND_TYPE: "timer-ambientType",
+  AMBIENT_VOLUME: "timer-ambientVolume",
 };
+
+export const AMBIENT_SOUNDS = [
+  { id: "none", label: "None", url: null },
+  { 
+    id: "rain", 
+    label: "Rain", 
+    url: "https://www.soundjay.com/nature/rain-02.mp3" 
+  },
+  { 
+    id: "river", 
+    label: "River", 
+    url: "https://www.soundjay.com/nature/river-1.mp3" 
+  },
+  { 
+    id: "lofi", 
+    label: "Lo-fi", 
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" 
+  }
+];

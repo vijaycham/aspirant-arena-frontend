@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 import { toast } from "react-hot-toast";
-import { DEFAULT_MODES, TIMER_STORAGE_KEYS } from "../utils/timer/timerConstants";
+import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
 
 export const useTimer = () => {
   /* ------------------ HELPERS ------------------ */
@@ -39,14 +39,25 @@ export const useTimer = () => {
   
   const [pendingSession, setPendingSession] = useState(null);
   
+  // Ambient Sound State
+  const [ambientEnabled, setAmbientEnabled] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED) === "true");
+  const [ambientType, setAmbientType] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE) || "rain");
+  const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem(TIMER_STORAGE_KEYS.AMBIENT_VOLUME)) || 0.5);
+
   const workerRef = useRef(null);
   const startTimeRef = useRef(null);
+  const ambientRef = useRef(null);
+  const chimeRef = useRef(null);
+  const [notificationPermission, setNotificationPermission] = useState(
+    typeof Notification !== "undefined" ? Notification.permission : "default"
+  );
 
   /* ------------------ API SYNC ------------------ */
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data } = await api.get("/focus/stats/today");
+        const tzOffset = new Date().getTimezoneOffset();
+        const { data } = await api.get(`/focus/stats/today?offset=${tzOffset}`);
         setTotalMinutesToday(data.totalMinutes || 0);
         setEffectiveMinutesToday(data.effectiveMinutes || 0);
         setSessionsCompleted(data.sessionCount || 0);
@@ -86,7 +97,104 @@ export const useTimer = () => {
     localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, isActive.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.ENABLE_REFLECTION, reflectionEnabled.toString());
-  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled]);
+    localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED, ambientEnabled.toString());
+    localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE, ambientType);
+    localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_VOLUME, volume.toString());
+  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled, ambientEnabled, ambientType, volume]);
+
+  /* ------------------ AMBIENT AUDIO LOGIC ------------------ */
+  useEffect(() => {
+    if (!ambientRef.current) {
+      ambientRef.current = new Audio();
+      ambientRef.current.loop = true;
+    }
+
+    const currentSound = AMBIENT_SOUNDS.find(s => s.id === ambientType);
+    
+    if (ambientEnabled && isActive && currentSound?.url) {
+      if (ambientRef.current.src !== currentSound.url) {
+        ambientRef.current.src = currentSound.url;
+      }
+      ambientRef.current.volume = volume;
+      ambientRef.current.play().catch(e => console.warn("Audio play blocked:", e));
+    } else {
+      ambientRef.current.pause();
+    }
+  }, [ambientEnabled, ambientType, isActive, volume]);
+
+  /* ------------------ MEDIA SESSION API (Mobile Controls) ------------------ */
+  useEffect(() => {
+    if ("mediaSession" in navigator) {
+      const modeLabel = mode.replace("_", " ").toLowerCase();
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = (timeLeft % 60).toString().padStart(2, '0');
+      
+      if (typeof MediaMetadata !== "undefined") {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `${modeLabel === 'focus' ? '🎯' : '☕'} ${minutes}:${seconds}`,
+          artist: "Aspirant Arena",
+          album: subject || "Deep Work Session",
+          artwork: [
+            { src: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", sizes: "512x512", type: "image/png" }
+          ]
+        });
+      }
+
+      navigator.mediaSession.setActionHandler("play", () => setIsActive(true));
+      navigator.mediaSession.setActionHandler("pause", () => setIsActive(false));
+    }
+  }, [timeLeft, mode, subject]);
+
+  /* ------------------ BROWSER TAB TITLE ------------------ */
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      if (isActive) {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = (timeLeft % 60).toString().padStart(2, '0');
+        const modeLabel = mode === "FOCUS" ? "Focusing" : "Break Time";
+        document.title = `(${minutes}:${seconds}) ${modeLabel} | Aspirant Arena`;
+      } else {
+        document.title = "Aspirant Arena | Deep Work Hub";
+      }
+    }
+  }, [timeLeft, isActive, mode]);
+
+  /* ------------------ NOTIFICATIONS ------------------ */
+  useEffect(() => {
+    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+      Notification.requestPermission().then(setNotificationPermission);
+    }
+  }, []);
+
+  const requestNotificationPermission = async () => {
+    if (typeof Notification === "undefined") {
+      toast.error("Notifications are not supported in this browser.");
+      return;
+    }
+    const permission = await Notification.requestPermission();
+    setNotificationPermission(permission);
+    if (permission === "granted") {
+      toast.success("Notifications enabled! 🔔");
+    } else if (permission === "denied") {
+      toast.error("Notifications are blocked by your browser settings.");
+    }
+  };
+
+  const sendNotification = (title, body) => {
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      new Notification(title, { 
+        body, 
+        icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
+      });
+    }
+  };
+
+  const playChime = () => {
+    if (!chimeRef.current) {
+      chimeRef.current = new Audio("https://actions.google.com/sounds/v1/alarms/notification_simple_01.ogg");
+    }
+    chimeRef.current.play().catch(() => {});
+  };
 
   /* ------------------ ACTIONS ------------------ */
   const saveSession = useCallback(async (seconds, status = "completed", rating = 3, notes = "") => {
@@ -127,7 +235,8 @@ export const useTimer = () => {
 
       // Re-fetch stats to update efficiency and rhythm
       try {
-        const { data: statsData } = await api.get("/focus/stats/today");
+        const tzOffset = new Date().getTimezoneOffset();
+        const { data: statsData } = await api.get(`/focus/stats/today?offset=${tzOffset}`);
         setTotalMinutesToday(statsData.totalMinutes || 0);
         setEffectiveMinutesToday(statsData.effectiveMinutes || 0);
         setSessionsCompleted(statsData.sessionCount || 0);
@@ -149,6 +258,14 @@ export const useTimer = () => {
   const handleTimerComplete = useCallback((manual = false) => {
     setIsActive(false);
     const elapsed = modeTimings[mode].time - timeLeft;
+
+    if (!manual) {
+      playChime();
+      sendNotification(
+        mode === "FOCUS" ? "Session Complete! 🎯" : "Break Over! ⚡",
+        mode === "FOCUS" ? "Great job! Time for a well-deserved break." : "Break is finished. Ready to dive back in?"
+      );
+    }
 
     if (mode === "FOCUS") {
       if (elapsed >= 60) {
@@ -242,6 +359,7 @@ export const useTimer = () => {
   };
 
   const setManualTime = (minutes) => {
+    if (minutes <= 0) return;
     const seconds = minutes * 60;
     const newTimings = { ...modeTimings, [mode]: { ...modeTimings[mode], time: seconds } };
     setModeTimings(newTimings);
@@ -316,6 +434,15 @@ export const useTimer = () => {
     completeRating,
     setPendingSession,
     reflectionEnabled,
-    setReflectionEnabled
+    setReflectionEnabled,
+    // Ambient sound
+    ambientEnabled,
+    setAmbientEnabled,
+    ambientType,
+    setAmbientType,
+    volume,
+    setVolume,
+    notificationPermission,
+    requestNotificationPermission
   };
 };
