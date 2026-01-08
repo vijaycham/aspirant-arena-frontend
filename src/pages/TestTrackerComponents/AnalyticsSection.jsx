@@ -42,7 +42,7 @@ const AnalyticsSection = ({
               <Shimmer variant="card" className="h-full" />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} style={{ outline: "none" }}>
+                <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis dataKey="name" hide />
                   <YAxis domain={[0, 100]} stroke="#cbd5e1" fontSize={9} tick={{ fontWeight: "bold" }} />
@@ -99,13 +99,15 @@ const AnalyticsSection = ({
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart style={{ outline: "none" }}>
+                <PieChart>
                   <Pie
                     data={mistakeData.filter((d) => d.value > 0)}
                     innerRadius="60%"
                     outerRadius="85%"
                     paddingAngle={5}
                     dataKey="value"
+                    stroke="none"
+                    activeShape={false}
                   >
                     {mistakeData
                       .filter((d) => d.value > 0)
@@ -157,7 +159,6 @@ const AnalyticsSection = ({
                   accuracy: Math.round(s.avgScore * 100),
                   target: s.avgTarget,
                 }))}
-                style={{ outline: "none" }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis
