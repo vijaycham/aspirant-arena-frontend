@@ -30,13 +30,15 @@ export const useTimer = () => {
   const [cycleNumber, setCycleNumber] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.CYCLE), 10) || 1);
   const [sessionsCompleted, setSessionsCompleted] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.SESSIONS), 10) || 0);
   const [totalMinutesToday, setTotalMinutesToday] = useState(0);
+  const [effectiveMinutesToday, setEffectiveMinutesToday] = useState(0);
+  const [todaySessions, setTodaySessions] = useState([]);
+  const [streak, setStreak] = useState(0);
   const [subject, setSubject] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.SUBJECT) || "");
   const [selectedTaskId, setSelectedTaskId] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.TASK_ID) || "");
   const [reflectionEnabled, setReflectionEnabled] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.ENABLE_REFLECTION) !== "false");
   
   const [pendingSession, setPendingSession] = useState(null);
   
-  const timerRef = useRef(null);
   const workerRef = useRef(null);
   const startTimeRef = useRef(null);
 
@@ -46,7 +48,10 @@ export const useTimer = () => {
       try {
         const { data } = await api.get("/focus/stats/today");
         setTotalMinutesToday(data.totalMinutes || 0);
+        setEffectiveMinutesToday(data.effectiveMinutes || 0);
         setSessionsCompleted(data.sessionCount || 0);
+        setStreak(data.streak || 0);
+        setTodaySessions(data.todaySessions || []);
       } catch (err) {
         console.error("Stats fetch failed", err);
       }
@@ -119,6 +124,18 @@ export const useTimer = () => {
       startTimeRef.current = null;
       setPendingSession(null);
       toast.success("Focus logged 🎯");
+
+      // Re-fetch stats to update efficiency and rhythm
+      try {
+        const { data: statsData } = await api.get("/focus/stats/today");
+        setTotalMinutesToday(statsData.totalMinutes || 0);
+        setEffectiveMinutesToday(statsData.effectiveMinutes || 0);
+        setSessionsCompleted(statsData.sessionCount || 0);
+        setStreak(statsData.streak || 0);
+        setTodaySessions(statsData.todaySessions || []);
+      } catch (err) {
+        console.error("Post-save stats sync failed", err);
+      }
     } catch (err) {
       console.error("Save failed", err);
     }
@@ -152,7 +169,7 @@ export const useTimer = () => {
       setMode("FOCUS");
       setTimeLeft(modeTimings.FOCUS.time);
     }
-  }, [mode, timeLeft, cycleNumber, modeTimings, saveSession]);
+  }, [mode, timeLeft, cycleNumber, modeTimings, saveSession, reflectionEnabled]);
 
   const toggleTimer = () => {
     if (!isActive && !startTimeRef.current) {
@@ -194,7 +211,9 @@ export const useTimer = () => {
     }
     setIsActive(false);
     setTotalMinutesToday(0);
+    setEffectiveMinutesToday(0);
     setSessionsCompleted(0);
+    setTodaySessions([]);
     setSubject("");
     setTimeLeft(modeTimings[mode].time);
     startTimeRef.current = null;
@@ -282,6 +301,10 @@ export const useTimer = () => {
     progress,
     sessionsCompleted,
     totalMinutesToday,
+    effectiveMinutesToday,
+    efficiencyScore: totalMinutesToday > 0 ? Math.round((effectiveMinutesToday / totalMinutesToday) * 100) : 0,
+    todaySessions,
+    streak,
     cycleNumber,
     subject,
     setSubject,
