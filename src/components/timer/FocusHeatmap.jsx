@@ -59,6 +59,10 @@ const FocusHeatmap = () => {
     };
 
     fetchHeatmap();
+
+    const handleClickAway = () => setHoveredDay(null);
+    document.addEventListener('click', handleClickAway);
+    return () => document.removeEventListener('click', handleClickAway);
   }, []);
 
   // Construct the array of 365 days
@@ -68,15 +72,12 @@ const FocusHeatmap = () => {
     const monthLabels = [];
     
     // Logic: Iterate backwards 365 days to build chronologically sorted list
-    let currentMonth = -1;
-
     for (let i = DAYS_TO_SHOW - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
       
       const dateStr = date.toLocaleDateString("en-CA"); 
-      const monthIndex = date.getMonth();
-
+      
       const label = date.toLocaleDateString(undefined, {
         month: "short",
         day: "numeric",
@@ -218,6 +219,10 @@ const FocusHeatmap = () => {
                 {days.map((day) => (
                     <motion.div
                         key={day.date}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMouseEnter(e, day);
+                        }}
                         onMouseEnter={(e) => handleMouseEnter(e, day)}
                         onFocus={(e) => handleMouseEnter(e, day)}
                         onBlur={() => setHoveredDay(null)}
@@ -251,7 +256,8 @@ const FocusHeatmap = () => {
                animate={{ opacity: 1, scale: 1, y: 0 }}
                exit={{ opacity: 0, scale: 0.8, y: 10 }}
                transition={{ type: "spring", stiffness: 350, damping: 25 }}
-               className="mb-1 w-32 bg-slate-900/95 backdrop-blur-xl border border-slate-800 p-2.5 rounded-xl text-center shadow-xl flex flex-col items-center"
+               className="mb-1 w-32 bg-slate-900/95 backdrop-blur-xl border border-slate-800 p-2.5 rounded-xl text-center shadow-xl flex flex-col items-center pointer-events-auto"
+               onClick={(e) => e.stopPropagation()}
              >
                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-white/10 pb-1 mb-1 w-full truncate">
                     {hoveredDay.label}

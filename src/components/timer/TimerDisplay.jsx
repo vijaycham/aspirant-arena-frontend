@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaExpand } from "react-icons/fa";
 
 const TimerDisplay = ({
   mode,
@@ -14,7 +14,8 @@ const TimerDisplay = ({
   handleManualSubmit,
   formatTime,
   cycleNumber,
-  isActive
+  isActive,
+  onFullScreen
 }) => {
   return (
     <>
@@ -85,7 +86,7 @@ const TimerDisplay = ({
           )}
         </AnimatePresence>
         
-        <div className="mt-8 flex flex-col items-center gap-2">
+        <div className="mt-8 flex flex-col items-center gap-6">
           <div className="flex gap-2">
             {[1, 2, 3, 4].map((num) => (
               <div
@@ -96,6 +97,14 @@ const TimerDisplay = ({
               />
             ))}
           </div>
+
+          <button
+            onClick={onFullScreen}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 hover:bg-white transition-all active:scale-95"
+          >
+            <FaExpand size={10} />
+            Zen Mode
+          </button>
         </div>
       </div>
     </>

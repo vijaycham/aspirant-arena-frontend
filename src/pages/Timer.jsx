@@ -27,6 +27,7 @@ import QuickStrategy from "../components/timer/QuickStrategy";
 import TimerResetModal from "../components/timer/TimerResetModal";
 import FocusRatingModal from "../components/timer/FocusRatingModal";
 import FocusHeatmap from "../components/timer/FocusHeatmap";
+import FullScreenTimer from "../components/timer/FullScreenTimer";
 
 const Timer = () => {
   const {
@@ -66,6 +67,7 @@ const Timer = () => {
     setVolume,
     notificationPermission,
     requestNotificationPermission,
+    progress,
   } = useTimer();
 
   const { tasks = [] } = useTasks() || {};
@@ -73,6 +75,7 @@ const Timer = () => {
   const [manualMin, setManualMin] = useState("");
   const [showTaskDropdown, setShowTaskDropdown] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [isMobileOrTablet, setIsMobileOrTablet] = React.useState(typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
 
   React.useEffect(() => {
@@ -80,6 +83,18 @@ const Timer = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Prevent body scroll when in Zen Mode
+  React.useEffect(() => {
+    if (isFullScreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isFullScreen]);
 
   /* ------------------ FORMATTERS ------------------ */
   const formatTime = (seconds) => {
@@ -248,11 +263,19 @@ const Timer = () => {
                   setIsEditing={setIsEditing}
                   manualMin={manualMin}
                   setManualMin={setManualMin}
-                  handleManualSubmit={handleManualSubmit}
-                  formatTime={formatTime}
-                  cycleNumber={cycleNumber}
-                  isActive={isActive}
-                 />
+                   handleManualSubmit={handleManualSubmit}
+                   formatTime={formatTime}
+                   cycleNumber={cycleNumber}
+                   isActive={isActive}
+                   onFullScreen={() => {
+                     setIsFullScreen(true);
+                     if (document.documentElement.requestFullscreen) {
+                       document.documentElement.requestFullscreen().catch(err => {
+                         console.warn("Fullscreen request failed:", err);
+                       });
+                     }
+                   }}
+                  />
 
               {/* Focus Mission Input - Restored */}
               <div className="max-w-md mx-auto mb-10 w-full relative">
@@ -453,15 +476,30 @@ const Timer = () => {
       />
 
       {/* Reset Confirmation Modal */}
-      <TimerResetModal 
-        isOpen={showResetConfirm}
-        onClose={() => setShowResetConfirm(false)}
-        onConfirm={() => {
-          resetDay();
-          setShowResetConfirm(false);
-        }}
-      />
-    </div>
+       <TimerResetModal 
+         isOpen={showResetConfirm}
+         onClose={() => setShowResetConfirm(false)}
+         onConfirm={() => {
+           resetDay();
+           setShowResetConfirm(false);
+         }}
+       />
+
+       {/* Simple Full Screen Timer */}
+       <FullScreenTimer
+         isOpen={isFullScreen}
+         timeLeft={timeLeft}
+         isActive={isActive}
+         toggleTimer={toggleTimer}
+         progress={progress}
+         onClose={() => {
+           setIsFullScreen(false);
+           if (document.fullscreenElement) {
+             document.exitFullscreen().catch(() => {});
+           }
+         }}
+       />
+     </div>
   );
 };
 
