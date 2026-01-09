@@ -2,19 +2,10 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FaPlay,
-  FaPause,
-  FaUndo,
-  FaStepForward,
-  FaCoffee,
-  FaBrain,
   FaSyncAlt,
   FaCalendarDay,
-  FaEdit,
   FaTasks,
   FaLightbulb,
-  FaBolt,
-  FaChartLine,
   FaFire,
   FaVolumeUp,
   FaVolumeMute,
@@ -27,6 +18,13 @@ import {
 import { useTimer } from "../hooks/useTimer";
 import { useTasks } from "../hooks/useTasks";
 import { UPSC_PRESETS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
+import TimerDisplay from "../components/timer/TimerDisplay";
+import TimerControls from "../components/timer/TimerControls";
+import FocusRhythm from "../components/timer/FocusRhythm";
+import WisdomQuote from "../components/timer/WisdomQuote";
+import DailyIntel from "../components/timer/DailyIntel";
+import QuickStrategy from "../components/timer/QuickStrategy";
+import TimerResetModal from "../components/timer/TimerResetModal";
 import FocusRatingModal from "../components/timer/FocusRatingModal";
 import FocusHeatmap from "../components/timer/FocusHeatmap";
 
@@ -241,86 +239,20 @@ const Timer = () => {
               animate={{ opacity: 1, y: 0 }}
               className="glass-card p-6 md:p-12 rounded-[2.5rem] shadow-xl border border-white/60 text-center relative h-full flex flex-col justify-center min-h-[500px]"
             >
-              <div className="inline-flex p-1 bg-gray-100/50 backdrop-blur-md rounded-xl mb-12 self-center">
-                {Object.entries(modes || {}).map(([key, value]) => (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      switchMode(key);
-                      setIsEditing(false);
-                    }}
-                    className={`px-6 md:px-8 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-                      mode === key ? "bg-white text-gray-900 shadow-sm scale-105" : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    {value.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="relative mb-10">
-                <AnimatePresence mode="wait">
-                  {!isEditing ? (
-                    <motion.div
-                      key="timer"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="group cursor-pointer relative inline-block"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      <h1 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-none">
-                        {formatTime(timeLeft)}
-                      </h1>
-                      <div className="absolute -top-4 -right-8 opacity-0 group-hover:opacity-100 transition-opacity text-primary-500">
-                        <FaEdit size={18} />
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <motion.form
-                      key="edit"
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.9, opacity: 0 }}
-                      onSubmit={handleManualSubmit}
-                      className="flex flex-col items-center gap-2"
-                    >
-                      <input 
-                        autoFocus
-                        type="number"
-                        min="1"
-                        max="300"
-                        placeholder="Mins"
-                        value={manualMin}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === '' || (parseInt(val) >= 0 && parseInt(val) <= 300)) {
-                            setManualMin(val);
-                          }
-                        }}
-                        className="text-6xl font-black w-40 text-center bg-transparent border-b-4 border-primary-500 outline-none"
-                      />
-                      <div className="flex gap-4 mt-4">
-                        <button type="submit" className="text-xs font-black uppercase text-primary-600">Save</button>
-                        <button type="button" onClick={() => setIsEditing(false)} className="text-xs font-black uppercase text-gray-400">Cancel</button>
-                      </div>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-                
-                <div className="mt-8 flex flex-col items-center gap-2">
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4].map((num) => (
-                      <div
-                        key={num}
-                        className={`h-2 w-10 rounded-full transition-all duration-500 ${
-                          num < cycleNumber ? "bg-primary-600 shadow-sm" : num === cycleNumber && isActive ? "bg-primary-400 animate-pulse" : "bg-gray-200"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <TimerDisplay 
+                  mode={mode}
+                  modes={modes}
+                  switchMode={switchMode}
+                  timeLeft={timeLeft}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
+                  manualMin={manualMin}
+                  setManualMin={setManualMin}
+                  handleManualSubmit={handleManualSubmit}
+                  formatTime={formatTime}
+                  cycleNumber={cycleNumber}
+                  isActive={isActive}
+                 />
 
               {/* Focus Mission Input - Restored */}
               <div className="max-w-md mx-auto mb-10 w-full relative">
@@ -402,80 +334,15 @@ const Timer = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center gap-8 mb-12">
-                <button
-                  onClick={resetTimer}
-                  className="w-14 h-14 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-all active:scale-95 shadow-sm"
-                >
-                  <FaUndo className="text-xl" />
-                </button>
-
-                <button
-                  onClick={toggleTimer}
-                  className={`w-24 h-24 flex items-center justify-center rounded-[2.5rem] shadow-xl transition-all active:scale-90 ${
-                    isActive ? "bg-rose-50 text-rose-600 hover:bg-rose-100" : "bg-primary-600 text-white hover:bg-primary-700 shadow-primary-300/50"
-                  }`}
-                >
-                  {isActive ? <FaPause className="text-3xl" /> : <FaPlay className="text-3xl ml-1" />}
-                </button>
-
-                <button
-                  onClick={skipTimer}
-                  className="w-14 h-14 flex items-center justify-center rounded-2xl bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600 transition-all active:scale-95 shadow-sm"
-                >
-                  <FaStepForward className="text-xl" />
-                </button>
-              </div>
+              <TimerControls 
+                isActive={isActive}
+                onToggle={toggleTimer}
+                onReset={resetTimer}
+                onSkip={skipTimer}
+              />
 
               {/* Focus Rhythm Chart - Improved alignment */}
-              {todaySessions?.length > 0 && (
-                <div className="max-w-md mx-auto w-full px-2 border-t border-gray-100/50 pt-10">
-                  <div className="flex items-center justify-center mb-8 text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">
-                    <span>Focus Rhythm</span>
-                  </div>
-                  <div className="overflow-x-auto pt-20 pb-4 scrollbar-hide -mt-20">
-                    <div className={`flex items-end gap-2 h-28 min-w-full ${todaySessions.length <= 8 ? "justify-center" : "justify-start px-4"}`}>
-                      {todaySessions.map((s, i) => (
-                        <div
-                          key={s._id || i}
-                          className="flex flex-col items-center justify-end flex-shrink-0 w-8 h-full relative group cursor-pointer"
-                        >
-                        <div 
-                          className={`w-full rounded-t-lg transition-all duration-700 ease-out border border-white/20 ${
-                            s.focusRating >= 5 ? "bg-emerald-600 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)] shadow-emerald-500/30" :
-                            s.focusRating >= 4 ? "bg-emerald-400" :
-                            s.focusRating >= 3 ? "bg-amber-400" :
-                            s.focusRating >= 2 ? "bg-orange-500" : "bg-rose-500"
-                          }`}
-                          style={{ 
-                            height: `${(s.focusRating / 5) * 100}%`,
-                            minHeight: '4px',
-                            opacity: 0.85 + (s.focusRating / 5) * 0.15
-                          }} 
-                        />
-                        {/* Time Label */}
-                        <span className="text-[9px] font-black text-gray-400 mt-2 uppercase tracking-tighter tabular-nums leading-none">
-                          {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-                        </span>
-                        
-                        {/* Improved Floating Tooltip - Dark Glass Style */}
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bg-slate-900/95 backdrop-blur-xl border border-slate-800 p-3 rounded-2xl opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 pointer-events-none z-50 shadow-2xl w-36 text-center">
-                          <p className="border-b border-white/10 pb-2 mb-2 font-black truncate text-primary-400 uppercase text-[8px] tracking-widest">{s.subject || 'Focus'}</p>
-                          <div className="flex justify-between items-center px-1">
-                            <span className="font-bold text-white text-[10px]">{s.duration}m</span>
-                            <span className="text-emerald-400 font-black text-[10px]">{s.focusRating}★</span>
-                          </div>
-                        </div>
-                        </div>
-                      ))}
-                      {/* Placeholder - Only show if very few sessions */}
-                      {todaySessions.length < 8 && Array.from({ length: 8 - todaySessions.length }).map((_, i) => (
-                        <div key={`empty-${i}`} className="w-8 h-4 bg-gray-100/50 rounded-md border border-gray-50 mb-[22px] flex-shrink-0" />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+              <FocusRhythm todaySessions={todaySessions} />
             </motion.div>
 
             
@@ -486,95 +353,16 @@ const Timer = () => {
 
             {/* Sidebar (Right) */}
             <div className="lg:col-span-4 space-y-6">
-              {/* Wisdom Quote - Light Glass Style */}
-              <div className="glass-card p-8 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-100/20 blur-3xl rounded-full -mr-16 -mt-16"></div>
-                <p className="text-[10px] font-black text-primary-600 uppercase tracking-widest mb-4 italic">Aspirant Wisdom</p>
-                <p className="text-sm font-semibold leading-relaxed italic text-gray-700 group-hover:text-gray-900 transition-colors">
-                  “The secret of getting ahead is getting started.”
-                </p>
-              </div>
+              <WisdomQuote />
 
               {/* Daily Intel */}
-              <div className="glass-card p-8 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden">
-                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-4">Daily Intel</h3>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Total Sit */}
-                  <div className="flex flex-col items-start gap-2 p-3 bg-primary-50/30 rounded-2xl border border-primary-100/20 group/intel relative cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center text-primary-600">
-                      <FaBrain size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">Total Spent</p>
-                      <p className="text-lg font-black text-gray-900 tracking-tight">{formatTotalTime(totalMinutesToday)}</p>
-                    </div>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-0 mb-2 w-48 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl opacity-0 group-hover/intel:opacity-100 pointer-events-none transition-all z-50 shadow-xl">
-                      <p className="text-[9px] text-gray-300 font-medium leading-relaxed">
-                        The raw clock time you&apos;ve spent with the timer active today.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Deep Focus */}
-                  <div className="flex flex-col items-start gap-2 p-3 bg-amber-50/30 rounded-2xl border border-amber-100/20 group/intel relative cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
-                      <FaBolt size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">Deep Focus</p>
-                      <p className="text-lg font-black text-gray-900 tracking-tight">{formatTotalTime(effectiveMinutesToday)}</p>
-                    </div>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-0 mb-2 w-48 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl opacity-0 group-hover/intel:opacity-100 pointer-events-none transition-all z-50 shadow-xl">
-                      <p className="text-[9px] text-gray-300 font-medium leading-relaxed">
-                        Adjusted study time based on your focus ratings. 5★ = 100% time, 3★ = 60%.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Quality */}
-                  <div className="flex flex-col items-start gap-2 p-3 bg-orange-50/30 rounded-2xl border border-orange-100/20 group/intel relative cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600">
-                      <FaChartLine size={14} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">Quality</p>
-                        <div className={`w-1.5 h-1.5 rounded-full ${
-                          efficiencyScore >= 80 ? "bg-emerald-500" :
-                          efficiencyScore >= 60 ? "bg-amber-500" : "bg-rose-500"
-                        }`} />
-                      </div>
-                      <p className="text-lg font-black text-gray-900 tracking-tight">{efficiencyScore}%</p>
-                    </div>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-0 mb-2 w-48 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl opacity-0 group-hover/intel:opacity-100 pointer-events-none transition-all z-50 shadow-xl">
-                      <p className="text-[9px] text-gray-300 font-medium leading-relaxed">
-                        Your average study efficiency based on self-reflection ratings today.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Sessions */}
-                  <div className="flex flex-col items-start gap-1.5 p-3 bg-emerald-50/30 rounded-2xl border border-emerald-100/20 group/intel relative cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                      <FaCoffee size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[8px] font-black text-gray-400 uppercase tracking-tighter">Sessions</p>
-                      <p className="text-lg font-black text-gray-900 tracking-tight">{sessionsCompleted}</p>
-                    </div>
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full right-0 mb-2 w-48 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl opacity-0 group-hover/intel:opacity-100 pointer-events-none transition-all z-50 shadow-xl">
-                      <p className="text-[9px] text-gray-300 font-medium leading-relaxed text-right">
-                        Total study cycles you&apos;ve started and logged throughout the day.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <DailyIntel 
+                totalMinutesToday={totalMinutesToday}
+                effectiveMinutesToday={effectiveMinutesToday}
+                efficiencyScore={efficiencyScore}
+                sessionsCompleted={sessionsCompleted}
+                formatTotalTime={formatTotalTime}
+              />
 
               {/* Ambient Atmosphere */}
               <div className="glass-card p-6 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden">
@@ -643,25 +431,11 @@ const Timer = () => {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-2">Quick Strategy</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {UPSC_PRESETS.map((preset) => (
-                    <button
-                      key={preset.name}
-                      onClick={() => {
-                        applyPreset(preset.name, preset.focus, preset.short, preset.long);
-                        setIsEditing(false);
-                      }}
-                      className="glass-card hover:bg-white p-4 rounded-2xl border border-white/60 text-left transition-all hover:shadow-md active:scale-95 group"
-                    >
-                      <span className="text-xl mb-1 block group-hover:scale-110 transition-transform">{preset.icon}</span>
-                      <h4 className="text-[8px] font-black uppercase text-gray-400 mb-0.5 tracking-tight group-hover:text-primary-600">{preset.name}</h4>
-                      <p className="text-xs font-black text-gray-900">{preset.focus}m / {preset.short}m</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <QuickStrategy 
+                applyPreset={applyPreset}
+                setIsEditing={setIsEditing}
+                upscPresets={UPSC_PRESETS}
+              />
             </div>
         </div>
       </div>
@@ -675,50 +449,14 @@ const Timer = () => {
       />
 
       {/* Reset Confirmation Modal */}
-      <AnimatePresence>
-        {showResetConfirm && (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
-              onClick={() => setShowResetConfirm(false)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl p-8 border border-white z-10 text-center"
-            >
-              <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaCalendarDay className="text-rose-500 text-2xl" />
-              </div>
-              <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter mb-2">Reset Analytics?</h3>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-8 px-4 leading-relaxed">
-                This will clear your focus minutes and sessions for today. Historical data is safe. Proceed?
-              </p>
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => {
-                    resetDay();
-                    setShowResetConfirm(false);
-                  }}
-                  className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-black transition-all"
-                >
-                  Yes, Reset Day
-                </button>
-                <button
-                  onClick={() => setShowResetConfirm(false)}
-                  className="w-full py-3 text-[9px] font-black uppercase text-gray-400 tracking-widest"
-                >
-                  Cancel
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <TimerResetModal 
+        isOpen={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        onConfirm={() => {
+          resetDay();
+          setShowResetConfirm(false);
+        }}
+      />
     </div>
   );
 };

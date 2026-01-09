@@ -24,4 +24,6 @@ dist-ssr
 *.sw?
 ARENA_LOGS.md
 FOCUS_ARENA_PLAN.md
+REFACTORING_NOTES.md
+FUTURE_ROADMAP.md
 .agent/
