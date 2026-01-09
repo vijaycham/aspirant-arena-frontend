@@ -271,7 +271,8 @@ const Timer = () => {
                   )}
                 </div>
 
-                <div className="relative">
+                <div className="relative group/input">
+                  <div className="absolute inset-0 bg-primary-100/20 blur-xl rounded-full opacity-0 group-focus-within/input:opacity-100 transition-opacity duration-500"></div>
                   <input
                     type="text"
                     placeholder="Focus Mission... (e.g. Laxmikanth Polity)"
@@ -280,7 +281,7 @@ const Timer = () => {
                       setSubject(e.target.value);
                       setSelectedTaskId(""); 
                     }}
-                    className="w-full bg-gray-50/50 border-2 border-transparent focus:border-primary-100 focus:bg-white px-6 py-4 rounded-2xl outline-none text-center font-bold text-gray-700 transition-all placeholder:text-gray-300 text-base shadow-inner"
+                    className="relative w-full bg-white/40 backdrop-blur-md border border-white/60 focus:border-primary-300 focus:bg-white/60 px-6 py-4 rounded-2xl outline-none text-center font-bold text-gray-800 transition-all placeholder:text-gray-400 text-base shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
                   />
                   
                   {/* Task Dropdown Menu */}
@@ -288,42 +289,44 @@ const Timer = () => {
                     {showTaskDropdown && (
                       <div className="contents">
                         <div 
-                          className="fixed inset-0 z-40 bg-black/5" 
+                          className="fixed inset-0 z-40 bg-black/5 rounded-[2.5rem]" 
                           onClick={() => setShowTaskDropdown(false)}
                         />
                         <motion.div
                           initial={{ opacity: 0, y: 10, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          className="absolute bottom-full left-0 right-0 mb-4 bg-white/98 backdrop-blur-2xl border border-gray-100 rounded-[2rem] shadow-2xl z-[100] max-h-[250px] overflow-y-auto overflow-x-hidden p-4 ring-1 ring-black/5"
+                          className="absolute bottom-full left-0 right-0 mb-4 bg-white/80 backdrop-blur-xl border border-white/60 rounded-[2.5rem] shadow-2xl z-[100] max-h-[250px] overflow-y-auto overflow-x-hidden p-5 ring-1 ring-black/5 scrollbar-hide"
                         >
-                          <div className="p-2 border-b border-gray-50 mb-2">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Your Active Tasks</p>
+                          <div className="p-2 border-b border-gray-100/50 mb-2">
+                            <p className="text-[9px] font-black text-black uppercase tracking-widest">Select Active Mission</p>
                           </div>
-                          {(tasks || []).map((t) => (
-                            <button
-                              key={t._id}
-                              onClick={() => {
-                                setSubject(t.text);
-                                setSelectedTaskId(t._id);
-                                setShowTaskDropdown(false);
-                              }}
-                              className="w-full text-left p-4 hover:bg-gray-50 rounded-2xl transition-all group flex items-start gap-3"
-                            >
-                              <div className={`mt-1 w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                                t.priority === 'high' ? 'bg-rose-500' : 
-                                t.priority === 'medium' ? 'bg-amber-500' : 'bg-emerald-500'
-                              }`} />
-                              <span className="text-sm font-bold text-gray-700 group-hover:text-primary-600 truncate">{t.text}</span>
-                            </button>
-                          ))}
+                          <div className="space-y-1">
+                            {(tasks || []).map((t) => (
+                              <button
+                                key={t._id}
+                                onClick={() => {
+                                  setSubject(t.text);
+                                  setSelectedTaskId(t._id);
+                                  setShowTaskDropdown(false); 
+                                }}
+                                className="w-full text-left p-4 hover:bg-white hover:shadow-sm rounded-xl transition-all group flex items-start gap-3 border border-transparent hover:border-white/50"
+                              >
+                                <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 shadow-sm ${
+                                  t.priority === 'high' ? 'bg-rose-500 shadow-rose-200' : 
+                                  t.priority === 'medium' ? 'bg-amber-500 shadow-amber-200' : 'bg-emerald-500 shadow-emerald-200'
+                                }`} />
+                                <span className="text-sm font-bold text-gray-700 group-hover:text-primary-600 truncate">{t.text}</span>
+                              </button>
+                            ))}
+                          </div>
                           <button
                             onClick={() => {
                               setSelectedTaskId("");
                               setSubject("");
                               setShowTaskDropdown(false);
                             }}
-                            className="w-full text-center p-3 mt-2 text-[10px] font-black uppercase text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                            className="w-full text-center p-3 mt-2 text-[10px] font-black uppercase text-rose-500 hover:bg-white hover:shadow-sm border border-transparent hover:border-rose-100 rounded-xl transition-all"
                           >
                             Clear Mission
                           </button>
@@ -406,6 +409,7 @@ const Timer = () => {
                       )}
                       <span className="relative z-10 flex items-center gap-2">
                         {sound.id === 'rain' && <FaCloudRain size={10} />}
+                        {sound.id === 'droplets' && <FaCloudRain size={10} />}
                         {sound.id === 'river' && <FaWater size={10} />}
                         {sound.id === 'lofi' && <FaMusic size={10} />}
                         {sound.label}

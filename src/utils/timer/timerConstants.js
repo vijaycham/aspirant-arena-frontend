@@ -32,7 +32,7 @@ export const AMBIENT_SOUNDS = [
   { 
     id: "rain", 
     label: "Rain", 
-    url: "https://www.soundjay.com/nature/rain-02.mp3" 
+    url: "https://www.orangefreesounds.com/wp-content/uploads/2018/04/Gentle-rain-loop.mp3" 
   },
   { 
     id: "river", 
