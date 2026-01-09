@@ -28,6 +28,7 @@ import { useTimer } from "../hooks/useTimer";
 import { useTasks } from "../hooks/useTasks";
 import { UPSC_PRESETS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
 import FocusRatingModal from "../components/timer/FocusRatingModal";
+import FocusHeatmap from "../components/timer/FocusHeatmap";
 
 const Timer = () => {
   const {
@@ -476,6 +477,11 @@ const Timer = () => {
                 </div>
               )}
             </motion.div>
+
+            
+            <div className="mt-6">
+              <FocusHeatmap />
+            </div>
           </div>
 
             {/* Sidebar (Right) */}
