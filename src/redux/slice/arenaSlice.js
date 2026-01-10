@@ -31,6 +31,17 @@ export const createArena = createAsyncThunk('arena/createArena', async (arenaDat
   }
 });
 
+export const deleteArena = createAsyncThunk('arena/deleteArena', async (arenaId, { rejectWithValue }) => {
+  try {
+    await api.delete(`/arenas/${arenaId}`);
+    toast.success('Arena deleted successfully 🗑️');
+    return arenaId;
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Failed to delete arena');
+    return rejectWithValue(err.response?.data?.message);
+  }
+});
+
 export const updateNode = createAsyncThunk('arena/updateNode', async ({ nodeId, updates }, { rejectWithValue }) => {
   try {
     const response = await api.patch(`/arenas/nodes/${nodeId}`, updates);
@@ -104,6 +115,13 @@ const arenaSlice = createSlice({
             state.syllabus[arenaId][index] = action.payload;
           }
         }
+      })
+      .addCase(deleteArena.fulfilled, (state, action) => {
+        state.arenas = state.arenas.filter(a => a._id !== action.payload);
+        if (state.currentArenaId === action.payload) {
+          state.currentArenaId = state.arenas.length > 0 ? (state.arenas.find(a => a.isPrimary)?._id || state.arenas[0]._id) : null;
+        }
+        delete state.syllabus[action.payload];
       });
   }
 });

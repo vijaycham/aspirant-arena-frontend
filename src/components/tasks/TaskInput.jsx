@@ -147,7 +147,14 @@ const TaskInput = ({
           <div className="flex flex-wrap gap-2 mt-2">
             {!selectedNodeId ? (
               <button
-                onClick={() => setShowArenaDropdown(true)}
+                onClick={() => {
+                  if (arenas.length === 1) {
+                    setSelectedArenaId(arenas[0]._id);
+                    setShowArenaDropdown(true);
+                  } else {
+                    setShowArenaDropdown(true);
+                  }
+                }}
                 className="px-3 py-1.5 rounded-xl bg-white/50 border border-gray-100 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 hover:bg-white transition-all flex items-center gap-2"
               >
                 <FiLayers size={10} /> Link Roadmap Topic

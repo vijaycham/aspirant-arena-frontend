@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchArenas, fetchSyllabus, setCurrentArena, createArena } from '../redux/slice/arenaSlice';
+import { fetchArenas, fetchSyllabus, setCurrentArena, createArena, deleteArena } from '../redux/slice/arenaSlice';
 import SyllabusTree from '../components/syllabus/SyllabusTree';
 import { motion } from 'framer-motion';
-import { FiPlus, FiSettings, FiRefreshCcw, FiLayers, FiTarget } from 'react-icons/fi';
+import { FiPlus, FiSettings, FiRefreshCcw, FiLayers, FiTarget, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../utils/api';
 
@@ -44,6 +44,13 @@ const ArenaDashboard = () => {
     }
   };
 
+  const handleDelete = async () => {
+    const confirmation = prompt("WARNING: This will permanently DELETE this Arena and all your progress. Type 'DELETE' to confirm.");
+    if (confirmation !== 'DELETE') return;
+    
+    dispatch(deleteArena(currentArenaId));
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       {/* Background Glows */}
@@ -81,6 +88,14 @@ const ArenaDashboard = () => {
               title="Reset to Master"
             >
               <FiRefreshCcw />
+            </button>
+            <button 
+              onClick={handleDelete}
+              disabled={!currentArenaId}
+              className="p-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all text-rose-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Delete Track"
+            >
+              <FiTrash2 />
             </button>
           </div>
         </div>
