@@ -40,6 +40,15 @@ export const updateNode = createAsyncThunk('arena/updateNode', async ({ nodeId, 
   }
 });
 
+export const syncNodeTime = createAsyncThunk('arena/syncNodeTime', async ({ nodeId, duration }, { rejectWithValue }) => {
+  try {
+    const response = await api.post(`/arenas/nodes/${nodeId}/time`, { duration });
+    return response.data.node;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message);
+  }
+});
+
 const arenaSlice = createSlice({
   name: 'arena',
   initialState: {
@@ -79,6 +88,15 @@ const arenaSlice = createSlice({
         state.currentArenaId = action.payload._id;
       })
       .addCase(updateNode.fulfilled, (state, action) => {
+        const { arenaId } = action.payload;
+        if (state.syllabus[arenaId]) {
+          const index = state.syllabus[arenaId].findIndex(n => n._id === action.payload._id);
+          if (index !== -1) {
+            state.syllabus[arenaId][index] = action.payload;
+          }
+        }
+      })
+      .addCase(syncNodeTime.fulfilled, (state, action) => {
         const { arenaId } = action.payload;
         if (state.syllabus[arenaId]) {
           const index = state.syllabus[arenaId].findIndex(n => n._id === action.payload._id);

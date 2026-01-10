@@ -2,8 +2,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 import { toast } from "react-hot-toast";
 import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
+import { useDispatch } from "react-redux";
+import { syncNodeTime } from "../redux/slice/arenaSlice";
 
 export const useTimer = () => {
+  const dispatch = useDispatch();
   /* ------------------ HELPERS ------------------ */
   const loadJSON = (key, fallback) => {
     try {
@@ -35,6 +38,8 @@ export const useTimer = () => {
   const [streak, setStreak] = useState(0);
   const [subject, setSubject] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.SUBJECT) || "");
   const [selectedTaskId, setSelectedTaskId] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.TASK_ID) || "");
+  const [selectedArenaId, setSelectedArenaId] = useState(() => localStorage.getItem('timer_arena_id') || "");
+  const [selectedNodeId, setSelectedNodeId] = useState(() => localStorage.getItem('timer_node_id') || "");
   const [reflectionEnabled, setReflectionEnabled] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.ENABLE_REFLECTION) !== "false");
   
   const [pendingSession, setPendingSession] = useState(null);
@@ -111,6 +116,8 @@ export const useTimer = () => {
     localStorage.setItem(TIMER_STORAGE_KEYS.SESSIONS, sessionsCompleted.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.SUBJECT, subject);
     localStorage.setItem(TIMER_STORAGE_KEYS.TASK_ID, selectedTaskId);
+    localStorage.setItem('timer_arena_id', selectedArenaId);
+    localStorage.setItem('timer_node_id', selectedNodeId);
     localStorage.setItem(TIMER_STORAGE_KEYS.MODE_TIMINGS, JSON.stringify(modeTimings));
     localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, isActive.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
@@ -269,6 +276,8 @@ export const useTimer = () => {
       await api.post("/focus", {
         subject: subject || "General Study",
         task: selectedTaskId || undefined,
+        arenaId: selectedArenaId || undefined,
+        nodeId: selectedNodeId || undefined,
         startTime,
         endTime,
         duration: addedMinutes,
@@ -279,6 +288,11 @@ export const useTimer = () => {
         focusRating: rating || 3,
         notes
       });
+
+      // ⛩️ Sync syllabus progress if a node is linked
+      if (selectedNodeId) {
+        dispatch(syncNodeTime({ nodeId: selectedNodeId, duration: addedMinutes }));
+      }
 
       startTimeRef.current = null;
       setPendingSession(null);
@@ -396,6 +410,8 @@ export const useTimer = () => {
     setTodaySessions([]);
     setSubject("");
     setSelectedTaskId("");
+    setSelectedArenaId("");
+    setSelectedNodeId("");
     setTimeLeft(modeTimings[mode].time);
     startTimeRef.current = null;
     toast.success("Daily dash reset 📅");
@@ -492,6 +508,10 @@ export const useTimer = () => {
     setSubject,
     selectedTaskId,
     setSelectedTaskId,
+    selectedArenaId,
+    setSelectedArenaId,
+    selectedNodeId,
+    setSelectedNodeId,
     modes: modeTimings,
     pendingSession,
     completeRating,

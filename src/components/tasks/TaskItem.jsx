@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { FiTarget } from "react-icons/fi";
 
 const TaskItem = ({ 
   taskItem, 
@@ -52,6 +53,11 @@ const TaskItem = ({
             {taskItem.dueDate && (
               <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                 <span className="text-xs opacity-50">📅</span> {new Date(taskItem.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+              </span>
+            )}
+            {taskItem.nodeId && (
+              <span className="text-[8px] font-black text-primary-400 uppercase tracking-widest flex items-center gap-1 bg-primary-50/50 px-2 py-0.5 rounded-lg border border-primary-100/30">
+                <FiTarget size={10} className="animate-pulse" /> Linked to Roadmap
               </span>
             )}
           </div>

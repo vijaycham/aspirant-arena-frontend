@@ -6,6 +6,9 @@ import {
 } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
 import { updateNode } from '../../redux/slice/arenaSlice';
+import { addTask } from '../../redux/slice/taskSlice';
+import api from '../../utils/api';
+import { toast } from 'react-hot-toast';
 
 const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
   const [isOpen, setIsOpen] = useState(depth < 1); // Expand top-level subjects by default
@@ -73,12 +76,35 @@ const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
           )}
         </div>
 
-        {/* Roadmap Resources Tooltip/Icon (Mock for now) */}
-        {node.resources?.length > 0 && (
-          <div className="flex items-center gap-2 mr-3 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* Actions (Promote to Task) */}
+        <div className="flex items-center gap-2 mr-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          {node.type !== 'subject' && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  const res = await api.post("/tasks", {
+                    text: node.title,
+                    priority: 'medium',
+                    arenaId: node.arenaId,
+                    nodeId: node._id
+                  });
+                  dispatch(addTask(res.data.task));
+                  toast.success("Added to Tasks! 📝");
+                } catch (err) {
+                  toast.error("Failed to add task");
+                }
+              }}
+              className="p-1.5 rounded-lg bg-primary-500/10 text-primary-400 hover:bg-primary-500 hover:text-white transition-all shadow-sm"
+              title="Add to Daily Tasks"
+            >
+              <FiPlus size={14} />
+            </button>
+          )}
+          {node.resources?.length > 0 && (
             <FiBook className="text-primary-400 h-4 w-4" title="Resources available" />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <AnimatePresence>

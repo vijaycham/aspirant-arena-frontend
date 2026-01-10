@@ -14,9 +14,13 @@ import {
   FaWater,
   FaBell,
   FaBellSlash,
+  FaBullseye,
 } from "react-icons/fa";
+import { FiLayers, FiTarget, FiSearch, FiChevronRight } from "react-icons/fi";
+import { useSelector, useDispatch } from "react-redux";
 import { useTimer } from "../hooks/useTimer";
 import { useTasks } from "../hooks/useTasks";
+import { fetchArenas, fetchSyllabus } from "../redux/slice/arenaSlice";
 import { UPSC_PRESETS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
 import TimerDisplay from "../components/timer/TimerDisplay";
 import TimerControls from "../components/timer/TimerControls";
@@ -49,6 +53,10 @@ const Timer = () => {
     setSubject,
     selectedTaskId,
     setSelectedTaskId,
+    selectedArenaId,
+    setSelectedArenaId,
+    selectedNodeId,
+    setSelectedNodeId,
     modes,
     pendingSession,
     completeRating,
@@ -70,10 +78,15 @@ const Timer = () => {
     progress,
   } = useTimer();
 
+  const { arenas, syllabus } = useSelector(state => state.arena);
+  const dispatch = useDispatch();
+
   const { tasks = [] } = useTasks() || {};
   const [isEditing, setIsEditing] = useState(false);
   const [manualMin, setManualMin] = useState("");
   const [showTaskDropdown, setShowTaskDropdown] = useState(false);
+  const [showArenaDropdown, setShowArenaDropdown] = useState(false);
+  const [nodeSearch, setNodeSearch] = useState("");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isMobileOrTablet, setIsMobileOrTablet] = React.useState(typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
@@ -83,6 +96,18 @@ const Timer = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  React.useEffect(() => {
+    if (arenas.length === 0) {
+      dispatch(fetchArenas());
+    }
+  }, [arenas.length, dispatch]);
+
+  React.useEffect(() => {
+    if (selectedArenaId && !syllabus[selectedArenaId]) {
+      dispatch(fetchSyllabus(selectedArenaId));
+    }
+  }, [selectedArenaId, dispatch, syllabus]);
 
   // Prevent body scroll when in Zen Mode
   React.useEffect(() => {
@@ -303,10 +328,21 @@ const Timer = () => {
                     onChange={(e) => {
                       setSubject(e.target.value);
                       setSelectedTaskId(""); 
+                      setSelectedNodeId("");
                     }}
                     className="relative w-full bg-white/40 backdrop-blur-md border border-white/60 focus:border-primary-300 focus:bg-white/60 px-6 py-4 rounded-2xl outline-none text-center font-bold text-gray-800 transition-all placeholder:text-gray-400 text-base shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
                   />
                   
+                  {/* Task Metadata Indicator (if linked to Syllabus) */}
+                  {selectedNodeId && (
+                    <div className="mt-4 flex justify-center">
+                       <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-100 text-[10px] font-black uppercase tracking-widest text-primary-600 transition-all flex items-center gap-2 shadow-sm">
+                          <FiTarget size={12} className="animate-pulse" /> 
+                          Linked to Roadmap
+                        </div>
+                    </div>
+                  )}
+
                   {/* Task Dropdown Menu */}
                   <AnimatePresence>
                     {showTaskDropdown && (
@@ -331,21 +367,28 @@ const Timer = () => {
                                 onClick={() => {
                                   setSubject(t.text);
                                   setSelectedTaskId(t._id);
+                                  setSelectedArenaId(t.arenaId || "");
+                                  setSelectedNodeId(t.nodeId || "");
                                   setShowTaskDropdown(false); 
                                 }}
                                 className="w-full text-left p-4 hover:bg-white hover:shadow-sm rounded-xl transition-all group flex items-start gap-3 border border-transparent hover:border-white/50"
                               >
-                                <div className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 shadow-sm ${
-                                  t.priority === 'high' ? 'bg-rose-500 shadow-rose-200' : 
-                                  t.priority === 'medium' ? 'bg-amber-500 shadow-amber-200' : 'bg-emerald-500 shadow-emerald-200'
-                                }`} />
-                                <span className="text-sm font-bold text-gray-700 group-hover:text-primary-600 truncate">{t.text}</span>
+                                <div className="flex items-center gap-3 w-full">
+                                  <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 shadow-sm ${
+                                    t.priority === 'high' ? 'bg-rose-500 shadow-rose-200' : 
+                                    t.priority === 'medium' ? 'bg-amber-500 shadow-amber-200' : 'bg-emerald-500 shadow-emerald-200'
+                                  }`} />
+                                  <span className="text-sm font-bold text-gray-700 group-hover:text-primary-600 truncate flex-1">{t.text}</span>
+                                  {t.nodeId && <FiTarget className="text-primary-400 animate-pulse flex-shrink-0" size={14} />}
+                                </div>
                               </button>
                             ))}
                           </div>
                           <button
                             onClick={() => {
                               setSelectedTaskId("");
+                              setSelectedArenaId("");
+                              setSelectedNodeId("");
                               setSubject("");
                               setShowTaskDropdown(false);
                             }}

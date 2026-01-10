@@ -39,6 +39,10 @@ const Tasks = () => {
     removeTask,
     confirmClearArchive,
     clearAllArchived,
+    selectedArenaId,
+    setSelectedArenaId,
+    selectedNodeId,
+    setSelectedNodeId,
     sortedTasks,
   } = useTasks();
 
@@ -83,6 +87,10 @@ const Tasks = () => {
           onCancel={cancelEditing}
           isEditing={!!editingTask}
           onKeyDown={handleKeyDown}
+          selectedArenaId={selectedArenaId}
+          setSelectedArenaId={setSelectedArenaId}
+          selectedNodeId={selectedNodeId}
+          setSelectedNodeId={setSelectedNodeId}
         />
 
         {/* List Section */}

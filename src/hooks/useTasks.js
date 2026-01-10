@@ -24,6 +24,8 @@ export const useTasks = () => {
   const [task, setTask] = useState("");
   const [priority, setPriority] = useState("medium");
   const [dueDate, setDueDate] = useState("");
+  const [selectedArenaId, setSelectedArenaId] = useState("");
+  const [selectedNodeId, setSelectedNodeId] = useState("");
   const [editingTask, setEditingTask] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -58,6 +60,8 @@ export const useTasks = () => {
           text: trimmedTask,
           priority,
           dueDate: dueDate || undefined,
+          arenaId: selectedArenaId || undefined,
+          nodeId: selectedNodeId || undefined,
         });
         dispatch(updateTask(res.data.task));
         toast.success("Task updated!");
@@ -67,6 +71,8 @@ export const useTasks = () => {
           text: trimmedTask,
           priority,
           dueDate: dueDate || undefined,
+          arenaId: selectedArenaId || undefined,
+          nodeId: selectedNodeId || undefined,
         });
         dispatch(addTaskAction(res.data.task));
         toast.success("Task added!");
@@ -74,6 +80,8 @@ export const useTasks = () => {
       setTask("");
       setPriority("medium");
       setDueDate("");
+      setSelectedArenaId("");
+      setSelectedNodeId("");
     } catch {
       toast.error("Operation failed.");
     }
@@ -84,6 +92,8 @@ export const useTasks = () => {
     setTask(taskItem.text);
     setPriority(taskItem.priority);
     setDueDate(taskItem.dueDate ? new Date(taskItem.dueDate).toISOString().split("T")[0] : "");
+    setSelectedArenaId(taskItem.arenaId || "");
+    setSelectedNodeId(taskItem.nodeId || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -92,6 +102,8 @@ export const useTasks = () => {
     setTask("");
     setPriority("medium");
     setDueDate("");
+    setSelectedArenaId("");
+    setSelectedNodeId("");
   };
 
   const handleKeyDown = (event) => {
@@ -167,5 +179,9 @@ export const useTasks = () => {
     confirmClearArchive,
     clearAllArchived,
     sortedTasks,
+    selectedArenaId,
+    setSelectedArenaId,
+    selectedNodeId,
+    setSelectedNodeId,
   };
 };

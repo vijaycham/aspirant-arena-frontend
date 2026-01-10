@@ -1,3 +1,9 @@
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiLayers, FiTarget, FiSearch, FiChevronRight, FiPlus } from "react-icons/fi";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchArenas, fetchSyllabus } from "../../redux/slice/arenaSlice";
+
 const TaskInput = ({ 
   task, 
   setTask, 
@@ -8,8 +14,63 @@ const TaskInput = ({
   onAdd, 
   onCancel, 
   isEditing, 
-  onKeyDown 
+  onKeyDown,
+  selectedArenaId,
+  setSelectedArenaId,
+  selectedNodeId,
+  setSelectedNodeId
 }) => {
+  const { arenas, syllabus } = useSelector(state => state.arena);
+  const dispatch = useDispatch();
+  const [showArenaDropdown, setShowArenaDropdown] = useState(false);
+  const [nodeSearch, setNodeSearch] = useState("");
+  const [currentParentId, setCurrentParentId] = useState(null);
+
+  // Reset navigation when arena changes
+  React.useEffect(() => {
+    setCurrentParentId(null);
+    setNodeSearch("");
+  }, [selectedArenaId]);
+
+  React.useEffect(() => {
+    if (arenas.length === 0) dispatch(fetchArenas());
+  }, [arenas.length, dispatch]);
+
+  React.useEffect(() => {
+    if (selectedArenaId && !syllabus[selectedArenaId]) {
+      dispatch(fetchSyllabus(selectedArenaId));
+    }
+  }, [selectedArenaId, dispatch, syllabus]);
+
+  const selectedNode = selectedNodeId && selectedArenaId && syllabus[selectedArenaId]?.find(n => n._id === selectedNodeId);
+
+  // Get children of current parent or top-level subjects
+  const currentLevelNodes = React.useMemo(() => {
+    if (!selectedArenaId || !syllabus[selectedArenaId]) return [];
+    const allNodes = syllabus[selectedArenaId];
+    
+    if (nodeSearch) {
+      return allNodes.filter(n => 
+        n.type !== 'subject' && 
+        n.title.toLowerCase().includes(nodeSearch.toLowerCase())
+      ).slice(0, 15);
+    }
+    
+    return allNodes.filter(n => n.parentId === currentParentId);
+  }, [selectedArenaId, syllabus, currentParentId, nodeSearch]);
+
+  // Build breadcrumbs for navigation
+  const breadcrumbs = React.useMemo(() => {
+    if (!selectedArenaId || !currentParentId || !syllabus[selectedArenaId]) return [];
+    const trail = [];
+    let current = syllabus[selectedArenaId].find(n => n._id === currentParentId);
+    while (current) {
+      trail.unshift(current);
+      current = syllabus[selectedArenaId].find(n => n._id === current.parentId);
+    }
+    return trail;
+  }, [selectedArenaId, currentParentId, syllabus]);
+
   return (
     <div className="glass-card p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-white">
       <div className="flex flex-col gap-6">
@@ -23,6 +84,153 @@ const TaskInput = ({
             placeholder="What needs to be done?"
             className="w-full p-4 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-700 placeholder:text-gray-300 shadow-sm"
           />
+          
+          <div className="flex flex-wrap gap-2 mt-2">
+            {!selectedNodeId ? (
+              <button
+                onClick={() => setShowArenaDropdown(true)}
+                className="px-3 py-1.5 rounded-xl bg-white/50 border border-gray-100 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 hover:bg-white transition-all flex items-center gap-2"
+              >
+                <FiLayers size={10} /> Link Roadmap Topic
+              </button>
+            ) : (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setShowArenaDropdown(true)}
+                  className="px-3 py-1.5 rounded-xl bg-primary-50 border border-primary-100 text-[9px] font-black uppercase tracking-widest text-primary-600 transition-all flex items-center gap-2 shadow-sm"
+                >
+                  <FiTarget size={10} className="animate-pulse" /> {selectedNode?.title || 'Linked Topic'}
+                </button>
+                <button 
+                  onClick={() => {
+                    setSelectedNodeId("");
+                    setSelectedArenaId("");
+                  }}
+                  className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:text-rose-500 transition-all"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Arena Dropdown Menu (Inline version for TaskInput) */}
+          <AnimatePresence>
+            {showArenaDropdown && (
+              <div className="relative">
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowArenaDropdown(false)}
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute top-full left-0 right-0 mt-4 bg-white border border-gray-100 rounded-[2rem] shadow-2xl z-50 p-6 max-h-[350px] overflow-hidden flex flex-col"
+                >
+                   <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+                      <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Master Roadmap Link</h3>
+                      <button onClick={() => setShowArenaDropdown(false)} className="text-gray-400 hover:text-black">&times;</button>
+                    </div>
+
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+                      {arenas.map(a => (
+                        <button
+                          key={a._id}
+                          onClick={() => setSelectedArenaId(a._id)}
+                          className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight border whitespace-nowrap transition-all ${
+                            selectedArenaId === a._id 
+                              ? 'bg-primary-600 border-primary-600 text-white shadow-lg' 
+                              : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                          }`}
+                        >
+                          {a.title}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="relative mb-4">
+                      <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input 
+                        type="text"
+                        placeholder="Search topics..."
+                        value={nodeSearch}
+                        onChange={(e) => setNodeSearch(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:ring-2 ring-primary-500/10 transition-all"
+                      />
+                    </div>
+
+                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide min-h-[32px] items-center">
+                       <button 
+                         onClick={() => setCurrentParentId(null)}
+                         className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all ${!currentParentId ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:text-gray-600'}`}
+                       >
+                         Root
+                       </button>
+                       {breadcrumbs.map((bc, idx) => (
+                         <React.Fragment key={bc._id}>
+                           <FiChevronRight size={10} className="text-gray-300" />
+                           <button 
+                             onClick={() => setCurrentParentId(bc._id)}
+                             className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all whitespace-nowrap ${idx === breadcrumbs.length - 1 ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:text-gray-600'}`}
+                           >
+                             {bc.title}
+                           </button>
+                         </React.Fragment>
+                       ))}
+                    </div>
+
+                    <div className="overflow-y-auto flex-1 space-y-1 pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+                      {!selectedArenaId ? (
+                        <p className="text-center text-gray-400 text-[10px] py-10 uppercase font-black opacity-50">Select an Arena first</p>
+                      ) : currentLevelNodes.length === 0 ? (
+                        <p className="text-center text-gray-400 text-[10px] py-10 uppercase font-black opacity-50">No topics found</p>
+                      ) : currentLevelNodes.map(node => (
+                        <button
+                          key={node._id}
+                          onClick={() => {
+                            if (node.type === 'subject' || node.type === 'topic') {
+                              setCurrentParentId(node._id);
+                            } else {
+                              setSelectedNodeId(node._id);
+                              setShowArenaDropdown(false);
+                              if (!task.trim()) setTask(node.title);
+                            }
+                          }}
+                          className="w-full text-left p-3 rounded-xl bg-white border border-transparent hover:border-gray-100 hover:bg-gray-50 transition-all group flex items-center justify-between"
+                        >
+                          <div>
+                            <p className="text-[8px] text-gray-400 mt-1 uppercase font-black tracking-tighter">
+                              {node.type}
+                            </p>
+                            <p className="text-xs font-bold text-gray-700 group-hover:text-primary-600 transition-colors uppercase tracking-tight">
+                              {node.title}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                             {(node.type === 'subject' || node.type === 'topic') ? (
+                               <FiChevronRight className="text-gray-300 group-hover:text-primary-400 transition-all" />
+                             ) : (
+                               <button 
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   setSelectedNodeId(node._id);
+                                   setShowArenaDropdown(false);
+                                   if (!task.trim()) setTask(node.title);
+                                 }}
+                                 className="opacity-0 group-hover:opacity-100 p-1.5 bg-primary-600 text-white rounded-lg transition-all shadow-lg shadow-primary-200"
+                               >
+                                 <FiPlus size={12} />
+                               </button>
+                             )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
         </div>
         
         <div className="flex flex-col md:flex-row items-end gap-6">
