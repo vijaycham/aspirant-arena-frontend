@@ -25,6 +25,25 @@ const TaskInput = ({
   const [showArenaDropdown, setShowArenaDropdown] = useState(false);
   const [nodeSearch, setNodeSearch] = useState("");
   const [currentParentId, setCurrentParentId] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Auto-suggestions based on what the user is typing in the task input
+  const suggestions = React.useMemo(() => {
+    if (!task || task.length < 2 || selectedNodeId) return [];
+    
+    // Search across all loaded syllabus arenas to find matches
+    const allMatches = [];
+    Object.keys(syllabus).forEach(arenaId => {
+      const nodes = syllabus[arenaId];
+      const matches = nodes.filter(n => 
+        n.type !== 'subject' && 
+        n.title.toLowerCase().includes(task.toLowerCase())
+      ).map(n => ({ ...n, arenaId }));
+      allMatches.push(...matches);
+    });
+    
+    return allMatches.slice(0, 5); // Limit to 5 suggestions for clarity
+  }, [task, syllabus, selectedNodeId]);
 
   // Reset navigation when arena changes
   React.useEffect(() => {
@@ -82,8 +101,48 @@ const TaskInput = ({
             onChange={(e) => setTask(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="What needs to be done?"
+            onFocus={() => setShowSuggestions(true)}
             className="w-full p-4 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-700 placeholder:text-gray-300 shadow-sm"
           />
+
+          {/* Type-Ahead Suggestions */}
+          <AnimatePresence>
+            {showSuggestions && suggestions.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute z-50 left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl p-2 space-y-1"
+              >
+                <div className="px-3 py-1.5 mb-1 border-b border-gray-50 flex items-center justify-between">
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Link to Roadmap Topic?</span>
+                  <button onClick={() => setShowSuggestions(false)} className="text-gray-300 hover:text-black">&times;</button>
+                </div>
+                {suggestions.map(suggestion => (
+                  <button
+                    key={suggestion._id}
+                    onClick={() => {
+                      setSelectedArenaId(suggestion.arenaId);
+                      setSelectedNodeId(suggestion._id);
+                      setTask(suggestion.title);
+                      setShowSuggestions(false);
+                    }}
+                    className="w-full text-left p-3 rounded-xl hover:bg-primary-50 transition-all group flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="text-[8px] text-gray-400 uppercase font-black tracking-tighter">
+                        {arenas.find(a => a._id === suggestion.arenaId)?.title} • {suggestion.type}
+                      </p>
+                      <p className="text-xs font-bold text-gray-700 group-hover:text-primary-600">
+                        {suggestion.title}
+                      </p>
+                    </div>
+                    <FiPlus className="text-gray-300 group-hover:text-primary-400 transition-all" />
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           <div className="flex flex-wrap gap-2 mt-2">
             {!selectedNodeId ? (
