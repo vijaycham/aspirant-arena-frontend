@@ -1,0 +1,1367 @@
+{
+  "id": "upsc-gs",
+  "title": "UPSC Civil Services (Comprehensive)",
+  "description": "Complete recursive syllabus for Prelims & Mains (GS 1-4) based on official detailed breakdown.",
+  "root": {
+    "title": "UPSC CSE Master Syllabus",
+    "type": "root",
+    "children": [
+      {
+        "title": "Prelims Phase",
+        "type": "category",
+        "children": [
+          {
+            "title": "GS Paper I (General Studies)",
+            "type": "subject",
+            "children": [
+              { "title": "Current Events of National & International Importance", "type": "topic" },
+              { "title": "History of India & Indian National Movement", "type": "topic" },
+              { "title": "Indian & World Geography", "type": "topic" },
+              { "title": "Indian Polity & Governance", "type": "topic" },
+              { "title": "Economic & Social Development", "type": "topic" },
+              { "title": "General Issues on Environment Ecology, Bio-diversity & Climate Change", "type": "topic" },
+              { "title": "General Science", "type": "topic" },
+              {
+                "title": "Environment & Ecology (Prelims Focus)",
+                "type": "topic",
+                "children": [
+                  { "title": "Protected Areas: National Parks, Wildlife Sanctuaries, Biosphere Reserves", "type": "micro-topic" },
+                  { "title": "Ramsar Wetlands & Important Lakes", "type": "micro-topic" },
+                  { "title": "IUCN Red List Categories & Species in News", "type": "micro-topic" },
+                  { "title": "Environmental Conventions: CBD, CITES, CMS, UNFCCC", "type": "micro-topic" },
+                  { "title": "Environmental Legislations: EPA 1986, NGT, CRZ, Wildlife Act", "type": "micro-topic" },
+                  { "title": "Climate Change Basics: GHGs, IPCC Reports, Carbon Markets", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "Science & Technology (Prelims Focus)",
+                "type": "topic",
+                "children": [
+                  { "title": "Space Technology: ISRO Missions & Global Space Programs", "type": "micro-topic" },
+                  { "title": "Defence Technology: Missiles, Exercises, Indigenous Systems", "type": "micro-topic" },
+                  { "title": "Biotechnology: Vaccines, mRNA, CRISPR, GM Crops", "type": "micro-topic" },
+                  { "title": "Information Technology: AI, Blockchain, Quantum Computing", "type": "micro-topic" },
+                  { "title": "Scientific Institutions, Awards & Nobel Prizes", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "Indian Economy (Prelims Focus)",
+                "type": "topic",
+                "children": [
+                  { "title": "Economic & Social Indicators (HDI, MPI, WEF, World Bank)", "type": "micro-topic" },
+                  { "title": "Budget Terminology: Deficit Types, Cess, Surcharge", "type": "micro-topic" },
+                  { "title": "Banking & Monetary Terms: Repo, Reverse Repo, CRR, SLR", "type": "micro-topic" },
+                  { "title": "Government Schemes & Indexes in News", "type": "micro-topic" }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "GS Paper II (CSAT)",
+            "type": "subject",
+            "children": [
+              { "title": "Comprehension", "type": "topic" },
+              { "title": "Interpersonal Skills including Communication Skills", "type": "topic" },
+              { "title": "Logical Reasoning & Analytical Ability", "type": "topic" },
+              { "title": "Decision Making & Problem Solving", "type": "topic" },
+              { "title": "General Mental Ability", "type": "topic" },
+              { "title": "Basic Numeracy (Class X Level)", "type": "topic" },
+              { "title": "Data Interpretation (Class X Level)", "type": "topic" }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Mains Phase",
+        "type": "category",
+        "children": [
+          {
+            "title": "Essay Paper",
+            "type": "subject",
+            "children": [
+              { "title": "Philosophical Topics", "type": "topic" },
+              { "title": "Socio-Political Topics", "type": "topic" },
+              { "title": "Economic Topics", "type": "topic" },
+              { "title": "Science & Tech Topics", "type": "topic" }
+            ]
+          },
+          {
+            "title": "General Studies I (Heritage, History, Geography, Society)",
+            "type": "subject",
+            "children": [
+              {
+                "title": "Art & Culture",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Architecture",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Harappan, Mauryan, Post-Mauryan, Gupta Period", "type": "micro-topic" },
+                      { "title": "Temples: Khajuraho, Odisha, Gwalior, Gujarat, Rajasthan, Bengal, Assam, HP, J&K", "type": "micro-topic" },
+                      { "title": "South Indian Temples: Pallava, Chola, Pandya, Vijaynagar, Nayaka, Kerala", "type": "micro-topic" },
+                      { "title": "Schools of Temple Architecture: Nagara, Vesara, Hoysala, Dravidian", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. Indo-Islamic Architecture",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Imperial (Delhi Sultanate) & Provincial Styles", "type": "micro-topic" },
+                      { "title": "Mughal Style, Sikh Style, Avadh Style, Rajput Architecture, Jaina Art", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. Modern Architecture",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "European Influence (Portuguese, Danish, British)", "type": "micro-topic" },
+                      { "title": "Indo-Saracenic & Post-Independence", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4. Sculptures",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Harappan, Mauryan, Post-Mauryan, Gupta, Medieval, Modern", "type": "micro-topic" },
+                      { "title": "Jain & Buddhist Sculptures", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "5. Paintings",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Cave, Mural, Miniature (Deccan, Rajput, Pahari, South India)", "type": "micro-topic" },
+                      { "title": "Regional, Modern & Contemporary Paintings", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "6. Pottery Tradition (OCP, BRW, PGW, NBPW, Glazed/Unglazed)", "type": "subtopic" },
+                  { "title": "7. Numismatics (Coinage)", "type": "subtopic" },
+                  {
+                    "title": "8. Music in India",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Classical (Hindustani, Carnatic, Gharanas)", "type": "micro-topic" },
+                      { "title": "Folk Music, Musical Instruments, Institutions", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "9. Dances in India",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Classical Dance Forms (8 Forms, Rasa, Bhava)", "type": "micro-topic" },
+                      { "title": "Folk & Modern Dances", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "10. Martial Arts & Sports in India", "type": "subtopic" },
+                  { "title": "11. Indian Puppetry (String, Shadow, Rod, Glove, Modern, Tribal)", "type": "subtopic" },
+                  {
+                    "title": "12. Literature & Philosophy",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Religions (Hinduism, Buddhism, Jainism, Sikhism, Islam, Christianity, etc.)", "type": "micro-topic" },
+                      { "title": "Philosophy in India (Bhakti & Sufi Movements, Saints)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "13. Miscellaneous",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Cultural Institutions (UNESCO List, Legal Provisions, Awards)", "type": "micro-topic" },
+                      { "title": "Indian Handicrafts, Personalities, Places of Interest", "type": "micro-topic" },
+                      { "title": "Calendar, Eras, Science & Tech in Ancient India", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Ancient History",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Prehistoric times",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Periodization of Indian Pre-History", "type": "micro-topic" },
+                      { "title": "Sources of Pre-History", "type": "micro-topic" },
+                      { "title": "Paleolithic Or Old Stone Age", "type": "micro-topic" },
+                      { "title": "Mesolithic Or Middle Stone Age", "type": "micro-topic" },
+                      { "title": "Neolithic Age or New Stone Age", "type": "micro-topic" },
+                      { "title": "Chalcolithic Age", "type": "micro-topic" },
+                      { "title": "Major Chalcolithic Cultures", "type": "micro-topic" },
+                      { "title": "Early Iron Age", "type": "micro-topic" },
+                      { "title": "Geographical Distribution and Characteristics", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. Indus Valley Civilization",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "IVC Geography and Archaeological Findings (Cities, Town Planning)", "type": "micro-topic" },
+                      { "title": "IVC Society and Culture (Script, Crafts, Religions, Seals)", "type": "micro-topic" },
+                      { "title": "IVC Economy (Trade, Agriculture, Animals, Weights)", "type": "micro-topic" },
+                      { "title": "Decline of Harappan Culture", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. Early Vedic Period",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Sources for Reconstructing Vedic Society", "type": "micro-topic" },
+                      { "title": "Geography of Rig Vedic Period", "type": "micro-topic" },
+                      { "title": "Political Organization & Evolution of Monarchy", "type": "micro-topic" },
+                      { "title": "Social Organization", "type": "micro-topic" },
+                      { "title": "Economy", "type": "micro-topic" },
+                      { "title": "Religious Practices and Culture", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4. Later Vedic Period",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Sources for Reconstructing Later Vedic Society", "type": "micro-topic" },
+                      { "title": "Geography of Later Vedic Period", "type": "micro-topic" },
+                      { "title": "Political Organization", "type": "micro-topic" },
+                      { "title": "Social Organization", "type": "micro-topic" },
+                      { "title": "Economy", "type": "micro-topic" },
+                      { "title": "Religious Practices and Culture", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "5. Buddhism",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Birth and Life of Buddha", "type": "micro-topic" },
+                      { "title": "Teachings of Buddha", "type": "micro-topic" },
+                      { "title": "Organization and Sects", "type": "micro-topic" },
+                      { "title": "Literature of Buddhism", "type": "micro-topic" },
+                      { "title": "Councils, Spread and Patronage", "type": "micro-topic" },
+                      { "title": "Causes for Decline", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. Jainism",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Birth and Life of Mahavira", "type": "micro-topic" },
+                      { "title": "Teachings of Mahavira", "type": "micro-topic" },
+                      { "title": "Organization and Sects", "type": "micro-topic" },
+                      { "title": "Literature of Jainism", "type": "micro-topic" },
+                      { "title": "Councils, Spread and Patronage", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "7. Mahajanapadas",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Republics and Monarchies", "type": "micro-topic" },
+                      { "title": "16 Mahajanapadas & Magadha", "type": "micro-topic" },
+                      { "title": "Key Dynasties (Haryanka, Shishunaga, Nanda)", "type": "micro-topic" },
+                      { "title": "Persian & Alexander's Invasions", "type": "micro-topic" },
+                      { "title": "Society Support & Rise of Urban Centres", "type": "micro-topic" },
+                      { "title": "Economy & Administration", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "8. Mauryan Empire",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Sources: Inscriptions (Ashoka) & Literary (Arthasastra)", "type": "micro-topic" },
+                      { "title": "Rulers: Chandragupta, Bindusara, Ashoka", "type": "micro-topic" },
+                      { "title": "Megasthenes", "type": "micro-topic" },
+                      { "title": "Ashoka's Policy of Dhamma & Buddhism", "type": "micro-topic" },
+                      { "title": "Mauryan Administration & Foreign Relations", "type": "micro-topic" },
+                      { "title": "Decline of Mauryas", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "9. Post Mauryans",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Society: Evolution of Jatis", "type": "micro-topic" },
+                      { "title": "Satavahanas", "type": "micro-topic" },
+                      { "title": "Sungas and Kanvas", "type": "micro-topic" },
+                      { "title": "Foreign Invasions: Sakas, Kushanas (Kanishka)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "10. Gupta Period",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Sources, Rulers, Chronology", "type": "micro-topic" },
+                      { "title": "Foreign Travellers (Fahien)", "type": "micro-topic" },
+                      { "title": "Gupta Administration", "type": "micro-topic" },
+                      { "title": "Society, Religion, Culture & Urban Centers", "type": "micro-topic" },
+                      { "title": "Economy, Science, Technology, Literature", "type": "micro-topic" },
+                      { "title": "Later Guptas & Other Dynasties", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "11. Harshavardhan",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Military Conquests", "type": "micro-topic" },
+                      { "title": "Harsha and Buddhism", "type": "micro-topic" },
+                      { "title": "Administration, Society, Culture, Economy", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "12. Sangam Period",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Sangam Literature", "type": "micro-topic" },
+                      { "title": "South Indian Dynasties (Cholas, Cheras, Pandyas)", "type": "micro-topic" },
+                      { "title": "Sangam Polity, Society, Culture, Economy", "type": "micro-topic" },
+                      { "title": "Commercial Contacts with Outside World", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Medieval India",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Major Dynasties of Early Medieval",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Pratiharas, Palas, Tripartite Conflict", "type": "micro-topic" },
+                      { "title": "Senas", "type": "micro-topic" },
+                      { "title": "Rajputs, Pallavas, Chalukyas, Rashtrakutas", "type": "micro-topic" },
+                      { "title": "Indian Feudalism, Administration, Society, Economy", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. Cholas & South Indian Kingdoms",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Chola Political History & Administration", "type": "micro-topic" },
+                      { "title": "Socio-Economic Life, Education, Literature", "type": "micro-topic" },
+                      { "title": "Cheras, Yadavas, SE Asia Contact", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. Early Muslim Invasions",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Arab Conquest of Sindh", "type": "micro-topic" },
+                      { "title": "Mahmud of Ghazni & Muhammad Ghori", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4. Delhi Sultanate (1206-1526)",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Slave, Khalji, Tughlaq, Sayyid, Lodi Dynasties", "type": "micro-topic" },
+                      { "title": "Mongol/Turk Attacks", "type": "micro-topic" },
+                      { "title": "Administration, Economy, Urbanization", "type": "micro-topic" },
+                      { "title": "Society, Culture, Scientific Knowledge, Legal System", "type": "micro-topic" },
+                      { "title": "Decline of Sultanate", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "5. Struggle For Empire (Afghans, Rajputs, Mughals)",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Ibrahim Lodi vs Babur (Battle of Panipat)", "type": "micro-topic" },
+                      { "title": "Babur's contributions & significance", "type": "micro-topic" },
+                      { "title": "Humayun and the Afghans (Sher Khan)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. The Sur Empire (Sher Shah)",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Rise of Sher Shah, Sur Empire (1540-56)", "type": "micro-topic" },
+                      { "title": "Contributions: Administration, Coinage, Architecture", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "7-9. The Mughal Empire (Akbar)",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Consolidation & Expansion (Panipat II, Halighati)", "type": "micro-topic" },
+                      { "title": "Relations with Rajputs (Composite Ruling Class)", "type": "micro-topic" },
+                      { "title": "State & Govt: Central, Provincial, Mansabdari, Dahsala", "type": "micro-topic" },
+                      { "title": "Religious Views: Ibadat Khana, Din-i-Ilahi, Sulh-i-kul", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "10-12. Maturity & Crisis of Mughal Empire",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Foreign Policy (Uzbeks, Iran)", "type": "micro-topic" },
+                      { "title": "Jahangir & Shah Jahan (Golden Age of Architecture)", "type": "micro-topic" },
+                      { "title": "Aurangzeb: Expansion, Deccan Policy, Religious Policy", "type": "micro-topic" },
+                      { "title": "Rise of Marathas (Shivaji)", "type": "micro-topic" },
+                      { "title": "Jagirdari Crisis", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "13-17. 18th Century & Regional States",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Maratha Expansion (Peshwas)", "type": "micro-topic" },
+                      { "title": "Vijayanagar Empire (Sources, Polity, Culture, Conflict)", "type": "micro-topic" },
+                      { "title": "Regional States (Bengal, Avadh, Sikhs, Hyderabad, Mysore)", "type": "micro-topic" },
+                      { "title": "Economic Life: Trade, Commerce, Decline", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Modern History",
+                "type": "topic",
+                "children": [
+                  { 
+                    "title": "1. The Advent Of Europeans In India",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Portuguese, Dutch, Danes, English, French (Carnatic Wars)", "type": "micro-topic" },
+                      { "title": "Causes of English Success", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. British Expansion In India",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Bengal, Anglo-Maratha Wars, Subsidiary Alliance", "type": "micro-topic" },
+                      { "title": "Conquest of Sindh, Anglo-Sikh Wars", "type": "micro-topic" },
+                      { "title": "Doctrine of Lapse, Annexation of Oudh", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3-5. British Administration & Impact (Pre-1857)",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Dual System, Charter Acts, Judicial System", "type": "micro-topic" },
+                      { "title": "Economic Policies (Mercantilism, Free Trade, Finance Imperialism)", "type": "micro-topic" },
+                      { "title": "Land Revenue (Ryotwari, Mahalwari, Permanent Settlement)", "type": "micro-topic" },
+                      { "title": "Impact: De-industrialization, Famine, Drain of Wealth", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. The Revolt Of 1857",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Causes (Economic, Political, Socio-Religious, Military)", "type": "micro-topic" },
+                      { "title": "Centres, Leaders, Suppression & Failure", "type": "micro-topic" },
+                      { "title": "Nature, Impact & Consequences", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "7. Administrative Changes After 1857",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Central, Provincial, Local Administration", "type": "micro-topic" },
+                      { "title": "Army Reforms, Princely States, Foreign Policy", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "8. Development Of Civil Services",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "ICS Act 1861, Aitchison Committee, Montford Reforms", "type": "micro-topic" },
+                      { "title": "Lee Commission, GOI Act 1935", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "9. Development Of Education",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Orientalist-Anglicist Controversy, Wood's Dispatch", "type": "micro-topic" },
+                      { "title": "Commissions (Hunter, Raleigh, Saddler, Hartog, Sergeant, Kothari)", "type": "micro-topic" },
+                      { "title": "Vernacular & Technical Education", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "10. Development Of Press (Vernacular Press Act, Struggle for Freedom)", "type": "subtopic" },
+                  {
+                    "title": "11. Socio-Religious Reforms",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Reform Movements (Hindu, Muslim, Sikh, Parsi)", "type": "micro-topic" },
+                      { "title": "Significance & Impact", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "12. Personalities",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Raja Ram Mohan Roy, Vivekananda, Dayananda Saraswati", "type": "micro-topic" },
+                      { "title": "Ishwar Chandra Vidyasagar, Syed Ahmad Khan, Jyotiba Phule, Ambedkar", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "13. Peasant, Tribal And Other Movements",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Tribal (Bhil, Santhal, Munda, etc.)", "type": "micro-topic" },
+                      { "title": "Peasant (Champaran, Kheda, Bardoli, Moplah, Tebhaga, Telangana)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "14. Revolutionary Nationalism",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Early Phase (Maharashtra, Bengal, Outside India)", "type": "micro-topic" },
+                      { "title": "Ghadar Party, Komagata Maru", "type": "micro-topic" },
+                      { "title": "Revival (HRA, HSRA, Surya Sen, INA)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "15-17. Indian National Movement (1905-1947)",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Phase I (1905-1918): Swadeshi, Surat Split, Home Rule", "type": "micro-topic" },
+                      { "title": "Phase II (1918-1929): Gandhian Era, NCM, Swaraj Party, Simon Commission", "type": "micro-topic" },
+                      { "title": "Phase III (1930-1947): CDM, Round Table Conf, Quit India, Independence", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "18. Governor Generals & Viceroys (1773-1947)", "type": "subtopic" }
+                ]
+              },
+              {
+                "title": "World History",
+                "type": "topic",
+                "children": [
+                  { "title": "Industrial Revolution", "type": "subtopic" },
+                  { "title": "World Wars", "type": "subtopic" },
+                  { "title": "Redrawing of National Boundaries", "type": "subtopic" },
+                  { "title": "Colonization & Decolonization", "type": "subtopic" },
+                  { "title": "Political Philosophies (Communism, Capitalism, Socialism)", "type": "subtopic" }
+                ]
+              },
+              {
+                "title": "Indian Society",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Unity in Diversity",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Forms of Diversity, Bonds of Unity, Geo-political Unity", "type": "micro-topic" },
+                      { "title": "Role of Sensitive Leaders & Constitutional Safeguards", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. Challenges of Diversity",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Regionalism, Casteism, Linguism, Communalism", "type": "micro-topic" },
+                      { "title": "Social Inequalities, Regional Disparities, Ethnic Conflicts", "type": "micro-topic" },
+                      { "title": "Family, Kinship, Patriarchy in India", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. Women Movements",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "19th Century Reform, Gandhian Era, Post-Independence", "type": "micro-topic" },
+                      { "title": "Violence Against Women, Developmental Movement", "type": "micro-topic" },
+                      { "title": "Uniform Civil Code, Feminism & Post-Feminism", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4. Caste System",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Concept, Caste & Politics, Reservation Policy Debate", "type": "micro-topic" },
+                      { "title": "Social Justice & Social Development", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "5. Social Security in India",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Organized vs Unorganized Sector, Assistance Programmes", "type": "micro-topic" },
+                      { "title": "Implementation Review, Suggestions, Social Security Code", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. Poverty",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Dimensions, Linkage with Development", "type": "micro-topic" },
+                      { "title": "Committees (Rangarajan), Alleviation Strategies, Inequality", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "7. Globalization",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Meaning, Reasons, Dimensions (Political, Cultural, Economic)", "type": "micro-topic" },
+                      { "title": "Impact & Anti-Globalization Movement", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "8. Contemporary Issues",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Secularism, Anti-Conversion, Regionalism (Smaller States)", "type": "micro-topic" },
+                      { "title": "Socio-Economic Caste Census 2011", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "9. Issues Related to Women",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Discrimination in Corporate, Female Genital Mutilation", "type": "micro-topic" },
+                      { "title": "Triple Talaq, Entry to Worship, Adultery Law", "type": "micro-topic" },
+                      { "title": "Unwanted Girls, Surrogacy, Panchayats, Me Too Movement", "type": "micro-topic" },
+                      { "title": "National Policy 2016, Marital Rape, Maternity Laws", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "10. Issues Related to Children",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "War Zone, Dropout Rate, Trafficking, School Safety", "type": "micro-topic" },
+                      { "title": "Malnutrition, Child Labour, Street Children", "type": "micro-topic" },
+                      { "title": "Juvenile Justice, Child Marriage, POSCO, National Policy", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "11. Health & Education",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Status of Sectors, Bills (Allied Health Care)", "type": "micro-topic" },
+                      { "title": "Diseases (Malaria, TB), E-Pharmacies, Nutrition", "type": "micro-topic" },
+                      { "title": "Education Policy (No Detention, NEP), Privatization", "type": "micro-topic" },
+                      { "title": "Ayushman Bharat, Sanitation Linkage", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Geography",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. General Geography & Geomorphology",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Universe & Earth Evolution (Theories, Solar System, Geological Time Scale)", "type": "micro-topic" },
+                      { "title": "Earth Basics (Lat/Long, Motions, Time Zones, Eclipses, Magnetic Field)", "type": "micro-topic" },
+                      { "title": "Earth's Interior (Crust, Mantle, Core) & Sources of Info", "type": "micro-topic" },
+                      { "title": "Geology: Minerals & Rocks (Igneous, Sedimentary, Metamorphic)", "type": "micro-topic" },
+                      { "title": "Geomorphic Processes: Endogenic (Diastrophism, Volcanism, Earthquakes)", "type": "micro-topic" },
+                      { "title": "Geomorphic Processes: Exogenic (Weathering, Mass Movements, Erosion)", "type": "micro-topic" },
+                      { "title": "Plate Tectonics (Continental Drift, Sea Floor Spreading, Plate Boundaries)", "type": "micro-topic" },
+                      { "title": "Landforms: Fluvial (River), Aeolian (Wind), Glacial, Karst (Groundwater), Coastal", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. Climatology",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Atmosphere (Composition, Structure, Insolation, Heat Budget)", "type": "micro-topic" },
+                      { "title": "Temperature & Pressure Belts (Inversion, Gradient, Coriolis Force)", "type": "micro-topic" },
+                      { "title": "Atmospheric Circulation (Planetary Winds, Jet Streams, Air Masses, Fronts)", "type": "micro-topic" },
+                      { "title": "Weather Systems (Cyclones, Tornadoes, Humidity, Clouds, Precipitation)", "type": "micro-topic" },
+                      { "title": "World Climate Zones (Koppen's Classification)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. Oceanography",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Ocean Relief (Continental Shelf/Slope, Deep Sea Plain, Ridges, Trenches)", "type": "micro-topic" },
+                      { "title": "Temperature, Salinity & Density of Oceans", "type": "micro-topic" },
+                      { "title": "Ocean Movements (Waves, Tides, Currents)", "type": "micro-topic" },
+                      { "title": "Marine Resources & Coral Reefs (Bleaching)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4. Bio-Geography",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Soils (Formation, Profile, Classification, Erosion, Conservation)", "type": "micro-topic" },
+                      { "title": "Vegetation (Forest Types, Grasslands, Desert, Tundra)", "type": "micro-topic" },
+                      { "title": "Deforestation & Conservation (Social Forestry, Agro-forestry)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "5. Human & Economic Geography",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Population (Growth, Migration, Demographic Transition, Theories)", "type": "micro-topic" },
+                      { "title": "Economic Activities (Primary, Agriculture Types, Mining, Secondary/Manufacturing)", "type": "micro-topic" },
+                      { "title": "Transport & Trade (Ports, Inland/Out/Oil Ports, Gateways)", "type": "micro-topic" },
+                      { "title": "Settlements (Rural Patterns, Urban Classification, Slums, Smart Cities)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. Indian Geography",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Physiography (Himalayas, Plains, Plateau, Desert, Coastal Plains, Islands)", "type": "micro-topic" },
+                      { "title": "Drainage System (Himalayan, Peninsular, River Systems)", "type": "micro-topic" },
+                      { "title": "Climate (Monsoon Mechanism, El Nino/La Nina, Droughts, Floods)", "type": "micro-topic" },
+                      { "title": "Soils & Natural Vegetation (Mangroves, Distribution)", "type": "micro-topic" },
+                      { "title": "Demography (Census, Growth Rates, Sex Ratio, Literacy, Health)", "type": "micro-topic" },
+                      { "title": "Mineral Resources (Iron, Manganese, Bauxite, Copper, Gold, Mica, etc.)", "type": "micro-topic" },
+                      { "title": "Energy Resources (Coal, Petroleum, Hydro, Nuclear, Solar, Wind)", "type": "micro-topic" },
+                      { "title": "Agriculture: Crops (Wheat, Rice, Maize, Pulses, Commercial, Plantation)", "type": "micro-topic" },
+                      { "title": "Agriculture: Issues (Green Revolution, Irrigation, Marketing, Patterns)", "type": "micro-topic" },
+                      { "title": "Industries (Iron & Steel, Textile, Engineering, Automobile, Fertilizer)", "type": "micro-topic" },
+                      { "title": "Transport (Railways, Roads, Pipelines, Waterways, Air)", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "General Studies II (Governance, Constitution, Polity, Social Justice, IR)",
+            "type": "subject",
+            "children": [
+              {
+                "title": "Polity",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Evolution of the Constitution",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Company Rule (1773-1858): Regulating, Pitt's, Charter Acts", "type": "micro-topic" },
+                      { "title": "Crown Rule (1858-1947): Councils Acts, GOI Acts 1919/1935", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2-3. Drafting & Salient Features",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Sources (External, Developmental), Committees", "type": "micro-topic" },
+                      { "title": "Features (Unitary, Federal, Constituent Assembly)", "type": "micro-topic" },
+                      { "title": "Types of Government (Parliamentary, Presidential)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. Preamble & Values",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Objectives, Amendability, Ideals (Sovereign, Secular, Republic, etc.)", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "7. Amendment of Constitution (Procedure, Types, Basic Structure)", "type": "subtopic" },
+                  { "title": "8. Union & Its Territory (Articles 1-4, State Reorganisation)", "type": "subtopic" },
+                  {
+                    "title": "9. Citizenship",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Constitutional Provisions, Citizenship Act 1955/2019", "type": "micro-topic" },
+                      { "title": "Rights & Duties, NRI, OCI, Pravasi Bhartiya Divas", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "10. Fundamental Rights",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Definition of State (Art 12), Laws Inconsistent (Art 13)", "type": "micro-topic" },
+                      { "title": "Right to Equality (Art 14-18)", "type": "micro-topic" },
+                      { "title": "Right to Freedom (Art 19-22)", "type": "micro-topic" },
+                      { "title": "Right against Exploitation (Art 23-24)", "type": "micro-topic" },
+                      { "title": "Freedom of Religion (Art 25-28)", "type": "micro-topic" },
+                      { "title": "Cultural & Educational Rights (Art 29-30)", "type": "micro-topic" },
+                      { "title": "Constitutional Remedies (Art 32 - Writs)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "11-13. DPSP & Fundamental Duties",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "DPSP: Socialist, Gandhian, Liberal-Intellectual Principles", "type": "micro-topic" },
+                      { "title": "Duties (Art 51A), Relation with FRs", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "14. System of Governance",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Centre-State Relations (Legislative, Administrative, Financial)", "type": "micro-topic" },
+                      { "title": "Inter-State Relations (Water Disputes, Councils)", "type": "micro-topic" },
+                      { "title": "Special Provisions for States (Art 370/371)", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "15. Emergency Provisions (National, State, Financial)", "type": "subtopic" },
+                  {
+                    "title": "16-19. Union Executive",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "President (Election, Powers, Impeachment, Pardoning)", "type": "micro-topic" },
+                      { "title": "Vice-President, Prime Minister, Council of Ministers", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "20-22. Union Legislature (Parliament)",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Organisation, Qualifications, Sessions, Privileges", "type": "micro-topic" },
+                      { "title": "Lok Sabha vs Rajya Sabha (Presiding Officers)", "type": "micro-topic" },
+                      { "title": "Legislative Procedure (Bills, Budget, Committees)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "23-25. State Executive & Legislature",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Governor (Powers, Appointment, Role)", "type": "micro-topic" },
+                      { "title": "Chief Minister, CoM, Advocate General", "type": "micro-topic" },
+                      { "title": "State Legislature (Assembly, Council)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "26-27. Local Govt & UTs",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Panchayati Raj (73rd Amd), Urban Local Govt (74th Amd)", "type": "micro-topic" },
+                      { "title": "Union Territories (Administration, Special Status)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "28-30. Judiciary",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Supreme Court (Jurisdiction, Independence, Appointment)", "type": "micro-topic" },
+                      { "title": "High Courts, Subordinate Courts, Tribunals", "type": "micro-topic" },
+                      { "title": "ADR, Lok Adalat, NALSA, Judicial Reforms", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "31-32. Constitutional & Non-Constitutional Bodies",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Constitutional: UPSC, SPSC, EC, CAG, Finance Comm, AG", "type": "micro-topic" },
+                      { "title": "Non-Constitutional: NITI Aayog, NHRC, CIC, CVC, Lokpal", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "33-34. Political Dynamics (Parties, Elections, Reforms, Anti-Defection)", "type": "subtopic" }
+                ]
+              },
+              {
+                "title": "Governance & Social Justice",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Governing Institutions",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Ministries, Departments, Secretariat (Functions, Structure)", "type": "micro-topic" },
+                      { "title": "Attached & Subordinate Offices, PSUs, Executive Organization", "type": "micro-topic" },
+                      { "title": "Organisational Structure Recommendations", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. Audit & Transparency",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "CVC, CAG, Lokpal, Lok Ayukta", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3-5. Development Processes & Pressure Groups",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "SHGs: Characteristics, Role in Development", "type": "micro-topic" },
+                      { "title": "NGOs: Functions, Role in Development", "type": "micro-topic" },
+                      { "title": "Pressure Groups: Types, Functions, Techniques, Democracy Link", "type": "micro-topic" },
+                      { "title": "Micro Finance Institutions: Features, Role", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. Social Sector Bills",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Juvenile Justice, Surrogacy, Child Labour, Maternity Benefit", "type": "micro-topic" },
+                      { "title": "POCSO, Anti-Trafficking, HIV/AIDS, Domestic Violence", "type": "micro-topic" },
+                      { "title": "Rights of Persons with Disabilities, Transgender Rights", "type": "micro-topic" },
+                      { "title": "SC/ST Prevention of Atrocities Act", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "7. Welfare Schemes",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Health (NHM, Ayush, Jan Aushadhi, Mission Indradhanush)", "type": "micro-topic" },
+                      { "title": "Education (Padhe Bharat, Mid Day Meal, GIAN, SWAYAM)", "type": "micro-topic" },
+                      { "title": "Skill Development (Start-up India, Stand up India, PMKVY, AIM)", "type": "micro-topic" },
+                      { "title": "Social Security (Atal Pension, PMJJBY, PMSBY)", "type": "micro-topic" },
+                      { "title": "Minorities (Nai Roshni, USTAAD, Nai Manzil)", "type": "micro-topic" },
+                      { "title": "Women & Child (Beti Bachao, Sukanya Samriddhi, Ujjawala, JSY)", "type": "micro-topic" },
+                      { "title": "SC/ST/Disability (Vanbandhu Kalyan, Accessible India)", "type": "micro-topic" },
+                      { "title": "Rural/Urban (Gram Sadak, Swachh Bharat, Smart Cities, Amrut, Hriday)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Inclusive Growth & Services",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Services (Health, Education, HR), NITI Aayog Reports", "type": "micro-topic" },
+                      { "title": "Poverty & Hunger (Causes, Alleviation, Food Security, Measurement Controversy)", "type": "micro-topic" },
+                      { "title": "Scheduled & Tribal Areas (5th/6th Schedule, Autonomous Councils)", "type": "micro-topic" },
+                      { "title": "Role of Civil Services in Democracy", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "International Relations",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. India's Foreign Policy",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Evolution, Post-1990 Scenario, Global Issues", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. South Asia",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Relations: Nepal, Bhutan, Afghanistan, Bangladesh, Maldives, Sri Lanka, Pakistan", "type": "micro-topic" },
+                      { "title": "SAARC, Relevance of NAM", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. West & Central Asia",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "West Asia: UAE, Iran, Israel, Palestine, Saudi Arabia", "type": "micro-topic" },
+                      { "title": "Central Asia: Mongolia, Kazakhstan, Turkmenistan, Uzbekistan", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Contemporary Global Issues",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Indo-Pacific Strategy & Maritime Security", "type": "micro-topic" },
+                      { "title": "Groupings: QUAD, AUKUS, I2U2, BRICS Expansion", "type": "micro-topic" },
+                      { "title": "Climate Diplomacy & Global Climate Finance", "type": "micro-topic" },
+                      { "title": "Trade Wars, WTO Reforms & Supply Chains", "type": "micro-topic" },
+                      { "title": "Technology & Geo-politics (Semiconductors, AI Regulation)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4. Asia-Pacific & Africa",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Asia-Pacific: ASEAN, Japan, Australia, South Korea, Vietnam", "type": "micro-topic" },
+                      { "title": "Africa: South Africa, Nigeria, Kenya, Sudan", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "5. Europe & Major Powers",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Europe: Russia, France, Germany, UK, EU", "type": "micro-topic" },
+                      { "title": "Major Powers: US-China Dynamics, India-US, India-China", "type": "micro-topic" },
+                      { "title": "Indian Ocean Region (Seychelles, Mauritius, Maldives)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6. Indian Diaspora",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Diaspora in West, Gulf, East & Middle East", "type": "micro-topic" }
+                    ]
+                  },
+                  { "title": "Important International Institutions, agencies and fora", "type": "subtopic" }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "General Studies III (Technology, Economic Dev, Biodiversity, Environment, Security, Disaster Mgmt)",
+            "type": "subject",
+            "children": [
+              {
+                "title": "Economy & Development",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Basic Economy & Planning",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Indian Economy (Pre/Post Independence, Issues, Planning History)", "type": "micro-topic" },
+                      { "title": "Resource Mobilization (Savings, Investment, Fiscal Policy)", "type": "micro-topic" },
+                      { "title": "Types of resources: Physical vs Finance Capital", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. Inclusive Growth",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Meaning, India's Experience, Social Sector Initiatives", "type": "micro-topic" },
+                      { "title": "Poverty Alleviation, Financial Inclusion (Jan Dhan, etc.)", "type": "micro-topic" },
+                      { "title": "Public Distribution System (PDS) & Food Security", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4-6. Budgeting & Fiscal Policy",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Budget Terminology, Outcome Budgeting, Deficits", "type": "micro-topic" },
+                      { "title": "Fiscal Policy (Reform, FRBM Act), Govt Revenues & Spending", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "7-9. Taxation & Monetary Policy",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Tax System (Direct/Indirect, GST, Reforms, Subsidies)", "type": "micro-topic" },
+                      { "title": "Monetary Policy (Instruments, Inflation Targeting, MPC)", "type": "micro-topic" },
+                      { "title": "Financial System (Money Market, Capital Market, Regulation)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "10-11. Banking & Foreign Trade",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Banking Structure (Commercial, NBFCs, NPA, Digital Banking)", "type": "micro-topic" },
+                      { "title": "Foreign Trade (BoP, Forex, FDI, FII, WTO, IMF, World Bank)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "12-14. Agriculture & Food Processing",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Land Reforms, Land Use, Cropping Patterns", "type": "micro-topic" },
+                      { "title": "Agri Finance (Credit, NABARD, Insurance/PMFBY, Cooperatives)", "type": "micro-topic" },
+                      { "title": "Agri Marketing (APMC, e-NAM), Subsidies (Fertilizer, MSP)", "type": "micro-topic" },
+                      { "title": "Food Processing (Scope, Supply Chain, Mega Food Parks)", "type": "micro-topic" },
+                      { "title": "Revolutions (Green, White, Blue, Pink)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "15-16. Industry & Industry Policy",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Industrial Policy (1991 Reforms, Make in India, MSMEs, SEZs)", "type": "micro-topic" },
+                      { "title": "Investment Models (PPP, FDI), Disinvestment", "type": "micro-topic" }
+                    ]
+                  },
+                   {
+                    "title": "Transport & Infrastructure",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Transport (Rail, Road, Air, Water, Pipeline)", "type": "micro-topic" },
+                      { "title": "Energy (Renewable, Power Sector), Ports, Airports", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Contemporary Economic Challenges",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Employment & Unemployment (Demographic Dividend, Jobless Growth)", "type": "micro-topic" },
+                      { "title": "Informal Sector & Gig Economy", "type": "micro-topic" },
+                      { "title": "MSMEs: Role, Credit Issues, Policy Support", "type": "micro-topic" },
+                      { "title": "Income Inequality & Inclusive Growth Debate", "type": "micro-topic" },
+                      { "title": "Economic Survey Themes & Key Findings", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Science & Technology",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1-7. General Biology & Life Sciences",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Basics: Cells, Genetics, DNA, Evolution, Classification", "type": "micro-topic" },
+                      { "title": "Human Systems: Nutrition, Digestion, Respiration, Immunity", "type": "micro-topic" },
+                      { "title": "Diseases (Viral, Bacterial, Lifestyle) & Public Health", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "16. S&T Policies & Institutions",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Policies (1958, 1983, 2013), DST, CSIR, Technology Vision 2035", "type": "micro-topic" },
+                      { "title": "IPR Policy, Indigenization, Awards", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Biotechnology",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Genetics (Stem Cells, GM Crops, Cloning, Gene Therapy)", "type": "micro-topic" },
+                      { "title": "Applications (Bio-fuels, Bioremediation, Food Processing)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Space Technology",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Orbits, Launch Vehicles (PSLV, GSLV), Cryogenic Engines", "type": "micro-topic" },
+                      { "title": "Missions: Chandrayaan, Mangalyaan, IRNSS/NavIC, Gaganyaan", "type": "micro-topic" },
+                      { "title": "Space Debris, Private Sector in Space", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Defence, Nuclear & Emerging Tech",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Defence: Missiles (Agni, Prithvi, Brahmos), Submarines, Aircraft", "type": "micro-topic" },
+                      { "title": "Nuclear Energy: Reactors, 3-Stage Program, Safety, Applications", "type": "micro-topic" },
+                      { "title": "IT & Computers: AI, Big Data, IoT, Supercomputers, Crypto", "type": "micro-topic" },
+                      { "title": "Nano-Technology & Robotics (Applications, Ethics)", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Environment & Ecology",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1-3. Ecology & Ecosystems",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Ecological Hierarchy (Organism, Population, Community, Biome)", "type": "micro-topic" },
+                      { "title": "Ecosystem Dynamics (Energy Flow, Food Web, Pyramids, Succession)", "type": "micro-topic" },
+                      { "title": "Biogeochemical Cycles (Carbon, Nitrogen, Phosphorus, Sulphur)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4-5. Biomes & Aquatic Life Zones",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Terrestrial Biomes (Forest, Grassland, Desert, Tundra)", "type": "micro-topic" },
+                      { "title": "Aquatic Zones (Ocean, Inlands, Estuaries, Mangroves, Coral Reefs)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "6-7. Biodiversity & Conservation",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Biodiversity Types, Hotspots, Mega-diverse Countries", "type": "micro-topic" },
+                      { "title": "Conservation Methods (In-situ, Ex-situ), IUCN Red List", "type": "micro-topic" },
+                      { "title": "Project Tiger, Elephant, Rhino, Biosphere Reserves", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "8-12. Degradation & Waste Management",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Pollution Impacts (Industry, Mining, Agriculture, Transport)", "type": "micro-topic" },
+                      { "title": "Deforestation (Causes, Implications, Conservation Strategies)", "type": "micro-topic" },
+                      { "title": "Waste Management (Solid, Hazardous, E-Waste, Bio-Medical)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "13-14. Sustainable Development & Pollution Types",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Sustainability Principles, Global Goals (SDGs)", "type": "micro-topic" },
+                      { "title": "Pollution Types: Air, Water, Thermal, Soil, Noise, Radioactive", "type": "micro-topic" }
+                    ]
+                  },
+                   {
+                    "title": "16-19. Coastal Ecosystem & EIA",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Coastal Mgmt (Mangroves, Coral Reefs, CRZ)", "type": "micro-topic" },
+                      { "title": "EIA (Process, Body, Rulings, Urbanization Impact)", "type": "micro-topic" },
+                      { "title": "Environmental Laws (Air Act, Water Act, EPA 1986, Wildlife Act 1972)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "20-27. Institutions, Schemes & Climate Change",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Institutions (NGT, CPCB, WCCB, Animal Welfare Board)", "type": "micro-topic" },
+                      { "title": "Schemes (Ecomark, Afforestation, Clean Ganga, AQI)", "type": "micro-topic" },
+                      { "title": "Climate Change (Global Warming, Ozone, Acid Rain, Mitigation)", "type": "micro-topic" },
+                      { "title": "International Governance (UNEP, UNDP, UNFCCC, Kyoto, Paris)", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Disaster Management",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "1. Introduction",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Concepts: Hazard, Vulnerability, Risk, Capacity", "type": "micro-topic" },
+                      { "title": "Classification of Disasters & DM Cycle", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "2. Disaster Management in India",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "DM Act 2005, National Policy 2009, National Plan 2016", "type": "micro-topic" },
+                      { "title": "DM Cycle in India", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "3. Hazards in India",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Vulnerability Profile, Natural & Man-made Hazards", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "4. International Cooperation",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Global Frameworks (Sendai), International Agencies", "type": "micro-topic" },
+                      { "title": "India's Leadership & Bilateral Agreements", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "5. Miscellaneous Topic",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Disaster Insurance, Community-Based DM, Role of Media", "type": "micro-topic" },
+                      { "title": "Retrofitting, Climate Change Linkage, Poverty Linkage", "type": "micro-topic" },
+                      { "title": "NDMA Guidelines, Plan for Animals", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              },
+              {
+                "title": "Internal Security",
+                "type": "topic",
+                "children": [
+                  { "title": "1. Challenges to Internal Security (Social Diversity, Non-State Actors)", "type": "subtopic" },
+                  { "title": "2. Terrorism (Threats, Changing Face, Linkages)", "type": "subtopic" },
+                  { "title": "3-4. Organized Crime & Linkages (Combating, Naxalism Link)", "type": "subtopic" },
+                  { "title": "5. Insurgency in North-East (Assam, Issues)", "type": "subtopic" },
+                  { "title": "6. Border Management (Challenges, Community Participation)", "type": "subtopic" },
+                  {
+                    "title": "7-9. Cyber Security",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Cyber Crimes, Ransomware, National Policy 2013", "type": "micro-topic" },
+                      { "title": "Cyber Warfare, Social Media Challenges", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "10-11. Money Laundering & Black Money",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Effects, Steps by Govt, Demonetization Impact", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "12-13. Security Forces & Reforms",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Police Reforms (Structure, Recommendations)", "type": "micro-topic" },
+                      { "title": "Security Forces (BSF, CRPF, CISF, NSG, Assam Rifles)", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Emerging Internal Security Challenges",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Border Management: China & Pakistan Fronts", "type": "micro-topic" },
+                      { "title": "Coastal & Maritime Security", "type": "micro-topic" },
+                      { "title": "Use of Technology in Policing & Surveillance", "type": "micro-topic" },
+                      { "title": "Social Media, Radicalization & Misinformation", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "General Studies IV (Ethics, Integrity and Aptitude)",
+            "type": "subject",
+            "children": [
+              {
+                "title": "1. Ethics & Human Interface",
+                "type": "topic",
+                "children": [
+                  { "title": "Essence, Determinants, Consequences, Dimensions", "type": "micro-topic" },
+                  { "title": "Ethics in Private & Public Relationships", "type": "micro-topic" },
+                  { "title": "Human Values (Lessons from Leaders, Role of Family/Society)", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "2. Attitude",
+                "type": "topic",
+                "children": [
+                  { "title": "Structure, Content, Function, Influence on Behaviour", "type": "micro-topic" },
+                  { "title": "Moral, Political Attitudes, Social Influence, Persuasion", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "3. Aptitude for Civil Services",
+                "type": "topic",
+                "children": [
+                  { "title": "Integrity, Impartiality, Non-Partisanship, Objectivity", "type": "micro-topic" },
+                  { "title": "Empathy, Tolerance, Compassion for Weaker Sections", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "4. Emotional Intelligence",
+                "type": "topic",
+                "children": [
+                  { "title": "Concepts, Utilities, Application in Admin & Governance", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "5. Moral Thinkers",
+                "type": "topic",
+                "children": [
+                  { "title": "Contributions from India & World Philosophers", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "6. Ethics in Public Administration",
+                "type": "topic",
+                "children": [
+                  { "title": "Status, Problems, Dilemmas (Govt & Private)", "type": "micro-topic" },
+                  { "title": "Laws, Rules, Conscience, Accountability", "type": "micro-topic" },
+                  { "title": "Ethical Governance, International Relations, Corporate Gov", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "7. Probity in Governance",
+                "type": "topic",
+                "children": [
+                  { "title": "Concept, Philosophical Basis, Transparency, RTI", "type": "micro-topic" },
+                  { "title": "Codes of Ethics/Conduct, Citizen's Charters, Work Culture", "type": "micro-topic" },
+                  { "title": "Fund Utilization, Corruption Challenges", "type": "micro-topic" }
+                ]
+              },
+              {
+                "title": "Ethics Case Studies & Thinkers",
+                "type": "topic",
+                "children": [
+                  {
+                    "title": "Ethical Case Study Frameworks",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Stakeholder Analysis", "type": "micro-topic" },
+                      { "title": "Ethical Dilemmas & Conflict of Interest", "type": "micro-topic" },
+                      { "title": "Moral vs Legal Perspectives", "type": "micro-topic" },
+                      { "title": "Accountability, Transparency & Public Interest", "type": "micro-topic" }
+                    ]
+                  },
+                  {
+                    "title": "Moral Thinkers & Philosophers",
+                    "type": "subtopic",
+                    "children": [
+                      { "title": "Indian Thinkers: Gandhi, Ambedkar", "type": "micro-topic" },
+                      { "title": "Western Thinkers: Kant, Aristotle, John Rawls", "type": "micro-topic" },
+                      { "title": "Utilitarianism: Bentham & Mill", "type": "micro-topic" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

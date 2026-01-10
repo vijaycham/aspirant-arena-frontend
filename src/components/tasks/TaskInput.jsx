@@ -31,19 +31,55 @@ const TaskInput = ({
   const suggestions = React.useMemo(() => {
     if (!task || task.length < 2 || selectedNodeId) return [];
     
-    // Search across all loaded syllabus arenas to find matches
-    const allMatches = [];
-    Object.keys(syllabus).forEach(arenaId => {
-      const nodes = syllabus[arenaId];
-      const matches = nodes.filter(n => 
-        n.type !== 'subject' && 
-        n.title.toLowerCase().includes(task.toLowerCase())
-      ).map(n => ({ ...n, arenaId }));
-      allMatches.push(...matches);
-    });
+    // Use local static syllabus if available (faster), else fallback to Redux
+    const sourceData = localSyllabus.length > 0 ? localSyllabus : Object.values(syllabus).flat();
+
+    const matches = sourceData.filter(n => 
+      n.type !== 'subject' && 
+      n.type !== 'root' &&
+      n.type !== 'category' &&
+      n.title.toLowerCase().includes(task.toLowerCase())
+    ).map(n => ({ ...n, arenaId: selectedArenaId || 'upsc-gs' }));
     
-    return allMatches.slice(0, 5); // Limit to 5 suggestions for clarity
-  }, [task, syllabus, selectedNodeId]);
+    return matches.slice(0, 5); 
+  }, [task, syllabus, selectedNodeId, localSyllabus]);
+
+  // Client-Side Optimization: Load deeply nested syllabus from static JSON
+  // This avoids massive DB calls for what is essentially "Read-Only Master Data"
+  const [localSyllabus, setLocalSyllabus] = useState([]);
+
+  React.useEffect(() => {
+    const loadStaticSyllabus = async () => {
+       try {
+         // Dynamic Import (Code Splitting)
+         const module = await import("../../data/syllabus/upsc-gs.json");
+         const staticData = module.default;
+         
+         const flatten = (node, pid) => {
+             let res = [];
+             const flat = {
+                 ...node,
+                 parentId: pid,
+                 _id: node.title.replace(/\s+/g, '-').toLowerCase()
+             };
+             res.push(flat);
+             if (node.children) {
+                 node.children.forEach(c => res.push(...flatten(c, flat._id)));
+             }
+             return res;
+         }
+         // Flatten root for easy searching
+         if (staticData.root) {
+             setLocalSyllabus(flatten(staticData.root, null));
+         }
+       } catch (e) {
+           console.error("Syllabus lazy load failed", e);
+       }
+    };
+    if (showSuggestions && localSyllabus.length === 0) {
+        loadStaticSyllabus();
+    }
+  }, [showSuggestions]);
 
   // Reset navigation when arena changes
   React.useEffect(() => {
