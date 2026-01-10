@@ -1,43 +1,36 @@
 # Aspirant Arena - Frontend 🎨
 
-The sleek, modern, and highly interactive frontend for **Aspirant Arena**. Built with React and Vite, it delivers a premium productivity experience with smooth animations and intuitive task management.
+The sleek, modern, and highly interactive frontend for **Aspirant Arena**—the specialized exam engine for serious aspirants. 
+
+> [!NOTE]
+> This repository is the strategic hub where ambition meets high-performance design.
 
 ---
 
 ## 🏗 Tech Stack
 
-- **Framework**: [React 19](https://react.dev/)
-- **Build Tool**: [Vite 6](https://vitejs.dev/)
-- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/) & [Redux Persist](https://github.com/rt2zz/redux-persist)
-- **Styling**: [Tailwind CSS 3](https://tailwindcss.com/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
-- **Toasts**: [React Hot Toast](https://react-hot-toast.com/) & [React Toastify](https://fkhadra.github.io/react-toastify/)
-- **HTTP Client**: [Axios](https://axios-http.com/) (Centralized instance in `src/utils/api.js`)
-- **Routing**: [React Router v7](https://reactrouter.com/)
-- **Testing**: [Vitest](https://vitest.dev/) & [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
+- **Framework**: [React 19](https://react.dev/) & [Vite 6](https://vitejs.dev/)
+- **State**: [Redux Toolkit](https://redux-toolkit.js.org/) & [Redux Persist](https://github.com/rt2zz/redux-persist)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
+- **Testing**: [Vitest](https://vitest.dev/)
+
+For a deep dive into the system design, see [ARCHITECTURE.md](file:///home/vijay/projects/fullstack/aspirant-arena-frontend/ARCHITECTURE.md).
 
 ---
 
-## 🪐 Key Features
+## 🗝 Key Features
 
-- **Trust-Based Verification Flow**: 
-  - **24-Hour Grace Period**: New users get full access for 24 hours to explore the platform before verification is required.
-  - **Locked State UI**: "Premium" blurred overlays and status badges (Verified / Grace Period / Unverified) managed via centralized auth logic.
-  - **Persistent Cooldown**: Smart "Resend Verification" button with a persistent 60s cooldown that survives page refreshes.
-- **Advanced Performance Suite**: High-fidelity dashboard for UPSC aspirants.
-  - **Mistake Logger**: Track *Conceptual Errors*, *Silly Mistakes*, and *Time Pressure*.
-  - **Unattended Tracker**: Log skipped questions to see the full "Lost Marks" profile.
-  - **Subject Analytics**: Filter trends by subject and set custom targets for automatic status highlighting (Green/Red bars).
-  - **Smart Tallying**: Real-time feedback in the entry form to ensure all lost marks are accounted for.
-  - **Avg Error Tracking**: Scalable performance metrics showing average mistakes per test instead of cumulative totals.
-- **Smart Strategy Coach**: "Performance-based tips" that analyze your mock data to identify specific bottlenecks (e.g., "Revision Bottleneck" or "Panic Mode").
-- **Dynamic To-Do List**: Manage tasks with priority levels (Low/Medium/High) and due dates.
-- **Aura Design System**: A cohesive, dark-themed UI featuring glassmorphism, animated blobs, and a "Slate-950" premium aesthetic across all pages (Login, Profile, Dashboard).
-- **Feedback & Support Central**: Dedicated hub for users to Contact Developer, Report Bugs, or Request Features, integrated with **Nodemailer** for real-time email dispatch.
-- **Vercel Optimized**: Integrated with `@vercel/speed-insights` for performance tracking.
-- **Google OAuth**: One-tap sign-in integrated with Firebase and the custom backend.
-- **Production-Ready Communication**: Centralized API utility with automatic response interceptors for clean data handling.
+- **The Focus Arena**: A heroic Zen-mode study timer.
+  - **Persistence 2.0 (Smart Resume)**: Automatically catches up if the tab is closed or mobile app is minimized.
+  - **Web Worker Support**: Industrial-grade timing precision that survives background CPU throttling.
+  - **Zen Mode 2.0**: Cinematic fullscreen focus with atmospheric glows and ambient audio.
+  - **Mobile Lock-Screen Integration**: Play/Pause your timer directly from notification controls.
+- **Strategic Mock Tracker**: Specialized analytics for UPSC papers.
+  - **Mistake Logger**: Categorize errors into *Conceptual*, *Silly*, or *Time Pressure*.
+  - **Smart Tallying**: Real-time feedback ensure every lost mark is analyzed.
+- **Mastery Analytics**:
+  - **Consistency Heatmap**: Visualizing 365 days of focus activity.
+  - **Focus Rhythm**: Data-driven insights into your daily efficiency peaks.
 
 ---
 
@@ -45,45 +38,15 @@ The sleek, modern, and highly interactive frontend for **Aspirant Arena**. Built
 
 ### Installation
 1. Clone the repository.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the root directory:
-   ```env
-   VITE_BACKEND_URL=http://localhost:8888
-   VITE_FIREBASE_API_KEY=your_key
-   # ... other firebase vars
-   ```
-4. Run development server:
-   ```bash
-   npm run dev
-   ```
-5. Run tests:
-   ```bash
-   npm run test:run
-   ```
+2. Install dependencies: `npm install`
+3. Configure your `.env` (See [DEPLOYMENT.md](file:///home/vijay/projects/fullstack/aspirant-arena-frontend/DEPLOYMENT.md)).
+4. Run development server: `npm run dev`
 
 ---
 
-## 🛠 Git Workflow
-
-We maintain a clean and scalable project structure using the **Feature Branch Workflow**:
-
-1.  **main**: Protected production branch.
-2.  **feature/x**: Dedicated branches for specific features (e.g., `feature/shimmer-ui`, `feature/notes`).
-3.  **Process**:
-    - Commit small, meaningful changes to your feature branch.
-    - Merge into `main` after local verification.
-    - Pull latest changes from `main` before starting new work.
-
----
-
-## 📦 Project Structure
-
-- `src/utils/api.js`: Centralized Axios instance for all v1 API calls.
-- `src/pages/`: Contains all main view components.
-- `src/pages/TestTrackerComponents/`: Modular UI components for the performance suite.
-- `src/hooks/`: Custom hooks like `useTestTracker.js` for clean state management.
-- `src/redux/`: Global state management logic.
-- `src/components/`: Reusable UI elements (Header, OAuth, etc.).
+## 📄 Documentation Suite
+To maintain professional standards, this project includes comprehensive documentation:
+- [CHANGELOG.md](file:///home/vijay/projects/fullstack/aspirant-arena-frontend/CHANGELOG.md): Version history and updates.
+- [DEPLOYMENT.md](file:///home/vijay/projects/fullstack/aspirant-arena-frontend/DEPLOYMENT.md): Vercel and domain setup.
+- [SECURITY.md](file:///home/vijay/projects/fullstack/aspirant-arena-frontend/SECURITY.md): Client-side hardening and auth guards.
+- [ARCHITECTURE.md](file:///home/vijay/projects/fullstack/aspirant-arena-frontend/ARCHITECTURE.md): Design system and state mapping.

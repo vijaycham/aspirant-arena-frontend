@@ -137,10 +137,7 @@ const Home = () => {
         
         {/* Hero Section */}
         <div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/50 shadow-sm">
-            <span className="flex h-2 w-2 rounded-full bg-primary-500 animate-pulse"></span>
-            <span className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest">Aspirant Workspace 2.0</span>
-          </div>
+            <span className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest">Aspirant Arena</span>
           
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 leading-[1.1] tracking-tighter">
             Where Ambition Meets <br className="hidden lg:block" />

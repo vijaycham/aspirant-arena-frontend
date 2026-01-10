@@ -37,7 +37,7 @@ const Landing = () => {
             <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-gray-900 leading-[0.95] tracking-tighter">
               Aspirant <br />
               <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">
-                Arena 2.0
+                Arena
               </span>
             </h1>
             
