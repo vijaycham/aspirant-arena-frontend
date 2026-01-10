@@ -160,7 +160,7 @@ const Home = () => {
             </Link>
             <Link
               to="/arena"
-              className="px-8 py-4 rounded-[2rem] bg-white text-gray-900 border-2 border-gray-900 font-black shadow-xl hover:bg-gray-50 hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base"
+              className="px-8 py-4 rounded-[2rem] bg-white text-gray-900  border-gray-900 border-gray-100  font-black shadow-xl hover:bg-gray-50 hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base"
             >
               Master Syllabus ⛩️
             </Link>

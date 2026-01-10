@@ -27,59 +27,27 @@ const TaskInput = ({
   const [currentParentId, setCurrentParentId] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Client-Side Optimization: Load deeply nested syllabus from static JSON
-  // This avoids massive DB calls for what is essentially "Read-Only Master Data"
-  const [localSyllabus, setLocalSyllabus] = useState([]);
-
-  React.useEffect(() => {
-    const loadStaticSyllabus = async () => {
-       try {
-         // Dynamic Import (Code Splitting)
-         const module = await import("../../data/syllabus/upsc-gs.json");
-         const staticData = module.default;
-         
-         const flatten = (node, pid) => {
-             let res = [];
-             const flat = {
-                 ...node,
-                 parentId: pid,
-                 _id: node.title.replace(/\s+/g, '-').toLowerCase()
-             };
-             res.push(flat);
-             if (node.children) {
-                 node.children.forEach(c => res.push(...flatten(c, flat._id)));
-             }
-             return res;
-         }
-         // Flatten root for easy searching
-         if (staticData.root) {
-             setLocalSyllabus(flatten(staticData.root, null));
-         }
-       } catch (e) {
-           console.error("Syllabus lazy load failed", e);
-       }
-    };
-    if (showSuggestions && localSyllabus.length === 0) {
-        loadStaticSyllabus();
-    }
-  }, [showSuggestions]);
-
   // Auto-suggestions based on what the user is typing in the task input
   const suggestions = React.useMemo(() => {
-    if (!task || task.length < 2 || selectedNodeId) return [];
+    if (!task || task.length < 2) return [];
     
-    // Use local static syllabus if available (faster), else fallback to Redux
-    const sourceData = localSyllabus.length > 0 ? localSyllabus : Object.values(syllabus).flat();
+    // Search within selected arena or across all active arenas if none selected
+    let sourceData = [];
+    if (selectedArenaId && syllabus[selectedArenaId]) {
+      sourceData = syllabus[selectedArenaId];
+    } else {
+      sourceData = Object.values(syllabus).flat();
+    }
 
     const matches = sourceData.filter(n => 
       n.type !== 'subject' && 
       n.type !== 'root' &&
       n.type !== 'category' &&
       n.title.toLowerCase().includes(task.toLowerCase())
-    ).map(n => ({ ...n, arenaId: selectedArenaId || 'upsc-gs' }));
+    ).map(n => ({ ...n, arenaId: n.arenaId || selectedArenaId }));
     
     return matches.slice(0, 5); 
-  }, [task, syllabus, selectedNodeId, localSyllabus]);
+  }, [task, syllabus, selectedArenaId]);
 
   // Reset navigation when arena changes
   React.useEffect(() => {
@@ -111,7 +79,7 @@ const TaskInput = ({
       ).slice(0, 15);
     }
     
-    return allNodes.filter(n => n.parentId === currentParentId);
+    return allNodes.filter(n => n.parentId === (currentParentId || null)); // Handle null explicitly for roots
   }, [selectedArenaId, syllabus, currentParentId, nodeSearch]);
 
   // Build breadcrumbs for navigation
@@ -221,14 +189,15 @@ const TaskInput = ({
             {showArenaDropdown && (
               <div className="relative">
                 <div 
-                  className="fixed inset-0 z-40" 
+                  className="fixed inset-0 z-[60] bg-white/10 backdrop-blur-sm" 
                   onClick={() => setShowArenaDropdown(false)}
                 />
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute top-full left-0 right-0 mt-4 bg-white border border-gray-100 rounded-[2rem] shadow-2xl z-50 p-6 max-h-[350px] overflow-hidden flex flex-col"
+                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                  className="absolute top-full left-0 right-0 mt-4 bg-white border-2 border-gray-100/50 rounded-[2rem] shadow-xl shadow-gray-200/50 z-[70] p-6 max-h-[400px] overflow-hidden flex flex-col ring-1 ring-black/5"
                 >
                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
                       <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Master Roadmap Link</h3>
@@ -291,7 +260,7 @@ const TaskInput = ({
                         <button
                           key={node._id}
                           onClick={() => {
-                            if (node.type === 'subject' || node.type === 'topic') {
+                            if (node.type === 'subject' || node.type === 'topic' || node.type === 'category' || node.type === 'root') {
                               setCurrentParentId(node._id);
                             } else {
                               setSelectedNodeId(node._id);
@@ -310,7 +279,7 @@ const TaskInput = ({
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                             {(node.type === 'subject' || node.type === 'topic') ? (
+                             {(node.type === 'subject' || node.type === 'topic' || node.type === 'category' || node.type === 'root') ? (
                                <FiChevronRight className="text-gray-300 group-hover:text-primary-400 transition-all" />
                              ) : (
                                <button 

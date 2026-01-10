@@ -10,11 +10,12 @@ import { addTask } from '../../redux/slice/taskSlice';
 import api from '../../utils/api';
 import { toast } from 'react-hot-toast';
 
-const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
-  const [isOpen, setIsOpen] = useState(depth < 1); // Expand top-level subjects by default
+const SyllabusNode = ({ node, nodeMap, depth = 0 }) => {
+  const [isOpen, setIsOpen] = useState(depth < 2); 
   const dispatch = useDispatch();
   
-  const children = allNodes.filter(n => n.parentId === node._id);
+  // O(1) Lookup instead of O(N) filter
+  const children = nodeMap[node._id] || [];
   const hasChildren = children.length > 0;
 
   const handleStatusToggle = (e) => {
@@ -27,29 +28,29 @@ const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
   };
 
   const statusIcons = {
-    pending: <FiCircle className="text-gray-400" />,
+    pending: <FiCircle className="text-gray-300" />,
     'in-progress': <FiClock className="text-amber-500 animate-pulse" />,
-    completed: <FiCheckCircle className="text-green-500" />
+    completed: <FiCheckCircle className="text-emerald-500" />
   };
 
   const typeStyles = {
-    subject: "border-b-2 border-primary-500/20 bg-primary-50/10",
-    topic: "bg-white/5",
-    subtopic: "text-sm",
-    'micro-topic': "text-xs italic text-gray-400"
+    subject: "border-b border-primary-100 bg-primary-50/50 text-gray-900",
+    topic: "bg-white hover:bg-gray-50 border-b border-gray-50 text-gray-800",
+    subtopic: "text-sm text-gray-700 hover:bg-gray-50",
+    'micro-topic': "text-xs italic text-gray-500 hover:bg-gray-50"
   };
 
   return (
-    <div className={`select-none ${depth > 0 ? 'ml-6 border-l border-gray-100/10' : ''}`}>
+    <div className={`select-none ${depth > 0 ? 'ml-6 border-l border-gray-200' : ''}`}>
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className={`group flex items-center p-3 hover:bg-white/10 transition-all rounded-lg cursor-pointer ${typeStyles[node.type] || ''}`}
+        className={`group flex items-center p-3 transition-all rounded-lg cursor-pointer ${typeStyles[node.type] || ''}`}
       >
         {/* Toggle Arrow */}
         <div className="w-6 flex items-center justify-center">
           {hasChildren && (
             <motion.div animate={{ rotate: isOpen ? 90 : 0 }}>
-              <FiChevronRight className="text-gray-500 group-hover:text-primary-400" />
+              <FiChevronRight className="text-gray-400 group-hover:text-primary-600" />
             </motion.div>
           )}
         </div>
@@ -62,11 +63,11 @@ const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
         {/* Title & Stats */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`truncate font-medium ${node.status === 'completed' ? 'text-gray-500 line-through' : 'text-gray-200'}`}>
+            <span className={`truncate font-medium ${node.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
               {node.title}
             </span>
             {node.timeSpent > 0 && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary-900/40 text-primary-300 font-mono">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary-100 text-primary-700 font-mono">
                 {node.timeSpent}m
               </span>
             )}
@@ -95,14 +96,14 @@ const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
                   toast.error("Failed to add task");
                 }
               }}
-              className="p-1.5 rounded-lg bg-primary-500/10 text-primary-400 hover:bg-primary-500 hover:text-white transition-all shadow-sm"
+              className="p-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-primary-600 hover:text-white transition-all shadow-sm"
               title="Add to Daily Tasks"
             >
               <FiPlus size={14} />
             </button>
           )}
           {node.resources?.length > 0 && (
-            <FiBook className="text-primary-400 h-4 w-4" title="Resources available" />
+            <FiBook className="text-primary-500 h-4 w-4" title="Resources available" />
           )}
         </div>
       </div>
@@ -119,7 +120,7 @@ const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
               <SyllabusNode 
                 key={child._id} 
                 node={child} 
-                allNodes={allNodes} 
+                nodeMap={nodeMap}
                 depth={depth + 1} 
               />
             ))}
@@ -131,13 +132,29 @@ const SyllabusNode = ({ node, allNodes, depth = 0 }) => {
 };
 
 const SyllabusTree = ({ nodes }) => {
-  const rootNodes = nodes.filter(n => !n.parentId);
+  // Performance Optimization: Pre-compute parentId -> children map
+  // This reduces rendering complexity from O(N^2) to O(N)
+  const { rootNodes, nodeMap } = React.useMemo(() => {
+    const map = {};
+    const roots = [];
+    
+    nodes.forEach(node => {
+      if (!node.parentId) {
+        roots.push(node);
+      } else {
+        if (!map[node.parentId]) map[node.parentId] = [];
+        map[node.parentId].push(node);
+      }
+    });
+
+    return { rootNodes: roots, nodeMap: map };
+  }, [nodes]);
 
   if (nodes.length === 0) {
     return (
-      <div className="text-center py-12 bg-white/5 rounded-2xl border border-dashed border-white/10">
-        <FiPlus className="mx-auto h-12 w-12 text-gray-600 mb-4" />
-        <h3 className="text-gray-300 font-medium">No Syllabus Found</h3>
+      <div className="text-center py-12 bg-white/5 rounded-2xl border border-dashed border-gray-200">
+        <FiPlus className="mx-auto h-12 w-12 text-gray-300 mb-4" />
+        <h3 className="text-gray-900 font-medium">No Syllabus Found</h3>
         <p className="text-gray-500 text-sm">Initialize an Arena to start tracking.</p>
       </div>
     );
@@ -146,7 +163,7 @@ const SyllabusTree = ({ nodes }) => {
   return (
     <div className="space-y-4">
       {rootNodes.map(node => (
-        <SyllabusNode key={node._id} node={node} allNodes={nodes} />
+        <SyllabusNode key={node._id} node={node} nodeMap={nodeMap} />
       ))}
     </div>
   );

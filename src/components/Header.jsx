@@ -68,10 +68,8 @@ const Header = () => {
             <nav className="hidden lg:flex items-center gap-8 font-bold text-sm tracking-tight text-white/80">
               <Link to="/" className="hover:text-primary-400 transition-colors">Home</Link>
               <Link to="/test-tracker" className="hover:text-primary-400 transition-colors">Analytics</Link>
-              <Link to="/arena" className="hover:text-primary-400 transition-colors flex items-center gap-1.5 underline decoration-primary-500/30 underline-offset-4">Arena</Link>
-              <Link to="/tasks" className="hover:text-primary-400 transition-colors">Tasks</Link>
-              <Link to="/timer" className="relative group/timer hover:text-primary-400 transition-all flex items-center gap-1.5">
-                Focus Arena
+              <Link to="/arena" className="relative group/arena hover:text-primary-400 transition-colors flex items-center gap-1.5 underline decoration-primary-500/30 underline-offset-4">
+                Arena
                 <motion.span
                   animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
@@ -79,7 +77,10 @@ const Header = () => {
                 >
                   NEW
                 </motion.span>
-                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-500 transition-all group-hover/timer:w-full" />
+              </Link>
+              <Link to="/tasks" className="hover:text-primary-400 transition-colors">Tasks</Link>
+              <Link to="/timer" className="hover:text-primary-400 transition-colors flex items-center gap-1.5">
+                Focus Arena
               </Link>
               
               {/* Verification Status Badge */}

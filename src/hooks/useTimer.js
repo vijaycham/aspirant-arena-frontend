@@ -346,6 +346,12 @@ export const useTimer = () => {
         setCycleNumber(1);
         setMode("LONG_BREAK");
         setTimeLeft(modeTimings.LONG_BREAK.time);
+        
+        // Clear task when cycle completes (User Request)
+        setSubject("");
+        setSelectedTaskId("");
+        setSelectedArenaId("");
+        setSelectedNodeId("");
       }
     } else {
       setMode("FOCUS");
@@ -395,6 +401,13 @@ export const useTimer = () => {
     setCycleNumber(1);
     setTimeLeft(modeTimings.FOCUS.time);
     startTimeRef.current = null;
+
+    // Clear task on manual cycle reset
+    setSubject("");
+    setSelectedTaskId("");
+    setSelectedArenaId("");
+    setSelectedNodeId("");
+
     toast.success("Cycle reset 🔁");
   };
 

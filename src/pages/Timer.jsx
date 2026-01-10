@@ -14,9 +14,8 @@ import {
   FaWater,
   FaBell,
   FaBellSlash,
-  FaBullseye,
 } from "react-icons/fa";
-import { FiLayers, FiTarget, FiSearch, FiChevronRight } from "react-icons/fi";
+import { FiTarget } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
 import { useTimer } from "../hooks/useTimer";
 import { useTasks } from "../hooks/useTasks";
@@ -81,12 +80,11 @@ const Timer = () => {
   const { arenas, syllabus } = useSelector(state => state.arena);
   const dispatch = useDispatch();
 
+  /* eslint-disable no-unused-vars */ // Temporarily ignore remaining unused vars if any
   const { tasks = [] } = useTasks() || {};
   const [isEditing, setIsEditing] = useState(false);
   const [manualMin, setManualMin] = useState("");
   const [showTaskDropdown, setShowTaskDropdown] = useState(false);
-  const [showArenaDropdown, setShowArenaDropdown] = useState(false);
-  const [nodeSearch, setNodeSearch] = useState("");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isMobileOrTablet, setIsMobileOrTablet] = React.useState(typeof window !== 'undefined' ? window.innerWidth <= 1024 : false);
