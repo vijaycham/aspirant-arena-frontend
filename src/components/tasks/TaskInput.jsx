@@ -27,23 +27,6 @@ const TaskInput = ({
   const [currentParentId, setCurrentParentId] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Auto-suggestions based on what the user is typing in the task input
-  const suggestions = React.useMemo(() => {
-    if (!task || task.length < 2 || selectedNodeId) return [];
-    
-    // Use local static syllabus if available (faster), else fallback to Redux
-    const sourceData = localSyllabus.length > 0 ? localSyllabus : Object.values(syllabus).flat();
-
-    const matches = sourceData.filter(n => 
-      n.type !== 'subject' && 
-      n.type !== 'root' &&
-      n.type !== 'category' &&
-      n.title.toLowerCase().includes(task.toLowerCase())
-    ).map(n => ({ ...n, arenaId: selectedArenaId || 'upsc-gs' }));
-    
-    return matches.slice(0, 5); 
-  }, [task, syllabus, selectedNodeId, localSyllabus]);
-
   // Client-Side Optimization: Load deeply nested syllabus from static JSON
   // This avoids massive DB calls for what is essentially "Read-Only Master Data"
   const [localSyllabus, setLocalSyllabus] = useState([]);
@@ -80,6 +63,23 @@ const TaskInput = ({
         loadStaticSyllabus();
     }
   }, [showSuggestions]);
+
+  // Auto-suggestions based on what the user is typing in the task input
+  const suggestions = React.useMemo(() => {
+    if (!task || task.length < 2 || selectedNodeId) return [];
+    
+    // Use local static syllabus if available (faster), else fallback to Redux
+    const sourceData = localSyllabus.length > 0 ? localSyllabus : Object.values(syllabus).flat();
+
+    const matches = sourceData.filter(n => 
+      n.type !== 'subject' && 
+      n.type !== 'root' &&
+      n.type !== 'category' &&
+      n.title.toLowerCase().includes(task.toLowerCase())
+    ).map(n => ({ ...n, arenaId: selectedArenaId || 'upsc-gs' }));
+    
+    return matches.slice(0, 5); 
+  }, [task, syllabus, selectedNodeId, localSyllabus]);
 
   // Reset navigation when arena changes
   React.useEffect(() => {

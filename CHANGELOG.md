@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - "Delete Arena" button in Dashboard with confirmation modal.
     - "Auto-Select": Task Input skips arena selection for single-arena users.
 - **Modular Dashboard**: Support for switching between multiple Exam Arenas.
+- **Quality Assurance**:
+    - **Unit Tests**: Added `TaskInput.test.jsx` verifying Smart Input and Lazy Loading.
+    - **Regression Fixes**: Patched `useTimer` tests for Redux compatibility.
 
 ## [v0.7.0] - 2026-01-10
 ### Added
