@@ -14,6 +14,7 @@ import {
   FaTimes,
   FaChartLine,
 } from "react-icons/fa";
+import { FiLayers } from "react-icons/fi";
 import { HiCheckCircle, HiXCircle, HiClock } from "react-icons/hi";
 import { signOut } from "../redux/user/authSlice";
 import api from "../utils/api";
@@ -67,6 +68,7 @@ const Header = () => {
             <nav className="hidden lg:flex items-center gap-8 font-bold text-sm tracking-tight text-white/80">
               <Link to="/" className="hover:text-primary-400 transition-colors">Home</Link>
               <Link to="/test-tracker" className="hover:text-primary-400 transition-colors">Analytics</Link>
+              <Link to="/arena" className="hover:text-primary-400 transition-colors flex items-center gap-1.5 underline decoration-primary-500/30 underline-offset-4">Arena</Link>
               <Link to="/tasks" className="hover:text-primary-400 transition-colors">Tasks</Link>
               <Link to="/timer" className="relative group/timer hover:text-primary-400 transition-all flex items-center gap-1.5">
                 Focus Arena
@@ -197,6 +199,16 @@ const Header = () => {
                   <div className="flex flex-col">
                     <span className="text-sm">Analytics</span>
                     <span className="text-[10px] text-gray-500 font-medium">Test Stats & Insights</span>
+                  </div>
+                </Link>
+
+                <Link to="/arena" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg shadow-primary-500/10">
+                    <FiLayers />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm">Syllabus Arena</span>
+                    <span className="text-[10px] text-gray-500 font-medium">Recursive Roadmap</span>
                   </div>
                 </Link>
 

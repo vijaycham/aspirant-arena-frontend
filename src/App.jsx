@@ -10,6 +10,7 @@ import Tasks from "./pages/Tasks";
 import Notes from "./pages/Notes";
 import Timer from "./pages/Timer";
 import TestTracker from "./pages/TestTracker";
+import ArenaDashboard from "./pages/ArenaDashboard";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
@@ -68,6 +69,7 @@ const App = () => {
           <Route path="/notes" element={<Notes />} />
           <Route path="/timer" element={<Timer />} />
           <Route path="/test-tracker" element={<TestTracker />} />
+          <Route path="/arena" element={<ArenaDashboard />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

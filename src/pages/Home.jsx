@@ -156,7 +156,13 @@ const Home = () => {
               to="/test-tracker"
               className="px-8 py-4 rounded-[2rem] bg-gray-900 text-white font-black shadow-2xl shadow-gray-200 hover:bg-black hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base"
             >
-              Analyze Your Performance 📈
+              Analyze Performance 📈
+            </Link>
+            <Link
+              to="/arena"
+              className="px-8 py-4 rounded-[2rem] bg-white text-gray-900 border-2 border-gray-900 font-black shadow-xl hover:bg-gray-50 hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base"
+            >
+              Master Syllabus ⛩️
             </Link>
             <Link
               to="/tasks"
@@ -208,6 +214,14 @@ const Home = () => {
                     ) : (
                       <Shimmer variant="stats" className="mt-1" />
                     )}
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Arena Progress</span>
+                    <Link to="/arena" className="block transform hover:scale-105 transition-transform">
+                      <span className="text-4xl font-black text-secondary-600">
+                        {user.primaryArenaProgress || 0}%
+                      </span>
+                    </Link>
                   </div>
                 </div>
 
