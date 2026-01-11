@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchArenas, fetchSyllabus, setCurrentArena, createArena, deleteArena } from '../redux/slice/arenaSlice';
 import SyllabusTree from '../components/syllabus/SyllabusTree';
 import ArenaModal from '../components/arena/ArenaModal';
+import ExamCountdown from '../components/arena/ExamCountdown';
 import { motion } from 'framer-motion';
 import { FiPlus, FiSettings, FiRefreshCcw, FiLayers, FiTarget, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
@@ -99,8 +100,11 @@ const ArenaDashboard = () => {
         {/* Dash Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Sidebar - Arena List */}
-          <div className="lg:col-span-3 space-y-4">
+          {/* Sidebar - Arena List & Widgets */}
+          <div className="lg:col-span-3 space-y-6">
+            <ExamCountdown />
+            
+            <div className="space-y-4">
             <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Active Tracks</h2>
             {arenas.map(arena => (
               <motion.div
@@ -124,6 +128,7 @@ const ArenaDashboard = () => {
                 </div>
               </motion.div>
             ))}
+            </div>
           </div>
 
           {/* Main - Syllabus Tracker */}
