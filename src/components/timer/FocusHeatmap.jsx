@@ -159,10 +159,7 @@ const FocusHeatmap = () => {
       ref={wrapperRef}
       className="glass-card p-6 md:p-8 rounded-[2rem] border border-white/60 shadow-lg relative group"
     >
-       {/* Background Glow Container (Clipped) */}
-       <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50/50 blur-3xl rounded-full -mr-20 -mt-20 transition-opacity opacity-50 group-hover:opacity-100"></div>
-       </div>
+
 
       <div className="flex items-center justify-between mb-2 relative z-10 px-1">
         <div className="flex items-center gap-3">
@@ -192,7 +189,7 @@ const FocusHeatmap = () => {
       {/* Heatmap Grid Container */}
       <div 
         ref={scrollContainerRef}
-        className="overflow-x-auto pb-4 pt-4 scrollbar-hide relative z-10 -mx-2 px-2"
+        className="overflow-x-auto pb-4 pt-4 scrollbar-thin relative z-10 -mx-2 px-2"
         style={{ scrollBehavior: 'smooth' }}
         onMouseLeave={() => setHoveredDay(null)}
       >

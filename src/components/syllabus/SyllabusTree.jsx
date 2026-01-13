@@ -34,10 +34,10 @@ const SyllabusNode = ({ node, nodeMap, depth = 0 }) => {
   };
 
   const typeStyles = {
-    subject: "border-b border-primary-100 bg-primary-50/50 text-gray-900",
-    topic: "bg-white hover:bg-gray-50 border-b border-gray-50 text-gray-800",
-    subtopic: "text-sm text-gray-700 hover:bg-gray-50",
-    'micro-topic': "text-xs italic text-gray-500 hover:bg-gray-50"
+    subject: "border-b border-primary-100 dark:border-white/10 bg-primary-50/50 dark:bg-primary-900/20 text-gray-900 dark:text-gray-100",
+    topic: "bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 border-b border-gray-50 dark:border-white/5 text-gray-800 dark:text-gray-200",
+    subtopic: "text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5",
+    'micro-topic': "text-xs italic text-gray-500 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5"
   };
 
   return (
@@ -63,7 +63,7 @@ const SyllabusNode = ({ node, nodeMap, depth = 0 }) => {
         {/* Title & Stats */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`truncate font-medium ${node.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
+            <span className={`truncate font-medium ${node.status === 'completed' ? 'text-gray-400 dark:text-gray-600 line-through' : 'text-gray-900 dark:text-gray-200'}`}>
               {node.title}
             </span>
             {node.timeSpent > 0 && (
@@ -152,10 +152,10 @@ const SyllabusTree = ({ nodes }) => {
 
   if (nodes.length === 0) {
     return (
-      <div className="text-center py-12 bg-white/5 rounded-2xl border border-dashed border-gray-200">
-        <FiPlus className="mx-auto h-12 w-12 text-gray-300 mb-4" />
-        <h3 className="text-gray-900 font-medium">No Syllabus Found</h3>
-        <p className="text-gray-500 text-sm">Initialize an Arena to start tracking.</p>
+      <div className="text-center py-12 bg-white/5 dark:bg-white/5 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
+        <FiPlus className="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
+        <h3 className="text-gray-900 dark:text-white font-medium">No Syllabus Found</h3>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">Initialize an Arena to start tracking.</p>
       </div>
     );
   }

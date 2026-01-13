@@ -25,6 +25,10 @@ For a deep dive into the system design, see [ARCHITECTURE.md](file:///home/vijay
   - **Web Worker Support**: Industrial-grade timing precision that survives background CPU throttling.
   - **Zen Mode 2.0**: Cinematic fullscreen focus with atmospheric glows and ambient audio.
   - **Mobile Lock-Screen Integration**: Play/Pause your timer directly from notification controls.
+- **Midnight Glass UI** (New! 🌙):
+  - **Premium Dark Mode**: Deep `slate-950` theme designed for long night study sessions.
+  - **Fluid Transitions**: Snappy 200ms animations for glare-free theme toggling.
+  - **Smart Contrast**: Adaptive text and card backdrops that maintain readability in any lighting.
 - **Strategic Mock Tracker**: Specialized analytics for UPSC papers.
   - **Mistake Logger**: Categorize errors into *Conceptual*, *Silly*, or *Time Pressure*.
   - **Smart Tallying**: Real-time feedback ensure every lost mark is analyzed.

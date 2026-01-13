@@ -19,6 +19,7 @@ import { HiCheckCircle, HiXCircle, HiClock } from "react-icons/hi";
 import { signOut } from "../redux/user/authSlice";
 import api from "../utils/api";
 import { getRemainingGraceHours } from "../utils/auth/verifyHelpers";
+import ThemeToggle from "./ThemeToggle";
 
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -48,10 +49,10 @@ const Header = () => {
   return (
     <>
       <header className="sticky top-4 z-50 px-4 sm:px-6 font-outfit">
-        <div className="container mx-auto bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-[2rem] px-6 py-3.5 flex justify-between items-center text-white shadow-2xl shadow-slate-900/20 transition-all duration-300">
+        <div className="container mx-auto bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-[2rem] px-6 py-3.5 flex justify-between items-center text-white shadow-2xl shadow-slate-900/20 transition-all duration-200">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-all duration-300">
+            <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-all duration-200">
               <img
                 src={logo}
                 alt="Aspirant Arena Logo"
@@ -100,7 +101,8 @@ const Header = () => {
                   </div>
                 )}
               </div>
-
+              <div className="h-4 w-px bg-white/10 mx-2" />
+              <ThemeToggle />
               <div className="h-4 w-px bg-white/10 mx-2" />
               <Link
                 to="/profile"
@@ -138,13 +140,16 @@ const Header = () => {
             </div>
           )}
           {isAuthenticated && (
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-xl active:scale-95 transition-all"
-              aria-label="Open Mobile Menu"
-            >
-              <FaBars />
-            </button>
+            <div className="lg:hidden flex items-center gap-3">
+              <ThemeToggle />
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-xl active:scale-95 transition-all"
+                aria-label="Open Mobile Menu"
+              >
+                <FaBars />
+              </button>
+            </div>
           )}
         </div>
       </header>

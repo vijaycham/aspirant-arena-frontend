@@ -95,7 +95,7 @@ const TaskInput = ({
   }, [selectedArenaId, currentParentId, syllabus]);
 
   return (
-    <div className="glass-card p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 border border-white">
+    <div className="glass-card dark:border-white/10 p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-black/50 border border-white relative z-50 transition-colors duration-200">
       <div className="flex flex-col gap-6">
         <div className="space-y-1">
           <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Task Description</label>
@@ -106,7 +106,7 @@ const TaskInput = ({
             onKeyDown={onKeyDown}
             placeholder="What needs to be done?"
             onFocus={() => setShowSuggestions(true)}
-            className="w-full p-4 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-2xl outline-none transition-all font-bold text-gray-700 placeholder:text-gray-300 shadow-sm"
+            className="w-full p-4 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-2xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 placeholder:text-gray-300 dark:placeholder:text-gray-600 shadow-sm"
           />
 
           {/* Type-Ahead Suggestions */}
@@ -131,13 +131,13 @@ const TaskInput = ({
                       setTask(suggestion.title);
                       setShowSuggestions(false);
                     }}
-                    className="w-full text-left p-3 rounded-xl hover:bg-primary-50 transition-all group flex items-center justify-between"
+                    className="w-full text-left p-3 rounded-xl hover:bg-primary-50 transition-colors group flex items-center justify-between"
                   >
                     <div>
                       <p className="text-[8px] text-gray-400 uppercase font-black tracking-tighter">
                         {arenas.find(a => a._id === suggestion.arenaId)?.title} • {suggestion.type}
                       </p>
-                      <p className="text-xs font-bold text-gray-700 group-hover:text-primary-600">
+                      <p className="text-xs font-bold text-gray-700 group-hover:text-primary-600 transition-colors">
                         {suggestion.title}
                       </p>
                     </div>
@@ -159,7 +159,7 @@ const TaskInput = ({
                     setShowArenaDropdown(true);
                   }
                 }}
-                className="px-3 py-1.5 rounded-xl bg-white/50 border border-gray-100 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 hover:bg-white transition-all flex items-center gap-2"
+                className="px-3 py-1.5 rounded-xl bg-white/50 dark:bg-slate-800/50 border border-gray-100 dark:border-white/10 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
               >
                 <FiLayers size={10} /> Link Roadmap Topic
               </button>
@@ -167,7 +167,7 @@ const TaskInput = ({
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setShowArenaDropdown(true)}
-                  className="px-3 py-1.5 rounded-xl bg-primary-50 border border-primary-100 text-[9px] font-black uppercase tracking-widest text-primary-600 transition-all flex items-center gap-2 shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-primary-50 border border-primary-100 text-[9px] font-black uppercase tracking-widest text-primary-600 transition-colors flex items-center gap-2 shadow-sm"
                 >
                   <FiTarget size={10} className="animate-pulse" /> {selectedNode?.title || 'Linked Topic'}
                 </button>
@@ -197,11 +197,11 @@ const TaskInput = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                  className="absolute top-full left-0 right-0 mt-4 bg-white border-2 border-gray-100/50 rounded-[2rem] shadow-xl shadow-gray-200/50 z-[70] p-6 max-h-[400px] overflow-hidden flex flex-col ring-1 ring-black/5"
+                  className="absolute top-full left-0 right-0 mt-4 bg-white dark:bg-slate-900 border-2 border-gray-100/50 dark:border-slate-800 rounded-[2rem] shadow-xl shadow-gray-200/50 dark:shadow-black/50 z-[70] p-6 max-h-[400px] overflow-hidden flex flex-col ring-1 ring-black/5 dark:ring-white/5"
                 >
-                   <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+                   <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-white/10 pb-4">
                       <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Master Roadmap Link</h3>
-                      <button onClick={() => setShowArenaDropdown(false)} className="text-gray-400 hover:text-black">&times;</button>
+                      <button onClick={() => setShowArenaDropdown(false)} className="text-gray-400 hover:text-black dark:hover:text-white">&times;</button>
                     </div>
 
                     <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
@@ -209,10 +209,10 @@ const TaskInput = ({
                         <button
                           key={a._id}
                           onClick={() => setSelectedArenaId(a._id)}
-                          className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight border whitespace-nowrap transition-all ${
+                          className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight border whitespace-nowrap transition-colors ${
                             selectedArenaId === a._id 
                               ? 'bg-primary-600 border-primary-600 text-white shadow-lg' 
-                              : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'
+                              : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400 hover:border-gray-200 dark:hover:border-slate-600'
                           }`}
                         >
                           {a.title}
@@ -227,23 +227,23 @@ const TaskInput = ({
                         placeholder="Search topics..."
                         value={nodeSearch}
                         onChange={(e) => setNodeSearch(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:ring-2 ring-primary-500/10 transition-all"
+                        className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:ring-2 ring-primary-500/10 dark:text-gray-200 transition-all"
                       />
                     </div>
 
                     <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide min-h-[32px] items-center">
                        <button 
                          onClick={() => setCurrentParentId(null)}
-                         className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all ${!currentParentId ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:text-gray-600'}`}
+                         className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all ${!currentParentId ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                        >
                          Root
                        </button>
                        {breadcrumbs.map((bc, idx) => (
                          <React.Fragment key={bc._id}>
-                           <FiChevronRight size={10} className="text-gray-300" />
+                           <FiChevronRight size={10} className="text-gray-300 dark:text-gray-600" />
                            <button 
                              onClick={() => setCurrentParentId(bc._id)}
-                             className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all whitespace-nowrap ${idx === breadcrumbs.length - 1 ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:text-gray-600'}`}
+                             className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all whitespace-nowrap ${idx === breadcrumbs.length - 1 ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                            >
                              {bc.title}
                            </button>
@@ -251,7 +251,7 @@ const TaskInput = ({
                        ))}
                     </div>
 
-                    <div className="overflow-y-auto flex-1 space-y-1 pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+                    <div className="overflow-y-auto flex-1 space-y-1 pr-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-slate-700">
                       {!selectedArenaId ? (
                         <p className="text-center text-gray-400 text-[10px] py-10 uppercase font-black opacity-50">Select an Arena first</p>
                       ) : currentLevelNodes.length === 0 ? (
@@ -268,13 +268,13 @@ const TaskInput = ({
                               if (!task.trim()) setTask(node.title);
                             }
                           }}
-                          className="w-full text-left p-3 rounded-xl bg-white border border-transparent hover:border-gray-100 hover:bg-gray-50 transition-all group flex items-center justify-between"
+                          className="w-full text-left p-3 rounded-xl border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all group flex items-center justify-between"
                         >
                           <div>
                             <p className="text-[8px] text-gray-400 mt-1 uppercase font-black tracking-tighter">
                               {node.type}
                             </p>
-                            <p className="text-xs font-bold text-gray-700 group-hover:text-primary-600 transition-colors uppercase tracking-tight">
+                            <p className="text-xs font-bold text-gray-700 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors uppercase tracking-tight">
                               {node.title}
                             </p>
                           </div>
@@ -311,7 +311,7 @@ const TaskInput = ({
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="w-full p-3 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-xl outline-none transition-all font-bold text-gray-700 text-sm appearance-none shadow-sm"
+                className="w-full p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm appearance-none shadow-sm"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -325,7 +325,7 @@ const TaskInput = ({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full p-3 bg-gray-50/50 border-2 border-transparent focus:border-primary-500 focus:bg-white rounded-xl outline-none transition-all font-bold text-gray-700 text-sm shadow-sm"
+                className="w-full p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm"
               />
             </div>
           </div>
@@ -333,14 +333,14 @@ const TaskInput = ({
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <button
               onClick={onAdd}
-              className="px-10 py-3.5 bg-gray-900 text-white font-black rounded-2xl hover:bg-black hover:scale-[1.03] active:scale-95 transition-all shadow-xl shadow-gray-200 uppercase tracking-widest text-xs"
+              className="px-10 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl hover:bg-black dark:hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition-transform shadow-xl shadow-gray-200 dark:shadow-none uppercase tracking-widest text-xs"
             >
               {isEditing ? "Update Task" : "Add Task"}
             </button>
             {isEditing && (
               <button
                 onClick={onCancel}
-                className="px-10 py-3.5 bg-gray-100 text-gray-500 font-black rounded-2xl hover:bg-gray-200 transition-all uppercase tracking-widest text-xs"
+                className="px-10 py-3.5 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-black rounded-2xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors uppercase tracking-widest text-xs"
               >
                 Cancel
               </button>

@@ -39,7 +39,7 @@ const FocusRatingModal = ({ isOpen, onClose, onComplete, sessionData }) => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl z-10 p-8 border border-white font-outfit"
+            className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl z-10 p-8 border border-white dark:border-white/10 font-outfit"
           >
             <button 
               onClick={onClose}
@@ -49,10 +49,10 @@ const FocusRatingModal = ({ isOpen, onClose, onComplete, sessionData }) => {
             </button>
 
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-4xl text-primary-600">🎯</span>
+              <div className="w-20 h-20 bg-primary-50 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl text-primary-600 dark:text-primary-400">🎯</span>
               </div>
-              <h2 className="text-2xl font-black text-gray-900 tracking-tight">Mission Accomplished!</h2>
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Mission Accomplished!</h2>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2 px-6 leading-relaxed">
                 You just crushed a {sessionData?.seconds ? Math.floor(sessionData.seconds / 60) : 0}-minute session. How was the intensity?
               </p>
@@ -94,7 +94,7 @@ const FocusRatingModal = ({ isOpen, onClose, onComplete, sessionData }) => {
                   placeholder="What was the core takeaway? Any distractions?"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm font-medium outline-none focus:bg-white focus:border-primary-200 focus:ring-4 focus:ring-primary-500/5 transition-all min-h-[100px] resize-none"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl p-4 text-sm font-medium outline-none text-gray-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:border-primary-200 dark:focus:border-primary-600 focus:ring-4 focus:ring-primary-500/5 transition-all min-h-[100px] resize-none"
                 />
               </div>
 

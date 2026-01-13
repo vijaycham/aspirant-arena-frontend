@@ -19,7 +19,7 @@ const TimerDisplay = ({
 }) => {
   return (
     <>
-      <div className="inline-flex p-1 bg-gray-100/50 backdrop-blur-md rounded-xl mb-12 self-center">
+      <div className="inline-flex p-1 bg-gray-100 dark:bg-slate-800/60 backdrop-blur-md rounded-xl mb-12 self-center border border-transparent dark:border-white/5">
         {Object.entries(modes || {}).map(([key, value]) => (
           <button
             key={key}
@@ -27,8 +27,8 @@ const TimerDisplay = ({
               switchMode(key);
               setIsEditing(false);
             }}
-            className={`px-6 md:px-8 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
-              mode === key ? "bg-white text-gray-900 shadow-sm scale-105" : "text-gray-400 hover:text-gray-600"
+            className={`px-6 md:px-8 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-transform duration-200 ${
+              mode === key ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm scale-105 ring-1 ring-black/5 dark:ring-white/10" : "text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5"
             }`}
           >
             {value.label}
@@ -47,7 +47,7 @@ const TimerDisplay = ({
               className="group cursor-pointer relative inline-block"
               onClick={() => setIsEditing(true)}
             >
-              <h1 className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-none">
+              <h1 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">
                 {formatTime(timeLeft)}
               </h1>
               <div className="absolute -top-4 -right-8 opacity-0 group-hover:opacity-100 transition-opacity text-primary-500">
@@ -76,7 +76,7 @@ const TimerDisplay = ({
                     setManualMin(val);
                   }
                 }}
-                className="text-6xl font-black w-40 text-center bg-transparent border-b-4 border-primary-500 outline-none"
+                className="text-6xl font-black w-40 text-center bg-transparent border-b-4 border-primary-500 outline-none text-gray-900 dark:text-white"
               />
               <div className="flex gap-4 mt-4">
                 <button type="submit" className="text-xs font-black uppercase text-primary-600">Save</button>
@@ -100,7 +100,7 @@ const TimerDisplay = ({
 
           <button
             onClick={onFullScreen}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-100 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 hover:bg-white transition-all active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-slate-900 transition-all active:scale-95"
           >
             <FaExpand size={10} />
             Zen Mode

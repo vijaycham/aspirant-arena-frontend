@@ -28,9 +28,9 @@ const AnalyticsSection = ({
     <div className="space-y-6 md:space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         {/* Line Chart */}
-        <div className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-[300px] md:h-[400px]">
+        <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-white/5 flex flex-col h-[300px] md:h-[400px]">
           <div className="mb-4 md:mb-6">
-            <h3 className="text-base md:text-lg font-black text-gray-800">
+            <h3 className="text-base md:text-lg font-black text-gray-800 dark:text-white">
               {selectedSubject === "All" ? "Performance Trend" : `${selectedSubject} Mastery`}
             </h3>
             <p className="text-[8px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">
@@ -43,7 +43,7 @@ const AnalyticsSection = ({
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" strokeOpacity={0.2} />
                   <XAxis dataKey="name" hide />
                   <YAxis domain={[0, 100]} stroke="#cbd5e1" fontSize={9} tick={{ fontWeight: "bold" }} />
                   <Tooltip
@@ -79,9 +79,9 @@ const AnalyticsSection = ({
         </div>
 
         {/* Mistake Breakdown Pie */}
-        <div className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col h-[300px] md:h-[400px]">
+        <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-white/5 flex flex-col h-[300px] md:h-[400px]">
           <div className="mb-4 md:mb-6 text-center">
-            <h3 className="text-base md:text-lg font-black text-gray-800">Analysis of Lost Marks</h3>
+            <h3 className="text-base md:text-lg font-black text-gray-800 dark:text-white">Analysis of Lost Marks</h3>
             <p className="text-[8px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1 text-nowrap">
               Strategic Breakdown
             </p>
@@ -90,8 +90,8 @@ const AnalyticsSection = ({
             {loading ? (
               <Shimmer variant="circle" className="w-48 h-48 md:w-64 md:h-64 mx-auto mt-4" />
             ) : mistakeData.every((d) => d.value === 0) ? (
-              <div className="absolute inset-4 flex items-center justify-center text-center p-6 md:p-12 bg-gray-50/50 rounded-full border-2 border-dashed border-gray-100">
-                <p className="text-gray-300 font-black uppercase text-[8px] md:text-[10px] tracking-widest leading-loose">
+              <div className="absolute inset-4 flex items-center justify-center text-center p-6 md:p-12 bg-gray-50/50 dark:bg-slate-800/50 rounded-full border-2 border-dashed border-gray-100 dark:border-white/5">
+                <p className="text-gray-300 dark:text-gray-600 font-black uppercase text-[8px] md:text-[10px] tracking-widest leading-loose">
                   Add error data
                   <br />
                   to generate charts
@@ -144,8 +144,8 @@ const AnalyticsSection = ({
       </div>
 
       {/* Proficiency Matrix */}
-      <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-gray-100">
-        <h3 className="text-base md:text-lg font-black text-gray-800 mb-6 md:mb-10 border-l-4 md:border-l-8 border-primary-600 pl-4 uppercase tracking-tighter">
+      <div className="bg-white dark:bg-slate-900 p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-white/5">
+        <h3 className="text-base md:text-lg font-black text-gray-800 dark:text-white mb-6 md:mb-10 border-l-4 md:border-l-8 border-primary-600 pl-4 uppercase tracking-tighter">
           Subject Proficiency Matrix
         </h3>
         <div className="h-[250px] md:h-[320px]">
@@ -160,14 +160,14 @@ const AnalyticsSection = ({
                   target: s.avgTarget,
                 }))}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" strokeOpacity={0.2} />
                 <XAxis
                   dataKey="name"
                   tick={{ fontSize: 8, fill: "#94a3b8", fontWeight: "900", textTransform: "uppercase" }}
                 />
                 <YAxis domain={[0, 100]} stroke="#cbd5e1" fontSize={9} tick={{ fontWeight: "bold" }} />
                 <Tooltip
-                  cursor={{ fill: "#f1f5f9", opacity: 0.4 }}
+                  cursor={{ fill: "transparent" }}
                   contentStyle={{
                     backgroundColor: "rgba(255, 255, 255, 0.98)",
                     borderRadius: "1rem",
