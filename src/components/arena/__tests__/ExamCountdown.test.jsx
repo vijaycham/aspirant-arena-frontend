@@ -1,65 +1,64 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import ExamCountdown from '../ExamCountdown';
 
 describe('ExamCountdown Component', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    localStorage.clear();
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('renders correctly with given title', () => {
-    render(<ExamCountdown title="Test Exam" targetDate="2030-01-01" />);
-    expect(screen.getByText('Test Exam')).toBeInTheDocument();
+  it('renders correctly with default Prelims mode', () => {
+    render(<ExamCountdown />);
+    expect(screen.getByText('UPSC CSE Prelims 2026')).toBeInTheDocument();
   });
 
-  it('calculates time remaining correctly', () => {
-    // Set current time to 2026-01-01
-    const mockNow = new Date('2026-01-01T00:00:00');
+  it('calculates time remaining correctly for Prelims (May 24, 2026)', () => {
+    // Mock Now: 1 Day before Prelims
+    // Prelims: 2026-05-24
+    const mockNow = new Date('2026-05-23T00:00:00'); 
     vi.setSystemTime(mockNow);
 
-    // Target is 1 day later
-    const target = '2026-01-02T00:00:00';
-    
-    render(<ExamCountdown targetDate={target} />);
+    render(<ExamCountdown />);
 
     // Should show 01 Days
     expect(screen.getByText('01')).toBeInTheDocument();
     expect(screen.getByText('days')).toBeInTheDocument();
   });
 
-  it('shows mission accomplished message when time is up', () => {
-    // Set current time to AFTER target
-    const mockNow = new Date('2026-05-25T00:00:00');
+  it('calculates time correctly for Mains when switched', () => {
+    // Mock Now: 1 Day before Mains
+    // Mains: 2026-09-18
+    const mockNow = new Date('2026-09-17T00:00:00');
     vi.setSystemTime(mockNow);
 
-    const target = '2026-05-24T00:00:00';
+    render(<ExamCountdown />);
 
-    render(<ExamCountdown targetDate={target} />);
+    // Default is Prelims (which is past in this mock time? No, May < Sept)
+    // Wait, if today is Sept 17, Prelims (May 24) is passed.
+    // It should show "Mission Accomplished" for Prelims? 
+    // Let's verify standard behavior first.
+    
+    // Switch to Mains
+    const switchBtn = screen.getByText('Switch to Mains');
+    fireEvent.click(switchBtn);
 
-    expect(screen.getByText(/Mission Accomplished/i)).toBeInTheDocument();
+    // Now expecting 1 day left for Mains
+    expect(screen.getByText('UPSC CSE Mains 2026')).toBeInTheDocument();
+    expect(screen.getByText('01')).toBeInTheDocument();
   });
 
-  it('updates countdown every second', () => {
-    const mockNow = new Date('2026-01-01T00:00:00');
+  it('shows mission accomplished when date is past', () => {
+    // Date after Prelims
+    const mockNow = new Date('2026-06-01T00:00:00');
     vi.setSystemTime(mockNow);
 
-    // Target 10 seconds away
-    const target = '2026-01-01T00:00:10';
-    render(<ExamCountdown targetDate={target} />);
-    
-    // Initially 10 seconds (logic might render 09 or 10 depending on ms, assuming 10 here)
-    // Let's rely on act to advance time
-    
-    act(() => {
-      vi.advanceTimersByTime(1000);
-    });
-    
-    // Checking if component re-renders is implicit, but we expect values to change. 
-    // Since exact string matching might be flaky with seconds, detailed logic verification is handled in the 'calculates time remaining' test.
-    // This test ensures no crash on update.
+    render(<ExamCountdown />); // Defaults to Prelims
+
+    expect(screen.getByText(/Mission Accomplished/i)).toBeInTheDocument();
   });
 });

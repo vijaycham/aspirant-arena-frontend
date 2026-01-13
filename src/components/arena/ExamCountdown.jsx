@@ -2,9 +2,25 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiClock, FiCalendar } from 'react-icons/fi';
 
-const ExamCountdown = ({ targetDate = "2026-05-24T00:00:00", title = "UPSC CSE Prelims 2026" }) => {
+const ExamCountdown = () => {
+  // State for exam mode (persisted in localStorage)
+  const [examMode, setExamMode] = useState(() => localStorage.getItem("examMode") || "prelims");
+
+  // Dates Configuration
+  const exams = {
+    prelims: { date: "2026-05-24T00:00:00", title: "UPSC CSE Prelims 2026" },
+    mains: { date: "2026-09-18T00:00:00", title: "UPSC CSE Mains 2026" } // Estimated
+  };
+
+  const currentTarget = exams[examMode].date;
+  const currentTitle = exams[examMode].title;
+
+  useEffect(() => {
+    localStorage.setItem("examMode", examMode);
+  }, [examMode]);
+
   const calculateTimeLeft = () => {
-    const difference = +new Date(targetDate) - +new Date();
+    const difference = +new Date(currentTarget) - +new Date();
     let timeLeft = {};
 
     if (difference > 0) {
@@ -21,12 +37,13 @@ const ExamCountdown = ({ targetDate = "2026-05-24T00:00:00", title = "UPSC CSE P
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
+    setTimeLeft(calculateTimeLeft()); // Immediate update on mode switch
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate]);
+  }, [examMode, currentTarget]);
 
   const timerComponents = [];
 
@@ -37,7 +54,7 @@ const ExamCountdown = ({ targetDate = "2026-05-24T00:00:00", title = "UPSC CSE P
 
     timerComponents.push(
       <div key={interval} className="flex flex-col items-center">
-        <span className="text-2xl sm:text-3xl font-black bg-gradient-to-br from-primary-600 to-indigo-600 bg-clip-text text-transparent font-mono tracking-tighter">
+        <span className="text-2xl sm:text-3xl font-black bg-gradient-to-br from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400 bg-clip-text text-transparent font-mono tracking-tighter">
           {String(timeLeft[interval]).padStart(2, '0')}
         </span>
         <span className="text-[9px] uppercase font-bold text-gray-400 tracking-widest">
@@ -51,7 +68,7 @@ const ExamCountdown = ({ targetDate = "2026-05-24T00:00:00", title = "UPSC CSE P
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-gray-100 dark:border-slate-800 shadow-xl shadow-gray-200/50 dark:shadow-black/30 relative overflow-hidden group"
+      className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-gray-100 dark:border-white/5 shadow-xl shadow-gray-200/50 dark:shadow-black/30 relative overflow-hidden group transition-all duration-200"
     >
         {/* Background blobs */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary-100/50 dark:bg-primary-900/20 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-primary-200/50"></div>
@@ -59,16 +76,25 @@ const ExamCountdown = ({ targetDate = "2026-05-24T00:00:00", title = "UPSC CSE P
 
         <div className="relative z-10">
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <div className="bg-primary-50 dark:bg-primary-900/30 p-2 rounded-xl text-primary-600 dark:text-primary-400">
                         <FiCalendar className="text-base" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wide leading-tight">{title}</h3>
-                        <p className="text-[10px] font-bold text-primary-500">Target: May 24, 2026</p>
+                        <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wide leading-tight transition-all duration-200">{currentTitle}</h3>
+                        <p className="text-[10px] font-bold text-primary-500 transition-all duration-200">
+                           Target: {new Date(currentTarget).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
                     </div>
                 </div>
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                
+                {/* Exam Mode Toggle */}
+                <button
+                  onClick={() => setExamMode(prev => prev === 'prelims' ? 'mains' : 'prelims')}
+                  className="px-3 py-1 rounded-full bg-gray-100 dark:bg-slate-800 text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-slate-600 flex items-center gap-2"
+                >
+                   <span>{examMode === 'prelims' ? 'Switch to Mains' : 'Switch to Prelims'}</span>
+                </button>
             </div>
 
             {timerComponents.length ? (
