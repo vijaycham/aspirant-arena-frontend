@@ -47,11 +47,11 @@ const Tasks = () => {
   } = useTasks();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col pt-20 px-4 sm:px-6 lg:px-8 font-outfit relative">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200 flex flex-col pt-20 px-4 sm:px-6 lg:px-8 font-outfit relative">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[30%] -right-[10%] w-[70%] h-[70%] rounded-full bg-primary-200/20 blur-3xl opacity-60 mix-blend-multiply animate-blob"></div>
-        <div className="absolute top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-rose-200/20 blur-3xl opacity-60 mix-blend-multiply animate-blob animation-delay-2000"></div>
+        <div className="absolute -top-[30%] -right-[10%] w-[70%] h-[70%] rounded-full bg-primary-200/20 dark:bg-primary-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob"></div>
+        <div className="absolute top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-rose-200/20 dark:bg-rose-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-2000"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-3xl mx-auto space-y-8 pb-20">
@@ -68,7 +68,7 @@ const Tasks = () => {
         )}
         
         <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter flex items-center justify-center md:justify-start gap-4 uppercase">
+          <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter flex items-center justify-center md:justify-start gap-4 uppercase transition-colors duration-200">
             Your <span className="text-primary-600 italic">Aspirations</span> 🚀
           </h1>
           <p className="text-gray-500 font-bold text-xs md:text-sm mt-2 uppercase tracking-widest opacity-70">
@@ -108,7 +108,7 @@ const Tasks = () => {
                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest animate-pulse">Synchronizing Workspace...</p>
             </div>
           ) : tasks.length === 0 ? (
-            <div className="text-center py-20 px-8 bg-white/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex flex-col items-center gap-4">
+            <div className="text-center py-20 px-8 bg-white/50 dark:bg-slate-900/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 dark:border-gray-800 flex flex-col items-center gap-4">
                <span className="text-4xl">🏝️</span>
                <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">Your agenda is clear. Ready for deep work?</p>
             </div>
@@ -162,7 +162,7 @@ const Tasks = () => {
                   {archivedTasks.map((taskItem) => (
                     <li
                       key={taskItem._id}
-                      className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 border border-transparent opacity-60"
+                      className="flex items-center justify-between p-4 rounded-2xl bg-gray-50/50 dark:bg-slate-800/50 border border-transparent opacity-60"
                     >
                       <div className="flex items-center gap-4">
                         <span className="text-emerald-500 italic">✓</span>

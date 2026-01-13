@@ -150,7 +150,7 @@ const Timer = () => {
 
   /* ------------------ RENDER ------------------ */
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4 font-outfit relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300 pt-20 pb-12 px-4 font-outfit relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -160,12 +160,12 @@ const Timer = () => {
         />
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto space-y-6 text-gray-900">
+      <div className="relative z-10 max-w-6xl mx-auto space-y-6 text-gray-900 dark:text-white">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-2">
           <div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tighter uppercase">
-              Focus <span className="text-primary-600 italic">Arena</span> 🎯
+              Focus <span className="text-primary-600 dark:text-primary-400 italic">Arena</span> 🎯
             </h1>
           </div>
 
@@ -176,10 +176,10 @@ const Timer = () => {
                 onClick={requestNotificationPermission}
                 className={`flex items-center justify-center w-[34px] h-full rounded-lg border transition-all shadow-sm active:scale-90 ${
                   notificationPermission === "granted" 
-                    ? "bg-emerald-50 border-emerald-100 text-emerald-600" 
+                    ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400" 
                     : notificationPermission === "denied"
-                    ? "bg-rose-50 border-rose-100 text-rose-600"
-                    : "bg-white border-gray-200 text-gray-400 hover:text-primary-600 hover:border-primary-100"
+                    ? "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800 text-rose-600 dark:text-rose-400"
+                    : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-primary-600 hover:border-primary-100"
                 }`}
               >
                 {notificationPermission === "denied" ? <FaBellSlash size={12} /> : <FaBell size={12} />}
@@ -221,14 +221,14 @@ const Timer = () => {
 
             <button
               onClick={resetCycle}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-primary-600 hover:border-primary-200 transition-all shadow-sm active:scale-95 h-[34px]"
+              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:border-primary-200 transition-all shadow-sm active:scale-95 h-[34px]"
             >
               <FaSyncAlt /> Cycle
             </button>
 
             <button
               onClick={() => setShowResetConfirm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 hover:text-rose-600 hover:border-rose-100 transition-all shadow-sm active:scale-95 h-[34px]"
+              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-100 transition-all shadow-sm active:scale-95 h-[34px]"
             >
               <FaCalendarDay /> Day
             </button>
@@ -239,10 +239,10 @@ const Timer = () => {
                 onClick={() => setReflectionEnabled(!reflectionEnabled)}
                 className={`flex items-center gap-2 px-3 sm:px-4 py-2 border rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 h-full ${
                   isActive 
-                    ? "opacity-60 cursor-not-allowed bg-gray-50 border-gray-100 text-gray-400" 
+                    ? "opacity-60 cursor-not-allowed bg-gray-50 dark:bg-slate-800/50 border-gray-100 dark:border-slate-700 text-gray-400" 
                     : reflectionEnabled 
-                      ? "bg-primary-50 border-primary-100 text-primary-600 hover:bg-primary-100" 
-                      : "bg-white border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                      ? "bg-primary-50 dark:bg-primary-900/20 border-primary-100 dark:border-primary-800 text-primary-600 dark:text-primary-400 hover:bg-primary-100" 
+                      : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
                 }`}
               >
                 <div className="relative flex items-center">
@@ -275,7 +275,7 @@ const Timer = () => {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass-card p-6 md:p-12 rounded-[2.5rem] shadow-xl border border-white/60 text-center relative h-full flex flex-col justify-center min-h-[500px]"
+              className="glass-card dark:bg-slate-900/60 dark:border-white/10 dark:shadow-black/50 p-6 md:p-12 rounded-[2.5rem] shadow-xl border border-white/60 text-center relative h-full flex flex-col justify-center min-h-[500px]"
             >
               <TimerDisplay 
                   mode={mode}
@@ -328,7 +328,7 @@ const Timer = () => {
                       setSelectedTaskId(""); 
                       setSelectedNodeId("");
                     }}
-                    className="relative w-full bg-white/40 backdrop-blur-md border border-white/60 focus:border-primary-300 focus:bg-white/60 px-6 py-4 rounded-2xl outline-none text-center font-bold text-gray-800 transition-all placeholder:text-gray-400 text-base shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
+                    className="relative w-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/60 dark:border-white/10 focus:border-primary-300 focus:bg-white/60 dark:focus:bg-slate-800/60 px-6 py-4 rounded-2xl outline-none text-center font-bold text-gray-800 dark:text-white transition-all placeholder:text-gray-400 text-base shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
                   />
                   
                   {/* Task Metadata Indicator (if linked to Syllabus) */}
@@ -432,7 +432,7 @@ const Timer = () => {
               />
 
               {/* Ambient Atmosphere */}
-              <div className="glass-card p-6 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden">
+              <div className="glass-card dark:bg-slate-900/60 dark:border-white/10 dark:shadow-black/50 p-6 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4 px-1">
                   <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                     <FaCloudRain className="text-primary-500" /> Ambient Focus
@@ -460,8 +460,8 @@ const Timer = () => {
                       }}
                       className={`flex-shrink-0 px-4 py-3 rounded-2xl border text-[9px] font-black uppercase tracking-tight transition-all flex items-center gap-2 relative overflow-hidden group/sbtn ${
                         ambientType === sound.id && ambientEnabled 
-                          ? 'bg-primary-50/50 border-primary-200 text-primary-700 shadow-sm' 
-                          : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:text-gray-600'
+                          ? 'bg-primary-50/50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-400 shadow-sm' 
+                          : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400 hover:border-gray-200 dark:hover:border-slate-600 hover:text-gray-600 dark:hover:text-gray-300'
                       }`}
                     >
                       {ambientType === sound.id && ambientEnabled && (
@@ -493,7 +493,7 @@ const Timer = () => {
                     step="0.01" 
                     value={volume}
                     onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="flex-1 h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                    className="flex-1 h-1.5 bg-gray-100 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
                   />
                   <span className="text-[10px] font-black text-gray-400 w-8 tabular-nums text-right">{Math.round(volume * 100)}%</span>
                 </div>

@@ -18,19 +18,19 @@ const TimerResetModal = ({ isOpen, onClose, onConfirm }) => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl p-8 border border-white z-10 text-center"
+            className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl p-8 border border-white dark:border-white/10 z-10 text-center"
           >
-            <div className="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <FaCalendarDay className="text-rose-500 text-2xl" />
             </div>
-            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter mb-2">Reset Analytics?</h3>
+            <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-2">Reset Analytics?</h3>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-8 px-4 leading-relaxed">
               This will clear your focus minutes and sessions for today. Historical data is safe. Proceed?
             </p>
             <div className="flex flex-col gap-3">
               <button
                 onClick={onConfirm}
-                className="w-full py-4 bg-gray-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-black transition-all"
+                className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-black dark:hover:bg-gray-200 transition-all"
               >
                 Yes, Reset Day
               </button>

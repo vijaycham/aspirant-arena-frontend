@@ -4,7 +4,7 @@ const FocusRhythm = ({ todaySessions }) => {
   if (!todaySessions || todaySessions.length === 0) return null;
 
   return (
-    <div className="max-w-md mx-auto w-full px-2 border-t border-gray-100/50 pt-10">
+    <div className="max-w-md mx-auto w-full px-2 border-t border-gray-100/50 dark:border-white/10 pt-10">
       <div className="flex items-center justify-center mb-8 text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">
         <span>Focus Rhythm</span>
       </div>
@@ -16,7 +16,7 @@ const FocusRhythm = ({ todaySessions }) => {
               className="flex flex-col items-center justify-end flex-shrink-0 w-8 h-full relative group cursor-pointer"
             >
             <div 
-              className={`w-full rounded-t-lg transition-all duration-700 ease-out border border-white/20 ${
+              className={`w-full rounded-t-lg transition-all duration-700 ease-out border border-white/20 dark:border-white/10 ${
                 s.focusRating >= 5 ? "bg-emerald-600 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)] shadow-emerald-500/30" :
                 s.focusRating >= 4 ? "bg-emerald-400" :
                 s.focusRating >= 3 ? "bg-amber-400" :
@@ -45,7 +45,7 @@ const FocusRhythm = ({ todaySessions }) => {
           ))}
           {/* Placeholder - Only show if very few sessions */}
           {todaySessions.length < 8 && Array.from({ length: 8 - todaySessions.length }).map((_, i) => (
-            <div key={`empty-${i}`} className="w-8 h-4 bg-gray-100/50 rounded-md border border-gray-50 mb-[22px] flex-shrink-0" />
+            <div key={`empty-${i}`} className="w-8 h-4 bg-gray-100/50 dark:bg-white/5 rounded-md border border-gray-50 dark:border-white/5 mb-[22px] flex-shrink-0" />
           ))}
         </div>
       </div>

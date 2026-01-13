@@ -5,6 +5,19 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0-dark] - 2026-01-13
+### Added
+- **Midnight Glass UI (Dark Mode)**:
+    - **Premium Theme**: Deep `slate-950` aesthetic for late-night focus sessions.
+    - **Smart Toggle**: Persistent preference syncing with system defaults.
+    - **Adaptive Components**: Over 15 core components (Charts, Modals, Timers) now auto-adapt to lighting conditions.
+- **Performance Tuning**:
+    - **Fast Transitions**: Reduced global animation timings from 300ms to **200ms** for a snappier feel.
+    - **Glitch Prevention**: Synchronized background/text color transitions to eliminate "flashbang" effects during theme toggles.
+- **UI Polish**:
+    - **Harmonized Buttons**: Unified Primary/Secondary CTA styles on the Dashboard for visual consistency.
+    - **Ghosting Fix**: Removed shadow animations on interactive elements to prevent layout thrashing.
+
 ## [1.0.2-coverage] - 2026-01-13
 ### Quality Assurance & Reliability
 - **Comprehensive Test Suite**: Achieved **>67% Project Coverage** (up from ~40%).

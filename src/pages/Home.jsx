@@ -125,28 +125,28 @@ const Home = () => {
   const strategy = getStrategyNote(stats);
 
   return (
-    <div className="min-h-screen relative bg-gray-50 flex flex-col pt-12 md:pt-20 px-4 sm:px-6 lg:px-8 font-outfit">
+    <div className="min-h-screen relative bg-gray-50 dark:bg-slate-950 transition-colors duration-200 flex flex-col pt-12 md:pt-20 px-4 sm:px-6 lg:px-8 font-outfit">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary-200/30 blur-3xl opacity-60 mix-blend-multiply animate-blob"></div>
-        <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-secondary-200/30 blur-3xl opacity-60 mix-blend-multiply animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-purple-200/30 blur-3xl opacity-60 mix-blend-multiply animate-blob animation-delay-4000"></div>
+        <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary-200/30 dark:bg-primary-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob"></div>
+        <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-secondary-200/30 dark:bg-secondary-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-purple-200/30 dark:bg-purple-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-4000"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         
         {/* Hero Section */}
         <div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
-            <span className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest">Aspirant Arena</span>
+            <span className="text-[10px] md:text-xs font-black text-gray-500 dark:text-gray-500 uppercase tracking-widest">Aspirant Arena</span>
           
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 leading-[1.1] tracking-tighter">
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 dark:text-white leading-[1.1] tracking-tighter transition-colors duration-200">
             Where Ambition Meets <br className="hidden lg:block" />
             <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">
               High Performance
             </span>
           </h1>
           
-          <p className="text-base md:text-lg lg:text-xl text-gray-500 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0">
+          <p className="text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-400 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0 transition-colors duration-200">
             The all-in-one strategic hub for UPSC aspirants. Track mock tests, 
             automate revision loops, and master your syllabus with data-driven precision.
           </p>
@@ -154,19 +154,19 @@ const Home = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
             <Link
               to="/test-tracker"
-              className="px-8 py-4 rounded-[2rem] bg-gray-900 text-white font-black shadow-2xl shadow-gray-200 hover:bg-black hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base"
+              className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base"
             >
               Analyze Performance 📈
             </Link>
             <Link
               to="/arena"
-              className="px-8 py-4 rounded-[2rem] bg-white text-gray-900  border-gray-900 border-gray-100  font-black shadow-xl hover:bg-gray-50 hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base"
+              className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base"
             >
               Master Syllabus ⛩️
             </Link>
             <Link
               to="/tasks"
-              className="px-8 py-4 rounded-[2rem] bg-white text-gray-900 font-black border border-gray-100 shadow-sm hover:bg-gray-50 hover:border-gray-200 transition-all duration-300 flex items-center justify-center gap-2 text-sm md:text-base"
+              className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-2 text-sm md:text-base"
             >
               Manage Tasks 📝
             </Link>
@@ -178,7 +178,7 @@ const Home = () => {
           {user ? (
             <div className="space-y-6">
               {/* Stats Card */}
-              <div className={`relative bg-white p-8 rounded-[3rem] shadow-2xl shadow-gray-200 border border-gray-100 scale-100 lg:scale-105 transition-transform hover:rotate-1 overflow-hidden`}>
+              <div className={`relative bg-white dark:bg-slate-900/50 dark:backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl shadow-gray-200 dark:shadow-slate-900/50 border border-gray-100 dark:border-white/10 scale-100 lg:scale-105 transition-all duration-200 hover:rotate-1 overflow-hidden`}>
                 
                 {/* 🔒 Locked State only if grace period EXPIRED and unverified */}
                 {user && !hasAccess(user) && (
@@ -186,8 +186,8 @@ const Home = () => {
                 )}
 
                 <div className="flex justify-between items-start mb-8">
-                  <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter">Live Progress</h3>
-                  <div className="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600 text-2xl font-black italic">!</div>
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Live Progress</h3>
+                  <div className="w-12 h-12 bg-primary-50 dark:bg-primary-500/20 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 text-2xl font-black italic">!</div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-8">
@@ -206,7 +206,7 @@ const Home = () => {
                   <div>
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Tests Logged</span>
                     {stats ? (
-                      <span className="text-4xl font-black text-gray-900 animate-fade-in">
+                      <span className="text-4xl font-black text-gray-900 dark:text-white animate-fade-in">
                         {stats.count}
                       </span>
                     ) : user && !hasAccess(user) ? (
@@ -226,8 +226,8 @@ const Home = () => {
                 </div>
 
                 {stats?.pendingRevisions > 0 && (
-                  <div className="mt-6 flex items-center justify-between bg-rose-50 p-3 rounded-2xl border border-rose-100">
-                    <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Active Revision Loops</span>
+                  <div className="mt-6 flex items-center justify-between bg-rose-50 dark:bg-rose-900/10 p-3 rounded-2xl border border-rose-100 dark:border-rose-900/20">
+                    <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Active Revision Loops</span>
                     <span className="bg-rose-500 text-white text-[10px] font-black px-3 py-1 rounded-full">{stats.pendingRevisions} Pending</span>
                   </div>
                 )}
@@ -245,16 +245,16 @@ const Home = () => {
                          <Link
                            key={t._id}
                            to={t.text.includes("conceptual errors") ? "/test-tracker" : "/tasks"}
-                           className="flex items-center gap-3 bg-white/50 hover:bg-white backdrop-blur-sm p-3 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-100 hover:scale-[1.02] active:scale-95 transition-all group"
+                           className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm p-3 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md hover:border-primary-100 dark:hover:border-white/10 hover:scale-[1.02] active:scale-95 transition-all group"
                          >
                            <div
                              className={`w-2 h-2 rounded-full shrink-0 ${
                                t.priority === "high"
-                                 ? "bg-rose-500 shadow-sm shadow-rose-200"
-                                 : "bg-primary-500 shadow-sm shadow-primary-200"
+                                 ? "bg-rose-500 shadow-sm shadow-rose-200 dark:shadow-none"
+                                 : "bg-primary-500 shadow-sm shadow-primary-200 dark:shadow-none"
                              }`}
                            ></div>
-                           <span className="text-xs font-bold text-gray-600 truncate group-hover:text-gray-900">
+                           <span className="text-xs font-bold text-gray-600 dark:text-gray-300 truncate group-hover:text-gray-900 dark:group-hover:text-white">
                              {t.text}
                            </span>
                          </Link>
@@ -288,7 +288,7 @@ const Home = () => {
                <div className="w-20 h-20 bg-gray-50 rounded-[2rem] mx-auto flex items-center justify-center text-4xl">🚀</div>
                <h3 className="text-2xl font-black text-gray-900">Join the Arena</h3>
                <p className="text-sm text-gray-500 font-medium">Create your free workspace to start tracking your journey to the Civil Services.</p>
-               <Link to="/signup" className="block w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all">Get Started</Link>
+               <Link to="/signup" className="block w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-colors">Get Started</Link>
             </div>
           )}
         </div>
