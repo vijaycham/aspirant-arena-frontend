@@ -28,6 +28,8 @@ Pushing to the `main` branch automatically triggers a production build on Vercel
 ## 🌐 Domain Configuration
 The domain **aspirantarena.in** is purchased from GoDaddy and its DNS is managed by Vercel for optimized edge delivery and automatic SSL (HTTPS).
 
+> **Note**: We strictly enforce this domain via `vercel.json`. Accessing the legacy `*.vercel.app` project domain will automatically redirect users to the production domain to ensure correct cookie/auth behavior.
+
 ## 🗝 Environment Variables
 Managed via Vercel Dashboard for Production:
 - `VITE_BACKEND_URL`: URL of the AWS EC2 Backend.

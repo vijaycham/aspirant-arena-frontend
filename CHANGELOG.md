@@ -5,6 +5,22 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2-coverage] - 2026-01-13
+### Quality Assurance & Reliability
+- **Comprehensive Test Suite**: Achieved **>67% Project Coverage** (up from ~40%).
+- **Critical Path Protection**:
+    - **Authentication**: 100% coverage on `authSlice`, 95% on `SignIn.jsx`.
+    - **Task Management**: Expanded `TaskInput` tests to cover priority, dates, and smart suggestions.
+    - **Redux State**: 100% coverage on `taskSlice` and robust `arenaSlice` logic tests.
+- **Infrastructure**:
+    - Configured `@vitest/coverage-v8` for HTML/Text reporting.
+    - Added `coverage/` to `.gitignore` to maintain repo hygiene.
+
+## [1.0.1-arena] - 2026-01-13
+### Fixed
+- **Domain Redirection**: Enforced canonical domain (`www.aspirantarena.in`) via `vercel.json` edge redirects to prevent legacy URL access and authentication failures.
+- **Preview Isolation**: Configured redirect logic to preserve access to Vercel preview/branch URLs for testing.
+
 ## [1.0.0-arena] - 2026-01-10
 ### Added
 - **Aspirant Arena v1.0 Branding**: Transitioned from generic "Productivity" to specialized "Arena" HLD.
