@@ -1,4 +1,28 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "aspirant-arena-frontend.vercel.app"
+        }
+      ],
+      "destination": "https://www.aspirantarena.in/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "aspirant-arena-frontend-vijay-s-s-projects.vercel.app"
+        }
+      ],
+      "destination": "https://www.aspirantarena.in/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
