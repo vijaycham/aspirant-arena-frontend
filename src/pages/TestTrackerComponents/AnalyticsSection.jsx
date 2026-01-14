@@ -57,6 +57,7 @@ const AnalyticsSection = ({
                     }}
                     itemStyle={{ color: "#1e293b" }}
                     labelStyle={{ color: "#64748b", marginBottom: "4px" }}
+                    formatter={(val) => Math.round(val)}
                   />
                   <ReferenceLine
                     y={currentTarget}
@@ -135,6 +136,7 @@ const AnalyticsSection = ({
                       fontSize: "12px",
                     }}
                     itemStyle={{ color: "#1e293b" }}
+                    formatter={(val) => Math.round(val)}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -177,6 +179,7 @@ const AnalyticsSection = ({
                   }}
                   itemStyle={{ color: "#1e293b" }}
                   labelStyle={{ color: "#64748b", marginBottom: "4px" }}
+                  formatter={(val) => Math.round(val)}
                 />
                 <Bar dataKey="accuracy" radius={[8, 8, 0, 0]} barSize={30}>
                   {stats.map((s, index) => (

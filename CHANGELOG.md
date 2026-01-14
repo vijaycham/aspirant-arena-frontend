@@ -5,6 +5,21 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2-polish] - 2026-01-14
+### Fixed
+- **Interaction Hardening**:
+    - **Robust Dropdowns**: Replaced fragile CSS-backdrop menus with a reliable `useClickOutside` logic using React Refs. Fixed sporadic touch/click failures on Timer and Task Input.
+    - **Session Persistence**: Implemented `localStorage` state recovery. Timer state (pending Reflection) now survives browser refreshes.
+    - **Auto-Save**: Timer completion modal now defaults to a neutral rating if dismissed, preventing data loss.
+- **Visual Polish**:
+    - **Dark Mode Consistency**:
+        - Fixed invisible "black-on-black" text in Focus Heatmap.
+        - Replaced glowing "radioactive" button shadows with deep, transparent shadows (`indigo-900/30`).
+        - Added dedicated Dark Mode styles to Task Input's "Type-Ahead" suggestions.
+    - **Animation Tuning**: Slowed down the global `shimmer` effect from 2s to **8s** for a calmer, less frantic loading state.
+    - **Artifact Removal**: Eliminated the "square shadow" glitch on Task Input dropdowns by removing the faulty backdrop layer.
+    - **Data Clarity**: Added rounding logic to Analytics charts (Line/Pie/Bar) to display clean integers (e.g., "5") instead of floats strings (e.g., "5.666").
+
 ## [1.1.0-dark] - 2026-01-13
 ### Added
 - **Midnight Glass UI (Dark Mode)**:

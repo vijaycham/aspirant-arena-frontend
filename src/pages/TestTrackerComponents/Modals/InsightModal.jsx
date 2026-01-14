@@ -5,7 +5,7 @@ const InsightModal = ({ viewingReflection, setViewingReflection }) => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/40 dark:bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-t-[2.5rem] sm:rounded-[3rem] shadow-2xl dark:shadow-slate-950/50 max-w-lg w-full border border-gray-100 dark:border-white/10 scale-100 animate-in translate-y-full sm:translate-y-0 sm:zoom-in-95 duration-300 sm:duration-200">
+      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-t-[2.5rem] sm:rounded-[3rem] shadow-2xl dark:shadow-slate-950/50 max-w-lg w-full border border-gray-100 dark:border-white/10 animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 sm:duration-200">
         <div className="flex justify-between items-start mb-6">
           <div>
             <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter leading-tight">

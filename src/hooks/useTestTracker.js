@@ -83,6 +83,42 @@ const useTestTracker = () => {
     setShowAdvance(false);
   }, []);
 
+  // Helper to sync revision tasks
+  const syncRevisionTask = async (payload) => {
+    if (payload.conceptualErrors > 0) {
+      try {
+        const tasksRes = await api.get("/tasks");
+        const existingTasks = tasksRes.data.tasks || [];
+
+        const existingRevision = existingTasks.find(t =>
+          !t.completed && t.text.startsWith(`Revise conceptual errors: ${payload.subject}`)
+        );
+
+        if (existingRevision) {
+          // Update existing task text to include new test
+          const newText = existingRevision.text.includes(payload.testName)
+            ? existingRevision.text
+            : `${existingRevision.text}, ${payload.testName}`;
+
+          if (newText !== existingRevision.text) {
+            await api.put(`/tasks/${existingRevision._id}`, { text: newText });
+            toast.success(`Updated ${payload.subject} revision task! 📚`);
+          }
+        } else {
+          // Create new task if none exists
+          await api.post("/tasks", {
+            text: `Revise conceptual errors: ${payload.subject} (${payload.testName})`,
+            priority: "high",
+            dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          });
+          toast.success("Added revision task! 📚");
+        }
+      } catch (err) {
+        console.error("Revision Loop Error:", err);
+      }
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -100,40 +136,11 @@ const useTestTracker = () => {
     try {
       if (editingId) {
         await api.put(`/test/${editingId}`, payload);
+        await syncRevisionTask(payload); // Now runs on update too
         toast.success("Test record updated! ✨");
       } else {
         await api.post("/test", payload);
-        if (payload.conceptualErrors > 0) {
-          try {
-            // Smart Consolidation Logic
-            const tasksRes = await api.get("/tasks");
-            const existingTasks = tasksRes.data.tasks || [];
-            
-            const existingRevision = existingTasks.find(t => 
-              !t.completed && t.text.startsWith(`Revise conceptual errors: ${payload.subject}`)
-            );
-
-            if (existingRevision) {
-              // Update existing task text to include new test
-              const newText = existingRevision.text.includes(payload.testName) 
-                ? existingRevision.text 
-                : `${existingRevision.text}, ${payload.testName}`;
-              
-              await api.put(`/tasks/${existingRevision._id}`, { text: newText });
-              toast.success(`Updated ${payload.subject} revision task! 📚`);
-            } else {
-              // Create new task if none exists
-              await api.post("/tasks", {
-                text: `Revise conceptual errors: ${payload.subject} (${payload.testName})`,
-                priority: "high",
-                dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-              });
-              toast.success("Added revision task! 📚");
-            }
-          } catch (err) { 
-            console.error("Revision Loop Error:", err);
-          }
-        }
+        await syncRevisionTask(payload);
         toast.success("Test logged! Data updated.");
       }
       resetForm();
@@ -212,10 +219,10 @@ const useTestTracker = () => {
     const diffAcc = prevAcc !== null ? currentAcc - prevAcc : 0;
 
     const avgAccuracy = pool.reduce((acc, t) => acc + (t.marksObtained / (t.totalMarks || 1)), 0) / pool.length;
-    
+
     // Calculate Average Speed (Marks per Min)
     const sessionsWithTime = pool.filter(t => t.timeTaken && t.timeTaken > 0);
-    const avgSpeed = sessionsWithTime.length > 0 
+    const avgSpeed = sessionsWithTime.length > 0
       ? sessionsWithTime.reduce((acc, t) => acc + (t.marksObtained / t.timeTaken), 0) / sessionsWithTime.length
       : 0;
 
@@ -235,7 +242,7 @@ const useTestTracker = () => {
   }, [tests, stats, selectedSubject]);
 
   const filteredTests = useMemo(() => {
-     return selectedSubject === "All" ? tests : tests.filter(t => t.subject === selectedSubject);
+    return selectedSubject === "All" ? tests : tests.filter(t => t.subject === selectedSubject);
   }, [tests, selectedSubject]);
 
   const chartData = useMemo(() => {

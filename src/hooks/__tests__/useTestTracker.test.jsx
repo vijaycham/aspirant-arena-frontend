@@ -132,4 +132,43 @@ describe("useTestTracker hook", () => {
     expect(result.current.marksLost).toBe(30);
     expect(result.current.accountedMarks).toBe(30);
   });
+  it("should sync revision task on update when conceptual errors > 0", async () => {
+    const store = createMockStore();
+    const { result } = renderHook(() => useTestTracker(), {
+      wrapper: (props) => wrapper({ ...props, store })
+    });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Mock Tasks response (No existing task)
+    api.get.mockImplementation((url) => {
+      if (url === "/tasks") return Promise.resolve({ data: { tasks: [] } });
+      return Promise.resolve({ data: {} });
+    });
+
+    // Simulate clicking Edit
+    act(() => {
+      result.current.handleEdit(mockTests[0]);
+    });
+
+    // Update form data
+    act(() => {
+      result.current.setFormData({
+        ...result.current.formData,
+        conceptualErrors: 5, // Triggers sync
+        testName: "Mock 1 Updated"
+      });
+    });
+
+    // Submit
+    await act(async () => {
+      await result.current.handleSubmit({ preventDefault: vi.fn() });
+    });
+
+    // Verify Task Sync was called (POST /tasks because mock returned empty list)
+    expect(api.post).toHaveBeenCalledWith("/tasks", expect.objectContaining({
+      text: expect.stringContaining("Revise conceptual errors: Polity (Mock 1 Updated)"),
+      priority: "high"
+    }));
+  });
 });

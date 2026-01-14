@@ -168,7 +168,7 @@ const FocusHeatmap = () => {
             </div>
             <div>
                 <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Yearly Consistency</h3>
-                <p className="text-sm font-black text-gray-900 tracking-tight">
+                <p className="text-[10px] font-black text-gray-900 dark:text-white tracking-tight">
                     {Math.round(totalYearlyMinutes / 60)}h Focused
                 </p>
             </div>

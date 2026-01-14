@@ -25,23 +25,24 @@ export const TIMER_STORAGE_KEYS = {
   AMBIENT_SOUND_ENABLED: "timer-ambientEnabled",
   AMBIENT_SOUND_TYPE: "timer-ambientType",
   AMBIENT_VOLUME: "timer-ambientVolume",
+  PENDING_SESSION: "timer-pendingSession",
 };
 
 export const AMBIENT_SOUNDS = [
   { id: "none", label: "None", url: null },
-  { 
-    id: "rain", 
-    label: "Rain", 
-    url: "https://www.orangefreesounds.com/wp-content/uploads/2018/04/Gentle-rain-loop.mp3" 
+  {
+    id: "rain",
+    label: "Rain",
+    url: "https://www.orangefreesounds.com/wp-content/uploads/2018/04/Gentle-rain-loop.mp3"
   },
-  { 
-    id: "river", 
-    label: "River", 
-    url: "https://www.soundjay.com/nature/river-1.mp3" 
+  {
+    id: "river",
+    label: "River",
+    url: "https://www.soundjay.com/nature/river-1.mp3"
   },
-  { 
-    id: "lofi", 
-    label: "Lo-fi", 
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" 
+  {
+    id: "lofi",
+    label: "Lo-fi",
+    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
   }
 ];
