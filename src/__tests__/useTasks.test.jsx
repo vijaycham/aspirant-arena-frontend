@@ -143,7 +143,7 @@ describe('useTasks Hook', () => {
     expect(result.current.editingTask).toBeNull();
   });
 
-  it('should toggle task completion (archive it)', async () => {
+  it('should toggle task completion (remain visible)', async () => {
     const activeTask = { _id: '1', text: 'To Complete', completed: false };
     store = createMockStore({
       task: { tasks: [activeTask], archivedTasks: [] }
@@ -155,8 +155,8 @@ describe('useTasks Hook', () => {
       return Promise.reject(new Error('Unknown URL'));
     });
 
-    const archivedTask = { ...activeTask, completed: true, isArchived: true };
-    api.patch.mockResolvedValue({ data: { task: archivedTask } });
+    const completedTask = { ...activeTask, completed: true }; // Not archived
+    api.patch.mockResolvedValue({ data: { task: completedTask } });
 
     const { result } = renderHook(() => useTasks(), {
       wrapper: (props) => wrapper({ ...props, store })
@@ -168,14 +168,14 @@ describe('useTasks Hook', () => {
       await result.current.toggleTask('1', false);
     });
 
+    // Check patch payload (should NOT include isArchived: true)
     expect(api.patch).toHaveBeenCalledWith('/tasks/1', expect.objectContaining({
-      completed: true,
-      isArchived: true
+      completed: true
     }));
     
     const state = store.getState().task;
-    expect(state.tasks).toHaveLength(0);
-    expect(state.archivedTasks).toHaveLength(1);
-    expect(state.archivedTasks[0].completed).toBe(true);
+    expect(state.tasks).toHaveLength(1); // Still in main list
+    expect(state.archivedTasks).toHaveLength(0); // Not moved to archive
+    expect(state.tasks[0].completed).toBe(true);
   });
 });

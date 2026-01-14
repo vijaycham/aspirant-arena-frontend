@@ -1,3 +1,4 @@
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Custom Hook
@@ -7,6 +8,9 @@ import { useTasks } from "../hooks/useTasks";
 import ConfirmationModal from "../components/tasks/ConfirmationModal";
 import TaskInput from "../components/tasks/TaskInput";
 import TaskItem from "../components/tasks/TaskItem";
+import KanbanBoard from "../components/tasks/board/KanbanBoard";
+import TaskCalendar from "../components/tasks/calendar/TaskCalendar";
+import SmartToolbar from "../components/tasks/SmartToolbar";
 
 // Utils
 import { getPriorityColor } from "../utils/tasks/taskHelpers";
@@ -45,6 +49,28 @@ const Tasks = () => {
     setSelectedNodeId,
     sortedTasks,
   } = useTasks();
+
+  const [viewMode, setViewMode] = React.useState("list");
+  const [timeFilter, setTimeFilter] = React.useState("all");
+
+  const filteredTasks = React.useMemo(() => {
+    const now = new Date();
+    // Reset time to start of day for comparison
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    return sortedTasks.filter(t => {
+       if (!t.dueDate) return timeFilter !== "upcoming"; // No due date = show in All/Today, hide in Upcoming
+       const taskTime = new Date(t.dueDate).getTime();
+       
+       if (timeFilter === "today") {
+          return taskTime <= startOfToday + 86400000; // Includes overdue and today
+       }
+       if (timeFilter === "upcoming") {
+          return taskTime > startOfToday + 86400000; // Strictly future
+       }
+       return true;
+    });
+  }, [sortedTasks, timeFilter]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-200 flex flex-col pt-20 px-4 sm:px-6 lg:px-8 font-outfit relative">
@@ -93,12 +119,22 @@ const Tasks = () => {
           setSelectedNodeId={setSelectedNodeId}
         />
 
+        <SmartToolbar 
+          viewMode={viewMode} 
+          setViewMode={setViewMode}
+          timeFilter={timeFilter} 
+          setTimeFilter={setTimeFilter}
+          activeTaskCount={filteredTasks.length}
+        />
+
         {/* List Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2">
-             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Roadmap</h3>
+             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+               {timeFilter === "today" ? "Focus for Today" : timeFilter === "upcoming" ? "Future Roadmap" : "Master List"}
+             </h3>
              <span className="text-[10px] font-black text-primary-600 bg-primary-50 px-3 py-1 rounded-full uppercase italic">
-               {tasks.length} Focus Points
+               {filteredTasks.length} Items
              </span>
           </div>
 
@@ -115,7 +151,7 @@ const Tasks = () => {
           ) : (
             <ul className="space-y-3 md:space-y-4">
               <AnimatePresence initial={false}>
-                {sortedTasks.map((taskItem) => (
+                {viewMode === "list" && filteredTasks.map((taskItem) => (
                   <TaskItem
                     key={taskItem._id}
                     taskItem={taskItem}
@@ -125,6 +161,26 @@ const Tasks = () => {
                     getPriorityColor={getPriorityColor}
                   />
                 ))}
+                {viewMode === "board" && (
+                    <motion.div
+                       initial={{ opacity: 0 }}
+                       animate={{ opacity: 1 }}
+                       exit={{ opacity: 0 }}
+                       className="w-full"
+                    >
+                       <KanbanBoard tasks={filteredTasks} onToggleTask={toggleTask} />
+                    </motion.div>
+                )}
+                {viewMode === "calendar" && (
+                    <motion.div
+                       initial={{ opacity: 0 }}
+                       animate={{ opacity: 1 }}
+                       exit={{ opacity: 0 }}
+                       className="w-full"
+                    >
+                       <TaskCalendar tasks={filteredTasks} onEdit={startEditing} />
+                    </motion.div>
+                )}
               </AnimatePresence>
             </ul>
           )}

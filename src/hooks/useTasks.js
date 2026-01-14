@@ -91,7 +91,7 @@ export const useTasks = () => {
     setEditingTask(taskItem);
     setTask(taskItem.text);
     setPriority(taskItem.priority);
-    setDueDate(taskItem.dueDate ? new Date(taskItem.dueDate).toISOString().split("T")[0] : "");
+    setDueDate(taskItem.dueDate || null);
     setSelectedArenaId(taskItem.arenaId || "");
     setSelectedNodeId(taskItem.nodeId || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -117,7 +117,7 @@ export const useTasks = () => {
     try {
       const res = await api.patch(`/tasks/${id}`, {
         completed: !currentStatus,
-        isArchived: !currentStatus,
+        isArchived: false, // Always ensure task is visible (unarchived) on toggle
       });
       dispatch(toggleTaskAction(res.data.task));
       toast.success(!currentStatus ? "Task completed & archived! 🎯" : "Task restored!");
