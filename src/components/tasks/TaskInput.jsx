@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiLayers, FiTarget, FiSearch, FiChevronRight, FiPlus } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchArenas, fetchSyllabus } from "../../redux/slice/arenaSlice";
+import { toLocalDateTimeInput, fromLocalDateTimeInput } from "../../utils/tasks/taskHelpers";
 
 const TaskInput = ({ 
   task, 
@@ -323,8 +324,8 @@ const TaskInput = ({
         </div>
         
         <div className="flex flex-col md:flex-row items-end gap-6">
-          <div className="grid grid-cols-2 gap-4 flex-1 w-full">
-            <div className="space-y-1">
+          <div className="flex flex-col md:flex-row gap-4 flex-1 w-full">
+            <div className="space-y-1 w-full md:w-32 flex-none">
               <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Priority</label>
               <select
                 value={priority}
@@ -337,21 +338,46 @@ const TaskInput = ({
               </select>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Due Date</label>
-              <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="w-full p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm"
-              />
+            <div className="space-y-1 flex-1">
+              <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Due Date & Time</label>
+              <div className="flex gap-4">
+                <input
+                  type="date"
+                  value={dueDate ? toLocalDateTimeInput(dueDate).split('T')[0] : ""}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    const newDate = e.target.value;
+                    if (!newDate) {
+                      setDueDate(null);
+                      return;
+                    }
+                    const currentLocal = dueDate ? toLocalDateTimeInput(dueDate) : "";
+                    const currentTime = currentLocal ? currentLocal.split('T')[1] : "09:00";
+                    setDueDate(fromLocalDateTimeInput(`${newDate}T${currentTime}`));
+                  }}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  className="flex-1 p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400"
+                />
+                <input
+                  type="time"
+                  value={dueDate ? toLocalDateTimeInput(dueDate).split('T')[1] : "09:00"}
+                  onChange={(e) => {
+                    const newTime = e.target.value;
+                    const currentLocal = dueDate ? toLocalDateTimeInput(dueDate) : "";
+                    const currentDate = currentLocal ? currentLocal.split('T')[0] : new Date().toISOString().split('T')[0];
+                    setDueDate(fromLocalDateTimeInput(`${currentDate}T${newTime}`));
+                  }}
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  className="w-32 p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400 dark:[color-scheme:dark]"
+                />
+              </div>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <button
               onClick={onAdd}
-              className="px-10 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl hover:bg-black dark:hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition-transform shadow-xl shadow-gray-200 dark:shadow-none uppercase tracking-widest text-xs"
+              className="px-10 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl hover:bg-black dark:hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition-transform dark:shadow-none uppercase tracking-widest text-xs"
             >
               {isEditing ? "Update Task" : "Add Task"}
             </button>

@@ -14,6 +14,10 @@
     background-color: #020617; /* slate-950 */
     color: #f8fafc; /* slate-50 */
   }
+
+  body {
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
 }
 
 /* Remove intrusive focus outlines on charts and SVGs */

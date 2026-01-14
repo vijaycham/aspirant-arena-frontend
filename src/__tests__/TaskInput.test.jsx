@@ -100,9 +100,24 @@ describe('TaskInput Component', () => {
   it('updates due date on change', () => {
     const { container } = renderComponent();
     const dateInput = container.querySelector('input[type="date"]');
+    const timeInput = container.querySelector('input[type="time"]');
     
+    // Simulate picking a date: 2023-12-31
     fireEvent.change(dateInput, { target: { value: '2023-12-31' } });
-    expect(props.setDueDate).toHaveBeenCalledWith('2023-12-31');
+    
+    // Default time is 09:00. This is local time.
+    // The helpers convert Local '2023-12-31T09:00' -> ISO (UTC).
+    const expectedISO1 = new Date('2023-12-31T09:00').toISOString();
+    expect(props.setDueDate).toHaveBeenCalledWith(expectedISO1);
+
+    // Simulate picking a time: 14:30
+    fireEvent.change(timeInput, { target: { value: '14:30' } });
+    
+    // Uses "today" if date isn't set in state (mocked).
+    // Local 'YYYY-MM-DDT14:30' -> ISO (UTC).
+    const today = new Date().toISOString().split('T')[0];
+    const expectedISO2 = new Date(`${today}T14:30`).toISOString();
+    expect(props.setDueDate).toHaveBeenCalledWith(expectedISO2);
   });
 
   it('calls onAdd when Add Task is clicked', () => {

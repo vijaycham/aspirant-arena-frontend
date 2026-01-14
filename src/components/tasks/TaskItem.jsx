@@ -52,7 +52,7 @@ const TaskItem = ({
             </span>
             {taskItem.dueDate && (
               <span className="text-[9px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                <span className="text-xs opacity-70">📅</span> {new Date(taskItem.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                <span className="text-xs opacity-70">📅</span> {new Date(taskItem.dueDate).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
               </span>
             )}
             {taskItem.nodeId && (
