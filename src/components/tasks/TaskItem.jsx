@@ -5,6 +5,7 @@ const TaskItem = ({
   taskItem, 
   onToggle, 
   onEdit, 
+  onArchive,
   onRemove, 
   getPriorityColor 
 }) => {
@@ -75,6 +76,17 @@ const TaskItem = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
+        )}
+        {taskItem.completed && (
+           <button
+             onClick={() => onArchive(taskItem._id)}
+             className="p-3 text-gray-300 hover:text-amber-500 hover:bg-amber-50 rounded-2xl transition-colors opacity-0 group-hover:opacity-100"
+             title="Archive task"
+           >
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+             </svg>
+           </button>
         )}
         <button
           onClick={() => onRemove(taskItem._id)}

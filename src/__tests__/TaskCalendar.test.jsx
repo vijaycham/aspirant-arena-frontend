@@ -17,7 +17,7 @@ vi.mock('react-big-calendar', () => ({
 }));
 
 vi.mock('date-fns', () => ({
-    format: (date, fmt) => 'Formatted Date',
+    format: (_date, _fmt) => 'Formatted Date',
     parse: () => new Date(),
     startOfWeek: () => new Date(),
     getDay: () => 0,

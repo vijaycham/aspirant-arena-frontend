@@ -120,9 +120,24 @@ export const useTasks = () => {
         isArchived: false, // Always ensure task is visible (unarchived) on toggle
       });
       dispatch(toggleTaskAction(res.data.task));
-      toast.success(!currentStatus ? "Task completed & archived! 🎯" : "Task restored!");
+      toast.success(!currentStatus ? "Task completed! 🎯" : "Task restored!");
     } catch {
       toast.error("Failed to update status.");
+    }
+  };
+
+  const archiveTask = async (id) => {
+    try {
+      await api.patch(`/tasks/${id}`, { isArchived: true });
+      dispatch(removeTaskAction(id)); // Remove from active list
+      // Optionally fetch archived tasks to update that list immediately, implies network call though
+      const archivedRes = await api.get("/tasks/archived");
+      if (archivedRes.data?.tasks) dispatch(setArchivedTasks(archivedRes.data.tasks));
+
+      toast.success("Task archived! 📦");
+    } catch (error) {
+      console.error("Archive error:", error);
+      toast.error("Failed to archive task.");
     }
   };
 
@@ -175,6 +190,7 @@ export const useTasks = () => {
     cancelEditing,
     handleKeyDown,
     toggleTask,
+    archiveTask,
     removeTask,
     confirmClearArchive,
     clearAllArchived,

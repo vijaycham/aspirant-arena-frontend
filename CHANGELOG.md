@@ -5,6 +5,17 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1-fix] - 2026-01-14
+### Fixed
+- Fixed task input layout issues on tablets and mobile devices
+- Prevented accidental Kanban drag actions on touch devices
+- Corrected misleading “Completed & Archived” task behavior
+
+### Added
+- Explicit Archive action for completed tasks
+- Clear separation between Completed and Archived task states
+
+
 ## [1.2.0-visual] - 2026-01-14
 ### Added
 - **Visual Workflow**

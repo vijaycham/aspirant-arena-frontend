@@ -8,6 +8,8 @@ vi.mock('@dnd-kit/core', () => ({
   useSensors: () => {},
   useSensor: () => {},
   PointerSensor: vi.fn(),
+  MouseSensor: vi.fn(),
+  TouchSensor: vi.fn(),
   KeyboardSensor: vi.fn(),
   DragOverlay: () => null, 
   closestCorners: vi.fn(),
