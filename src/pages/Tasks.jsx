@@ -40,6 +40,7 @@ const Tasks = () => {
     cancelEditing,
     handleKeyDown,
     toggleTask,
+    archiveTask,
     removeTask,
     confirmClearArchive,
     clearAllArchived,
@@ -157,6 +158,7 @@ const Tasks = () => {
                     taskItem={taskItem}
                     onToggle={toggleTask}
                     onEdit={startEditing}
+                    onArchive={archiveTask}
                     onRemove={removeTask}
                     getPriorityColor={getPriorityColor}
                   />

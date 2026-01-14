@@ -323,8 +323,8 @@ const TaskInput = ({
           </AnimatePresence>
         </div>
         
-        <div className="flex flex-col md:flex-row items-end gap-6">
-          <div className="flex flex-col md:flex-row gap-4 flex-1 w-full">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-6">
+          <div className="flex flex-col lg:flex-row gap-4 flex-1 w-full">
             <div className="space-y-1 w-full md:w-32 flex-none">
               <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Priority</label>
               <select
@@ -340,7 +340,7 @@ const TaskInput = ({
 
             <div className="space-y-1 flex-1">
               <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Due Date & Time</label>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap sm:flex-nowrap gap-4">
                 <input
                   type="date"
                   value={dueDate ? toLocalDateTimeInput(dueDate).split('T')[0] : ""}
@@ -356,7 +356,7 @@ const TaskInput = ({
                     setDueDate(fromLocalDateTimeInput(`${newDate}T${currentTime}`));
                   }}
                   onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  className="flex-1 p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400"
+                  className="flex-1 min-w-[140px] p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400"
                 />
                 <input
                   type="time"
@@ -368,23 +368,23 @@ const TaskInput = ({
                     setDueDate(fromLocalDateTimeInput(`${currentDate}T${newTime}`));
                   }}
                   onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  className="w-32 p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400 dark:[color-scheme:dark]"
+                  className="w-full sm:w-32 p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400 dark:[color-scheme:dark]"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
             <button
               onClick={onAdd}
-              className="px-10 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl hover:bg-black dark:hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition-transform dark:shadow-none uppercase tracking-widest text-xs"
+              className="w-full lg:w-auto px-10 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl hover:bg-black dark:hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition-transform dark:shadow-none uppercase tracking-widest text-xs flex justify-center"
             >
               {isEditing ? "Update Task" : "Add Task"}
             </button>
             {isEditing && (
               <button
                 onClick={onCancel}
-                className="px-10 py-3.5 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-black rounded-2xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors uppercase tracking-widest text-xs"
+                className="w-full lg:w-auto px-7 py-5 bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-gray-400 font-black rounded-2xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors uppercase tracking-widest text-xs flex justify-center"
               >
                 Cancel
               </button>

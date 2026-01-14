@@ -4,7 +4,8 @@ import {
   DragOverlay,
   closestCorners,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -31,7 +32,13 @@ const KanbanBoard = ({ tasks, onToggleTask }) => {
   }, [tasks]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), // 5px movement to start drag
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { 
+        activationConstraint: { 
+            delay: 250, 
+            tolerance: 5 
+        } 
+    }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 

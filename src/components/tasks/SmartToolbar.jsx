@@ -58,7 +58,7 @@ const SmartToolbar = ({
               onClick={() => setViewMode(v.id)}
               className={`p-3 rounded-xl transition-all duration-200 ${
                 viewMode === v.id
-                  ? "bg-black dark:bg-white text-white dark:text-black shadow-lg shadow-gray-200 dark:shadow-none scale-105"
+                  ? "bg-black dark:bg-white text-white dark:text-black dark:shadow-none scale-105"
                   : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-slate-700/50"
               }`}
               title={`${v.label} View`}
