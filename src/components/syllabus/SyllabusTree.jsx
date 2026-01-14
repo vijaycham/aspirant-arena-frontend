@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FiChevronRight, FiChevronDown, FiPlus, FiBook, 
-  FiClock, FiCheckCircle, FiCircle, FiExternalLink, FiMoreVertical 
+  FiChevronRight, FiPlus, FiBook, 
+  FiClock, FiCheckCircle, FiCircle 
 } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
 import { updateNode } from '../../redux/slice/arenaSlice';
@@ -92,7 +92,8 @@ const SyllabusNode = ({ node, nodeMap, depth = 0 }) => {
                   });
                   dispatch(addTask(res.data.task));
                   toast.success("Added to Tasks! 📝");
-                } catch (err) {
+                } catch {
+                  // ignore error
                   toast.error("Failed to add task");
                 }
               }}

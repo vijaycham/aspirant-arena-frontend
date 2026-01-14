@@ -20,6 +20,7 @@ const Profile = () => {
   const [imagePercentage, setImagePercentage] = useState(0);
   const [imageError, setImageError] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
+  const userId = currentUser?._id;
   const [previewImage, setPreviewImage] = useState(currentUser?.photoUrl || "");
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,10 +48,10 @@ const Profile = () => {
       }
     };
 
-    if (currentUser) {
+    if (userId) {
       fetchProfile();
     }
-  }, [dispatch, currentUser?._id]); 
+  }, [dispatch, userId]); 
 
   // Update form data when currentUser changes
   useEffect(() => {
@@ -125,7 +126,7 @@ const Profile = () => {
       setImageError(true);
       toast.error("Failed to process image.");
     }
-  }, [currentUser?._id, currentUser?.id, dispatch]);
+  }, [currentUser?._id, currentUser?.id]);
 
   useEffect(() => {
     if (image) {

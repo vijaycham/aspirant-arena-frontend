@@ -5,13 +5,13 @@ import SyllabusTree from '../components/syllabus/SyllabusTree';
 import ArenaModal from '../components/arena/ArenaModal';
 import ExamCountdown from '../components/arena/ExamCountdown';
 import { motion } from 'framer-motion';
-import { FiPlus, FiSettings, FiRefreshCcw, FiLayers, FiTarget, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiRefreshCcw, FiLayers, FiTarget, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../utils/api';
 
 const ArenaDashboard = () => {
   const dispatch = useDispatch();
-  const { arenas, currentArenaId, syllabus, loading } = useSelector(state => state.arena);
+  const { arenas, currentArenaId, syllabus } = useSelector(state => state.arena);
   const [modalType, setModalType] = useState(null); // 'create' | 'delete' | 'reset'
 
   useEffect(() => {
@@ -41,7 +41,8 @@ const ArenaDashboard = () => {
       await api.post(`/arenas/${currentArenaId}/reset`);
       dispatch(fetchSyllabus(currentArenaId));
       toast.success("Arena reset to Master Blueprint 🔄");
-    } catch (err) {
+    } catch {
+      // ignore
       toast.error("Reset failed");
     }
     setModalType(null);

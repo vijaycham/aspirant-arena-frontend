@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiClock, FiCalendar } from 'react-icons/fi';
 
@@ -19,7 +19,7 @@ const ExamCountdown = () => {
     localStorage.setItem("examMode", examMode);
   }, [examMode]);
 
-  const calculateTimeLeft = () => {
+  const calculateTimeLeft = useCallback(() => {
     const difference = +new Date(currentTarget) - +new Date();
     let timeLeft = {};
 
@@ -32,7 +32,7 @@ const ExamCountdown = () => {
       };
     }
     return timeLeft;
-  };
+  }, [currentTarget]);
 
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
@@ -43,7 +43,7 @@ const ExamCountdown = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [examMode, currentTarget]);
+  }, [examMode, currentTarget, calculateTimeLeft]);
 
   const timerComponents = [];
 

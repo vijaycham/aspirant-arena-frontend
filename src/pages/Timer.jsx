@@ -59,7 +59,6 @@ const Timer = () => {
     modes,
     pendingSession,
     completeRating,
-    setPendingSession,
     reflectionEnabled,
     setReflectionEnabled,
     todaySessions,
@@ -80,7 +79,7 @@ const Timer = () => {
   const { arenas, syllabus } = useSelector(state => state.arena);
   const dispatch = useDispatch();
 
-  /* eslint-disable no-unused-vars */ // Temporarily ignore remaining unused vars if any
+
   const { tasks = [] } = useTasks() || {};
   const [isEditing, setIsEditing] = useState(false);
   const [manualMin, setManualMin] = useState("");

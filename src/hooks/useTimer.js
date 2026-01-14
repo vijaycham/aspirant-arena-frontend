@@ -130,7 +130,7 @@ export const useTimer = () => {
     } else {
       localStorage.removeItem(TIMER_STORAGE_KEYS.PENDING_SESSION);
     }
-  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled, ambientEnabled, ambientType, volume, pendingSession]);
+  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled, ambientEnabled, ambientType, volume, pendingSession, selectedArenaId, selectedNodeId]);
 
   /* ------------------ AMBIENT AUDIO LOGIC ------------------ */
   useEffect(() => {
@@ -318,7 +318,7 @@ export const useTimer = () => {
     } catch (err) {
       console.error("Save failed", err);
     }
-  }, [subject, selectedTaskId, cycleNumber]);
+  }, [subject, selectedTaskId, cycleNumber, dispatch, selectedArenaId, selectedNodeId]);
 
   const completeRating = async (rating, notes) => {
     if (!pendingSession) return;

@@ -48,6 +48,9 @@ const getStrategyNote = (stats) => {
 
 const Home = () => {
   const { currentUser: user } = useSelector((state) => state.user);
+  const userId = user?._id;
+  const isEmailVerified = user?.isEmailVerified;
+  const createdAt = user?.createdAt;
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const [stats, setStats] = useState(null);
@@ -55,7 +58,8 @@ const Home = () => {
 
   useEffect(() => {
     // 🛡️ Only fetch if user has access (verified or within grace period)
-    if (user && hasAccess(user)) {
+    const userForAccess = { isEmailVerified, createdAt };
+    if (userId && hasAccess(userForAccess)) {
       const fetchHomeStats = async () => {
         try {
           const [testsRes, tasksRes] = await Promise.all([
@@ -90,7 +94,7 @@ const Home = () => {
       };
       fetchHomeStats();
     }
-  }, [user?._id, user?.isEmailVerified]);
+  }, [userId, isEmailVerified, createdAt]);
 
   // Handle successful verification redirect
   useEffect(() => {
@@ -108,7 +112,7 @@ const Home = () => {
       window.history.replaceState({}, "", `${window.location.pathname}?${newParams.toString()}`);
 
       const syncProfile = async () => {
-        if (!user || user.isEmailVerified) return;
+        if (!userId || isEmailVerified) return;
         try {
           const res = await api.get("/profile");
           if (res.status === "success" && res.data.user) {
@@ -120,7 +124,7 @@ const Home = () => {
       };
       syncProfile();
     }
-  }, [searchParams, dispatch, user?._id, user?.isEmailVerified]);
+  }, [searchParams, dispatch, userId, isEmailVerified]);
 
   const strategy = getStrategyNote(stats);
 

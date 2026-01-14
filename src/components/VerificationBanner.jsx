@@ -10,6 +10,8 @@ import { updateProfile } from "../redux/user/authSlice";
 
 const VerificationBanner = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const userId = currentUser?._id;
+  const isEmailVerified = currentUser?.isEmailVerified;
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -32,12 +34,12 @@ const VerificationBanner = () => {
         localStorage.removeItem(storageKey);
       }
     }
-  }, [currentUser?._id, storageKey]);
+  }, [userId, storageKey]);
 
   // 🔄 Sync user profile on mount to catch cross-device verification
   useEffect(() => {
     const syncProfile = async () => {
-      if (!currentUser || currentUser.isEmailVerified) return;
+      if (!userId || isEmailVerified) return;
       try {
         const res = await api.get("/profile");
         if (res?.status === "success" && res?.data?.user) {
@@ -48,7 +50,7 @@ const VerificationBanner = () => {
       }
     };
     syncProfile();
-  }, [currentUser?._id, currentUser?.isEmailVerified, dispatch]);
+  }, [userId, isEmailVerified, dispatch]);
 
   // Handle countdown timer
   useEffect(() => {

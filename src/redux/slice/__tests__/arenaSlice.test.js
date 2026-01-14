@@ -7,7 +7,7 @@ import arenaReducer, {
   updateNode,
   syncNodeTime
 } from '../arenaSlice';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 describe('arenaSlice Reducer', () => {
   const initialState = {
@@ -74,10 +74,10 @@ describe('arenaSlice Reducer', () => {
         currentArenaId: '2',
         syllabus: { '2': [] }
       };
-      
+
       const action = { type: deleteArena.fulfilled.type, payload: '2' };
       const actual = arenaReducer(state, action);
-      
+
       expect(actual.arenas).toHaveLength(1);
       expect(actual.arenas[0]._id).toEqual('1');
       expect(actual.currentArenaId).toEqual('1'); // Fallback to first
