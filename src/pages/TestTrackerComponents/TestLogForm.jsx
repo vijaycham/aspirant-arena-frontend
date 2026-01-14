@@ -304,7 +304,7 @@ const TestLogForm = ({
           type="submit"
           className={`w-full py-3.5 md:py-4 mt-2 text-white font-black rounded-xl md:rounded-2xl hover:scale-[1.02] transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[10px] md:text-xs ${
             editingId
-              ? "bg-indigo-600 shadow-indigo-200 hover:bg-indigo-700"
+              ? "bg-indigo-600 shadow-indigo-200 dark:shadow-indigo-900/30 hover:bg-indigo-700"
               : "bg-gray-900 dark:bg-white dark:text-gray-900 shadow-gray-200 dark:shadow-none hover:bg-black dark:hover:bg-gray-200"
           }`}
         >

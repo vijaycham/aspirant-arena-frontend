@@ -145,4 +145,13 @@ describe('useTimer Hook', () => {
     expect(result.current.timeLeft).toBe(20 * 60);
     expect(result.current.isActive).toBe(true);
   });
+
+  it('should persist pending session to localStorage', () => {
+    const sessionData = { seconds: 120, status: 'completed' };
+    localStorage.setItem(TIMER_STORAGE_KEYS.PENDING_SESSION, JSON.stringify(sessionData));
+    
+    const { result } = renderHook(() => useTimer(), { wrapper });
+    
+    expect(result.current.pendingSession).toEqual(sessionData);
+  });
 });

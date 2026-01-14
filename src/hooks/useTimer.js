@@ -20,7 +20,7 @@ export const useTimer = () => {
   /* ------------------ STATE ------------------ */
   const [mode, setMode] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS");
   const [modeTimings, setModeTimings] = useState(() => loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES));
-  
+
   const [timeLeft, setTimeLeft] = useState(() => {
     const saved = localStorage.getItem(TIMER_STORAGE_KEYS.TIME_LEFT);
     if (saved) return parseInt(saved, 10);
@@ -41,9 +41,9 @@ export const useTimer = () => {
   const [selectedArenaId, setSelectedArenaId] = useState(() => localStorage.getItem('timer_arena_id') || "");
   const [selectedNodeId, setSelectedNodeId] = useState(() => localStorage.getItem('timer_node_id') || "");
   const [reflectionEnabled, setReflectionEnabled] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.ENABLE_REFLECTION) !== "false");
-  
-  const [pendingSession, setPendingSession] = useState(null);
-  
+
+  const [pendingSession, setPendingSession] = useState(() => loadJSON(TIMER_STORAGE_KEYS.PENDING_SESSION, null));
+
   // Ambient Sound State
   const [ambientEnabled, setAmbientEnabled] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED) === "true");
   const [ambientType, setAmbientType] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE) || "rain");
@@ -81,7 +81,7 @@ export const useTimer = () => {
     const catchUp = () => {
       const lastUpdate = localStorage.getItem(TIMER_STORAGE_KEYS.LAST_UPDATE);
       const wasActive = localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true";
-      
+
       if (wasActive && lastUpdate) {
         const now = Date.now();
         const gapSeconds = Math.floor((now - parseInt(lastUpdate, 10)) / 1000);
@@ -125,7 +125,12 @@ export const useTimer = () => {
     localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED, ambientEnabled.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE, ambientType);
     localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_VOLUME, volume.toString());
-  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled, ambientEnabled, ambientType, volume]);
+    if (pendingSession) {
+      localStorage.setItem(TIMER_STORAGE_KEYS.PENDING_SESSION, JSON.stringify(pendingSession));
+    } else {
+      localStorage.removeItem(TIMER_STORAGE_KEYS.PENDING_SESSION);
+    }
+  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled, ambientEnabled, ambientType, volume, pendingSession]);
 
   /* ------------------ AMBIENT AUDIO LOGIC ------------------ */
   useEffect(() => {
@@ -135,7 +140,7 @@ export const useTimer = () => {
     }
 
     const currentSound = AMBIENT_SOUNDS.find(s => s.id === ambientType);
-    
+
     if (ambientEnabled && isActive && currentSound?.url) {
       if (ambientRef.current.src !== currentSound.url) {
         ambientRef.current.src = currentSound.url;
@@ -153,7 +158,7 @@ export const useTimer = () => {
       const modeLabel = mode.replace("_", " ").toLowerCase();
       const minutes = Math.floor(timeLeft / 60);
       const seconds = (timeLeft % 60).toString().padStart(2, '0');
-      
+
       if (typeof MediaMetadata !== "undefined") {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: `${modeLabel === 'focus' ? '🎯' : '☕'} ${minutes}:${seconds}`,
@@ -257,7 +262,7 @@ export const useTimer = () => {
   /* ------------------ ACTIONS ------------------ */
   const saveSession = useCallback(async (seconds, status = "completed", rating = 3, notes = "") => {
     if (seconds < 60) return;
-    
+
     // If no rating is provided yet, we store it as a pending session for the UI to handle
     if (!rating && status === "completed") {
       setPendingSession({ seconds, status });
@@ -272,7 +277,7 @@ export const useTimer = () => {
     try {
       const endTime = new Date();
       const startTime = startTimeRef.current || new Date(endTime.getTime() - seconds * 1000);
-      
+
       await api.post("/focus", {
         subject: subject || "General Study",
         task: selectedTaskId || undefined,
@@ -346,7 +351,7 @@ export const useTimer = () => {
         setCycleNumber(1);
         setMode("LONG_BREAK");
         setTimeLeft(modeTimings.LONG_BREAK.time);
-        
+
         // Clear task when cycle completes (User Request)
         setSubject("");
         setSelectedTaskId("");
@@ -465,7 +470,7 @@ export const useTimer = () => {
   useEffect(() => {
     // Initialize Worker
     workerRef.current = new Worker("/workers/timerWorker.js");
-    
+
     workerRef.current.onmessage = (e) => {
       if (e.data === "tick") {
         setTimeLeft(prev => {

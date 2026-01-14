@@ -148,6 +148,25 @@ const Timer = () => {
     }
   };
 
+  const dropdownRef = React.useRef(null);
+  const btnRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showTaskDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        btnRef.current &&
+        !btnRef.current.contains(event.target)
+      ) {
+        setShowTaskDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showTaskDropdown]);
+
   /* ------------------ RENDER ------------------ */
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300 pt-20 pb-12 px-4 font-outfit relative overflow-hidden">
@@ -306,6 +325,7 @@ const Timer = () => {
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Focus Mission</label>
                   {tasks?.length > 0 ? (
                     <button 
+                      ref={btnRef}
                       onClick={() => setShowTaskDropdown(!showTaskDropdown)}
                       className="text-[10px] font-black text-primary-600 uppercase tracking-widest hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-lg transition-all flex items-center gap-1.5"
                     >
@@ -345,11 +365,8 @@ const Timer = () => {
                   <AnimatePresence>
                     {showTaskDropdown && (
                       <div className="contents">
-                        <div 
-                          className="fixed inset-0 z-40 bg-black/5 rounded-[2.5rem]" 
-                          onClick={() => setShowTaskDropdown(false)}
-                        />
                         <motion.div
+                          ref={dropdownRef}
                           initial={{ opacity: 0, y: 10, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -511,7 +528,7 @@ const Timer = () => {
       {/* Post-Session Rating Modal */}
       <FocusRatingModal
         isOpen={!!pendingSession}
-        onClose={() => setPendingSession(null)}
+        onClose={() => completeRating(3)}
         onComplete={completeRating}
         sessionData={pendingSession}
       />

@@ -39,11 +39,11 @@ const FocusRatingModal = ({ isOpen, onClose, onComplete, sessionData }) => {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl z-10 p-8 border border-white dark:border-white/10 font-outfit"
+            className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl z-10 p-6 md:p-8 border border-white dark:border-white/10 font-outfit"
           >
             <button 
               onClick={onClose}
-              className="absolute top-8 right-8 text-gray-400 hover:text-rose-500 transition-colors z-20"
+              className="absolute top-4 right-4 md:top-8 md:right-8 text-gray-400 hover:text-rose-500 transition-colors z-20"
             >
               <FaTimes size={18} />
             </button>
@@ -110,7 +110,7 @@ const FocusRatingModal = ({ isOpen, onClose, onComplete, sessionData }) => {
                   onClick={onClose}
                   className="w-full py-3 text-[10px] font-black uppercase text-gray-400 tracking-widest hover:text-rose-500"
                 >
-                  Discard Feedback
+                  Skip Rating (Auto-Save 3★)
                 </button>
               </div>
             </form>

@@ -94,6 +94,25 @@ const TaskInput = ({
     return trail;
   }, [selectedArenaId, currentParentId, syllabus]);
 
+  const dropdownRef = React.useRef(null);
+  const btnRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showArenaDropdown &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        btnRef.current &&
+        !btnRef.current.contains(event.target)
+      ) {
+        setShowArenaDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showArenaDropdown]);
+
   return (
     <div className="glass-card dark:border-white/10 p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-black/50 border border-white relative z-50 transition-colors duration-200">
       <div className="flex flex-col gap-6">
@@ -116,11 +135,11 @@ const TaskInput = ({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute z-50 left-0 right-0 mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl p-2 space-y-1"
+                className="absolute z-50 left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-xl dark:shadow-black/50 p-2 space-y-1"
               >
-                <div className="px-3 py-1.5 mb-1 border-b border-gray-50 flex items-center justify-between">
+                <div className="px-3 py-1.5 mb-1 border-b border-gray-50 dark:border-white/5 flex items-center justify-between">
                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Link to Roadmap Topic?</span>
-                  <button onClick={() => setShowSuggestions(false)} className="text-gray-300 hover:text-black">&times;</button>
+                  <button onClick={() => setShowSuggestions(false)} className="text-gray-300 hover:text-black dark:hover:text-white">&times;</button>
                 </div>
                 {suggestions.map(suggestion => (
                   <button
@@ -131,13 +150,13 @@ const TaskInput = ({
                       setTask(suggestion.title);
                       setShowSuggestions(false);
                     }}
-                    className="w-full text-left p-3 rounded-xl hover:bg-primary-50 transition-colors group flex items-center justify-between"
+                    className="w-full text-left p-3 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors group flex items-center justify-between"
                   >
                     <div>
                       <p className="text-[8px] text-gray-400 uppercase font-black tracking-tighter">
                         {arenas.find(a => a._id === suggestion.arenaId)?.title} • {suggestion.type}
                       </p>
-                      <p className="text-xs font-bold text-gray-700 group-hover:text-primary-600 transition-colors">
+                      <p className="text-xs font-bold text-gray-700 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                         {suggestion.title}
                       </p>
                     </div>
@@ -151,6 +170,7 @@ const TaskInput = ({
           <div className="flex flex-wrap gap-2 mt-2">
             {!selectedNodeId ? (
               <button
+                ref={btnRef}
                 onClick={() => {
                   if (arenas.length === 1) {
                     setSelectedArenaId(arenas[0]._id);
@@ -159,13 +179,14 @@ const TaskInput = ({
                     setShowArenaDropdown(true);
                   }
                 }}
-                className="px-3 py-1.5 rounded-xl bg-white/50 dark:bg-slate-800/50 border border-gray-100 dark:border-white/10 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
+                className="px-3 py-1.5 rounded-xl bg-white/50 dark:bg-slate-800/50 border border-gray-100 dark:border-white/10 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-slate-700 transition-colors flex items-center gap-2 shadow-sm"
               >
                 <FiLayers size={10} /> Link Roadmap Topic
               </button>
             ) : (
               <div className="flex items-center gap-1">
                 <button
+                  ref={btnRef}
                   onClick={() => setShowArenaDropdown(true)}
                   className="px-3 py-1.5 rounded-xl bg-primary-50 border border-primary-100 text-[9px] font-black uppercase tracking-widest text-primary-600 transition-colors flex items-center gap-2 shadow-sm"
                 >
@@ -188,16 +209,13 @@ const TaskInput = ({
           <AnimatePresence>
             {showArenaDropdown && (
               <div className="relative">
-                <div 
-                  className="fixed inset-0 z-[60] bg-white/10 backdrop-blur-sm" 
-                  onClick={() => setShowArenaDropdown(false)}
-                />
                 <motion.div
+                  ref={dropdownRef}
                   initial={{ opacity: 0, y: 10, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                  className="absolute top-full left-0 right-0 mt-4 bg-white dark:bg-slate-900 border-2 border-gray-100/50 dark:border-slate-800 rounded-[2rem] shadow-xl shadow-gray-200/50 dark:shadow-black/50 z-[70] p-6 max-h-[400px] overflow-hidden flex flex-col ring-1 ring-black/5 dark:ring-white/5"
+                  className="absolute top-full left-0 right-0 mt-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-gray-100/50 dark:border-slate-800 rounded-[2rem] shadow-2xl shadow-gray-200/50 dark:shadow-black/80 z-[70] p-6 max-h-[400px] overflow-hidden flex flex-col ring-1 ring-black/5 dark:ring-white/5"
                 >
                    <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-white/10 pb-4">
                       <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Master Roadmap Link</h3>
