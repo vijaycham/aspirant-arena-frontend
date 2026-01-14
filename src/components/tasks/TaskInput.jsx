@@ -356,7 +356,7 @@ const TaskInput = ({
                     setDueDate(fromLocalDateTimeInput(`${newDate}T${currentTime}`));
                   }}
                   onClick={(e) => e.target.showPicker && e.target.showPicker()}
-                  className="flex-1 p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400 dark:[color-scheme:dark]"
+                  className="flex-1 p-3 bg-gray-50/50 dark:bg-slate-900/50 border-2 border-transparent focus:border-primary-500 focus:bg-white dark:focus:bg-slate-900 rounded-xl outline-none transition-colors font-bold text-gray-700 dark:text-gray-200 text-sm shadow-sm placeholder-gray-400"
                 />
                 <input
                   type="time"
@@ -377,7 +377,7 @@ const TaskInput = ({
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <button
               onClick={onAdd}
-              className="px-10 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl hover:bg-black dark:hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition-transform shadow-xl shadow-gray-200 dark:shadow-none uppercase tracking-widest text-xs"
+              className="px-10 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black rounded-2xl hover:bg-black dark:hover:bg-gray-200 hover:scale-[1.03] active:scale-95 transition-transform dark:shadow-none uppercase tracking-widest text-xs"
             >
               {isEditing ? "Update Task" : "Add Task"}
             </button>
