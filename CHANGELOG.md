@@ -5,6 +5,21 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0-visual] - 2026-01-14
+### Added
+- **Visual Workflow**
+  - **Kanban Board**: Drag-and-drop task management with clear status transitions.
+  - **Calendar View**: Month and Week views to visualize tasks by due date.
+  - **Smart Toolbar**: Unified switcher for List, Board, and Calendar views with time-based filters (Today, Upcoming).
+
+- **Task Input 2.0**
+  - **Split Date & Time Inputs**: Dedicated controls for due date and time with an improved layout.
+  - **Dark Mode–Ready Inputs**: Native date pickers with correct color-scheme handling and icon visibility.
+
+- **Quality & Verification**
+  - Added unit tests for Kanban Board rendering and column behavior.
+  - Added unit tests for Calendar event mapping and date handling.
+
 ## [1.1.2-polish] - 2026-01-14
 ### Fixed
 - **Interaction Hardening**:
