@@ -13,6 +13,7 @@ import {
   FaBars,
   FaTimes,
   FaChartLine,
+  FaTrophy,
 } from "react-icons/fa";
 import { FiLayers } from "react-icons/fi";
 import { HiCheckCircle, HiXCircle, HiClock } from "react-icons/hi";
@@ -69,6 +70,9 @@ const Header = () => {
             <nav className="hidden lg:flex items-center gap-8 font-bold text-sm tracking-tight text-white/80">
               <Link to="/" className="hover:text-primary-400 transition-colors">Home</Link>
               <Link to="/test-tracker" className="hover:text-primary-400 transition-colors">Analytics</Link>
+              <Link to="/leaderboard" className="hover:text-primary-400 transition-colors flex items-center gap-1.5">
+                <FaTrophy className="text-yellow-400" /> Ranks
+              </Link>
               <Link to="/arena" className="relative group/arena hover:text-primary-400 transition-colors flex items-center gap-1.5 underline decoration-primary-500/30 underline-offset-4">
                 Arena
                 <motion.span
@@ -205,6 +209,16 @@ const Header = () => {
                   <div className="flex flex-col">
                     <span className="text-sm">Analytics</span>
                     <span className="text-[10px] text-gray-500 font-medium">Test Stats & Insights</span>
+                  </div>
+                </Link>
+
+                <Link to="/leaderboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-all shadow-lg shadow-yellow-500/10">
+                    <FaTrophy />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm">Leaderboard</span>
+                    <span className="text-[10px] text-gray-500 font-medium">Top Performers</span>
                   </div>
                 </Link>
 
