@@ -5,6 +5,21 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0-leaderboard] - 2026-01-15
+### Added
+- **Leaderboard System** 🏆
+  - **Competitive Rankings**: Daily, Weekly, and Monthly rankings calculated from focus hours.
+  - **Podium View**: Premium Top 3 visualization with Gold, Silver, and Bronze cards, including crown animations.
+  - **Smart Identity**: Displays user profile photos when available and automatically falls back to deterministic Robot Avatars (DiceBear) if images are missing or fail to load.
+
+- **UI Architecture**
+  - **<GlassCard> System**: Introduced a unified glassmorphism component (`backdrop-blur-xl`, `bg-white/50`) to replace ad-hoc styles.
+  - **Responsive Tables**: Ranking tables support horizontal scrolling on mobile (`overflow-x-auto`) without breaking layout.
+  - **Adaptive Grid**: Podium avatars scale intelligently (`w-24` on desktop → `w-20` on mobile) with optimized grid spacing.
+
+### Quality Assurance
+- Added integration tests covering leaderboard loading states, empty states, and error handling.
+
 ## [1.2.1-fix] - 2026-01-14
 ### Fixed
 - Fixed task input layout issues on tablets and mobile devices
