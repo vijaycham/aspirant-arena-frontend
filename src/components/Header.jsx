@@ -1,38 +1,59 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../../assets/3.png";
 import { useSelector, useDispatch } from "react-redux";
-import { persistor } from "../redux/store";
-import {
-  FaSignOutAlt,
-  FaTasks,
-  FaUserCircle,
-  FaStickyNote,
-  FaClock,
-  FaHome,
-  FaBars,
-  FaTimes,
-  FaChartLine,
-  FaTrophy,
+import { 
+  FaBars, 
+  FaTimes, 
+  FaUserCircle, 
+  FaHome, 
+  FaChartLine, 
+  FaTrophy, 
+  FaTasks, 
+  FaClock, 
+  FaSignOutAlt 
 } from "react-icons/fa";
 import { FiLayers } from "react-icons/fi";
 import { HiCheckCircle, HiXCircle, HiClock } from "react-icons/hi";
-import { signOut } from "../redux/user/authSlice";
-import api from "../utils/api";
-import { getRemainingGraceHours } from "../utils/auth/verifyHelpers";
-import ThemeToggle from "./ThemeToggle";
+import { AnimatePresence, motion } from "framer-motion";
 
-import { motion, AnimatePresence } from "framer-motion";
+import logo from "../../assets/3.png";
+import ThemeToggle from "./ThemeToggle";
+import api from "../utils/api";
+import { signOut } from "../redux/user/authSlice";
+import { persistor } from "../redux/store";
+import { getRemainingGraceHours } from "../utils/auth/verifyHelpers";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const location = useLocation(); // Unused
   const user = useSelector((state) => state.user.currentUser);
   const isAuthenticated = !!user;
 
-  // 📱 Mobile Menu State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  // 🖱️ Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // ⌨️ Close dropdown on Escape key
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
+        setProfileOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -42,158 +63,189 @@ const Header = () => {
       await persistor.flush();
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       navigate("/signin");
-    } catch (error) {
-      console.error("Logout Error:", error);
+    } catch (err) {
+      console.error("Logout error", err);
     }
   };
 
   return (
     <>
-      <header className="sticky top-4 z-50 px-4 sm:px-6 font-outfit">
-        <div className="container mx-auto bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-[2rem] px-6 py-3.5 flex justify-between items-center text-white shadow-2xl shadow-slate-900/20 transition-all duration-200">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-all duration-200">
-              <img
-                src={logo}
-                alt="Aspirant Arena Logo"
-                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-              />
+      {/* ================= HEADER ================= */}
+      <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-xl border-b border-white/10 font-outfit">
+        <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+
+          {/* LOGO */}
+          <Link to="/" className="flex items-center gap-2">
+            <div className="relative w-9 h-9 rounded-lg overflow-hidden shadow-lg shadow-primary-500/20">
+              <img src={logo} alt="Aspirant Arena" className="w-full h-full object-cover" />
             </div>
-            <span className="text-lg font-black tracking-tighter bg-gradient-to-r from-white to-primary-300 bg-clip-text text-transparent hidden sm:block uppercase">
+            <span className="hidden sm:block text-lg font-black uppercase tracking-tight text-white">
               Aspirant Arena
             </span>
           </Link>
 
-          {/* 🌍 Desktop Navigation */}
-          {isAuthenticated ? (
-            <nav className="hidden lg:flex items-center gap-8 font-bold text-sm tracking-tight text-white/80">
+          {/* ================= DESKTOP NAV (Right Aligned & Calmer) ================= */}
+          {isAuthenticated && (
+            <div className="hidden xl:flex items-center gap-8 ml-auto mr-12 text-sm font-bold text-white/70">
               <Link to="/" className="hover:text-primary-400 transition-colors">Home</Link>
               <Link to="/test-tracker" className="hover:text-primary-400 transition-colors">Analytics</Link>
-              <Link to="/leaderboard" className="hover:text-primary-400 transition-colors flex items-center gap-1.5">
-                <FaTrophy className="text-yellow-400" /> Ranks
-              </Link>
-              <Link to="/arena" className="relative group/arena hover:text-primary-400 transition-colors flex items-center gap-1.5 underline decoration-primary-500/30 underline-offset-4">
-                Arena
-                <motion.span
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  className="bg-primary-500 text-[8px] px-1.5 py-0.5 rounded-full text-white font-black"
-                >
-                  NEW
-                </motion.span>
-              </Link>
+              <Link to="/arena" className="hover:text-primary-400 transition-colors">Arena</Link>
               <Link to="/tasks" className="hover:text-primary-400 transition-colors">Tasks</Link>
-              <Link to="/timer" className="hover:text-primary-400 transition-colors flex items-center gap-1.5">
-                Focus Arena
-              </Link>
-              
-              {/* Verification Status Badge */}
-              <div className="flex items-center">
-                {user.isEmailVerified ? (
-                  <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/5">
-                    <HiCheckCircle className="text-sm" /> Verified
-                  </div>
-                ) : (
-                  <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest shadow-lg ${
-                    getRemainingGraceHours(user) > 0 
-                      ? "bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-amber-500/5" 
-                      : "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-rose-500/5"
-                  }`}>
-                    {getRemainingGraceHours(user) > 0 ? <HiClock className="text-sm" /> : <HiXCircle className="text-sm" />}
-                    {getRemainingGraceHours(user) > 0 ? "Grace Period" : "Unverified"}
-                  </div>
-                )}
-              </div>
-              <div className="h-4 w-px bg-white/10 mx-2" />
-              <ThemeToggle />
-              <div className="h-4 w-px bg-white/10 mx-2" />
-              <Link
-                to="/profile"
-                className="inline-block p-0.5 rounded-full border-2 border-transparent hover:border-primary-400 transition-all"
-              >
-                {user.photoUrl ? (
-                  <img src={user.photoUrl} alt="User" className="w-9 h-9 object-cover rounded-full border border-white/10 shadow-lg" />
-                ) : (
-                  <FaUserCircle className="text-3xl text-gray-400" />
-                )}
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-rose-400 hover:text-rose-500 transition-colors font-black uppercase text-[10px] tracking-widest pl-2"
-              >
-                <FaSignOutAlt className="text-xs" /> Logout
-              </button>
-            </nav>
-          ) : (
-            <nav className="hidden lg:flex items-center gap-8 font-bold text-sm tracking-tight text-white/80">
-              <Link to="/about" className="hover:text-primary-400 transition-colors uppercase tracking-widest text-[10px]">About Arena</Link>
-              <Link to="/signin" className="px-6 py-2.5 rounded-xl bg-white text-slate-900 font-black uppercase tracking-widest text-[10px] hover:bg-gray-100 transition-all shadow-lg shadow-white/5 active:scale-95">
-                Portal Login
-              </Link>
-            </nav>
+              <Link to="/timer" className="hover:text-primary-400 transition-colors">Focus</Link>
+            </div>
           )}
 
-          {/* 📱 Mobile Toggle Button */}
-          {!isAuthenticated && (
-            <div className="flex items-center gap-4 lg:hidden">
-              <Link to="/about" className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition-colors">About</Link>
-              <Link to="/signin" className="px-5 py-2 rounded-xl bg-white text-slate-900 font-black text-[10px] uppercase tracking-widest active:scale-95">
-                Login
-              </Link>
-            </div>
-          )}
-          {isAuthenticated && (
+          {/* ================= ACTIONS ================= */}
+          <div className="flex items-center gap-4">
+            {!isAuthenticated ? (
+              <nav className="hidden lg:flex items-center gap-6">
+                <Link to="/about" className="text-xs font-bold uppercase tracking-widest text-white/60 hover:text-white transition-colors">
+                  About
+                </Link>
+                <Link
+                  to="/signin"
+                  className="px-6 py-2 rounded-xl bg-white text-slate-900 font-black text-xs uppercase tracking-widest hover:bg-gray-100 transition-all shadow-lg"
+                >
+                  Login
+                </Link>
+              </nav>
+            ) : (
+              <div className="flex items-center gap-4">
+                <ThemeToggle className="hidden xl:block" />
+
+                {/* Profile Dropdown */}
+                <div className="relative" ref={profileRef}>
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="hidden lg:flex items-center gap-2 transition-opacity hover:opacity-80"
+                    aria-label="User Menu"
+                  >
+                    {user.photoUrl ? (
+                      <img
+                        src={user.photoUrl}
+                        alt="User"
+                        className="w-8 h-8 rounded-full border border-white/10"
+                      />
+                    ) : (
+                      <FaUserCircle className="text-2xl text-gray-400" />
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {profileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                        className="absolute right-0 mt-3 w-56 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 py-1"
+                      >
+                        <div className="px-4 py-3 border-b border-white/5 mb-1">
+                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Account Context</p>
+                          <p className="text-sm font-bold text-white truncate">{user.firstName} {user.lastName}</p>
+                          <p className="text-[10px] text-gray-500 truncate mt-0.5">{user.emailId}</p>
+                          
+                          {/* Verification in Dropdown (Clean) */}
+                          <div className="mt-2 text-[10px] font-black uppercase tracking-widest">
+                            {user.isEmailVerified ? (
+                              <span className="text-emerald-500 flex items-center gap-1">
+                                <HiCheckCircle /> Verified Profile
+                              </span>
+                            ) : (
+                              <span className={getRemainingGraceHours(user) > 0 ? "text-amber-500 flex items-center gap-1" : "text-rose-500 flex items-center gap-1"}>
+                                {getRemainingGraceHours(user) > 0 ? <HiClock /> : <HiXCircle />} 
+                                {getRemainingGraceHours(user) > 0 ? "Grace Period" : "Unverified Access"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <Link
+                          to="/profile"
+                          onClick={() => setProfileOpen(false)}
+                          className="block px-4 py-2.5 text-sm text-white/80 hover:bg-white/5 transition-colors font-bold"
+                        >
+                          View Profile
+                        </Link>
+                        <Link
+                          to="/leaderboard"
+                          onClick={() => setProfileOpen(false)}
+                          className="block px-4 py-2.5 text-sm text-white/80 hover:bg-white/5 transition-colors font-bold"
+                        >
+                          Leaderboard
+                        </Link>
+                        <Link
+                          to="/feedback"
+                          onClick={() => setProfileOpen(false)}
+                          className="block px-4 py-2.5 text-sm text-white/80 hover:bg-white/5 transition-colors font-bold"
+                        >
+                          Feedback & Support
+                        </Link>
+                        <div className="h-px bg-white/5 my-1" />
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full text-left px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 transition-colors font-bold"
+                        >
+                          Sign Out
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Actions */}
             <div className="lg:hidden flex items-center gap-3">
-              <ThemeToggle />
-              <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-xl active:scale-95 transition-all"
-                aria-label="Open Mobile Menu"
-              >
-                <FaBars />
-              </button>
+              {isAuthenticated && <ThemeToggle />}
+              {isAuthenticated && (
+                <button
+                  onClick={() => setMobileMenuOpen(true)}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-xl text-white/80"
+                >
+                  <FaBars />
+                </button>
+              )}
+              {!isAuthenticated && (
+                <Link to="/signin" className="px-5 py-2 rounded-xl bg-white text-slate-900 font-black text-[10px] uppercase tracking-widest">
+                  Login
+                </Link>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </header>
 
-      {/* 📱 MOBILE NAVIGATION DRAWER */}
+      {/* ================= MOBILE DRAWER (UNCHANGED PREMIUM UX) ================= */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[60] lg:hidden"
+              className="fixed inset-0 bg-slate-950/60 backdrop-blur-md z-[60]"
             />
 
-            {/* Side Drawer */}
             <motion.aside
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-slate-900 border-l border-white/5 z-[70] shadow-2xl flex flex-col font-outfit lg:hidden"
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-slate-900 border-l border-white/5 z-[70] flex flex-col font-outfit"
             >
               {/* Header */}
               <div className="p-6 flex justify-between items-center border-b border-white/5">
                 <span className="text-xs font-black text-gray-500 uppercase tracking-widest">Aspirant Navigation</span>
-                <button 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-white/60 hover:text-white transition-colors"
-                >
+                <button onClick={() => setMobileMenuOpen(false)} className="text-white/60">
                   <FaTimes />
                 </button>
               </div>
 
               {/* Links */}
               <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-2">
-                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg shadow-primary-500/10">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg">
                     <FaHome />
                   </div>
                   <div className="flex flex-col">
@@ -202,8 +254,8 @@ const Header = () => {
                   </div>
                 </Link>
 
-                <Link to="/test-tracker" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-lg shadow-indigo-500/10">
+                <Link to="/test-tracker" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-lg">
                     <FaChartLine />
                   </div>
                   <div className="flex flex-col">
@@ -212,8 +264,8 @@ const Header = () => {
                   </div>
                 </Link>
 
-                <Link to="/leaderboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-all shadow-lg shadow-yellow-500/10">
+                <Link to="/leaderboard" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400 group-hover:bg-yellow-500 group-hover:text-white transition-all shadow-lg">
                     <FaTrophy />
                   </div>
                   <div className="flex flex-col">
@@ -222,8 +274,8 @@ const Header = () => {
                   </div>
                 </Link>
 
-                <Link to="/arena" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg shadow-primary-500/10">
+                <Link to="/arena" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg">
                     <FiLayers />
                   </div>
                   <div className="flex flex-col">
@@ -232,8 +284,8 @@ const Header = () => {
                   </div>
                 </Link>
 
-                <Link to="/tasks" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-secondary-500/10 text-secondary-400 group-hover:bg-secondary-500 group-hover:text-white transition-all shadow-lg shadow-secondary-500/10">
+                <Link to="/tasks" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-secondary-500/10 text-secondary-400 group-hover:bg-secondary-500 group-hover:text-white transition-all shadow-lg">
                     <FaTasks />
                   </div>
                   <div className="flex flex-col">
@@ -242,8 +294,8 @@ const Header = () => {
                   </div>
                 </Link>
 
-                <Link to="/timer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold hover:bg-white/10 transition-all border border-white/5 group">
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg shadow-primary-500/10 relative">
+                <Link to="/timer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-primary-500/10 text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-all shadow-lg relative">
                     <FaClock />
                     <motion.div
                       animate={{ scale: [1, 1.3, 1] }}
@@ -254,20 +306,24 @@ const Header = () => {
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
                        <span className="text-sm">Focus Arena</span>
-                       <span className="bg-primary-500 text-[7px] px-1.5 py-0.5 rounded-full text-white font-black animate-pulse">NEW</span>
+                       <span className="bg-primary-500 text-[7px] px-1.5 py-0.5 rounded-full text-white font-black">NEW</span>
                     </div>
                     <span className="text-[10px] text-gray-500 font-medium">Deep Work Timer</span>
                   </div>
                 </Link>
 
-                <div className="mt-4 pt-6 border-t border-white/5 space-y-4 opacity-40 grayscale pointer-events-none">
-                  <div className="px-4 flex items-center gap-4">
-                    <FaStickyNote className="text-lg" /> <span className="text-sm font-bold">Cloud Notes (Soon)</span>
+                <Link to="/feedback" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 text-white font-bold border border-white/5 group">
+                  <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 group-hover:bg-amber-500 group-hover:text-white transition-all shadow-lg">
+                    <FaTasks />
                   </div>
-                </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm">Feedback & Support</span>
+                    <span className="text-[10px] text-gray-500 font-medium">Reach out to us</span>
+                  </div>
+                </Link>
               </div>
 
-              {/* Footer / Account */}
+              {/* Footer Account Section */}
               <div className="p-6 mt-auto bg-black/20 border-t border-white/5">
                  <Link 
                    to="/profile" 
@@ -275,7 +331,7 @@ const Header = () => {
                    className="flex items-center gap-4 mb-6 group"
                  >
                     {user.photoUrl ? (
-                      <img src={user.photoUrl} alt="User" className="w-12 h-12 rounded-2xl object-cover border border-white/10 shadow-xl" />
+                      <img src={user.photoUrl} alt="User" className="w-12 h-12 rounded-2xl object-cover border border-white/10" />
                     ) : (
                       <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-gray-500 text-2xl">
                         <FaUserCircle />
@@ -283,15 +339,10 @@ const Header = () => {
                     )}
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-black text-white">{user.firstName || "Aspirant"}</span>
-                        {/* Mobile Badge */}
-                        {user.isEmailVerified ? (
-                           <HiCheckCircle className="text-emerald-500 text-sm" />
-                        ) : (
-                           <HiClock className={getRemainingGraceHours(user) > 0 ? "text-amber-500 text-sm" : "text-rose-500 text-sm"} />
-                        )}
+                        <span className="text-sm font-black text-white">{user.firstName}</span>
+                        {user.isEmailVerified ? <HiCheckCircle className="text-emerald-500" /> : <HiClock className="text-amber-500" />}
                       </div>
-                      <span className="text-[10px] text-primary-400 font-black uppercase tracking-widest group-hover:text-primary-300 transition-colors">View Profile &rarr;</span>
+                      <span className="text-[10px] text-primary-400 font-black uppercase tracking-widest">Profile &rarr;</span>
                     </div>
                  </Link>
 
@@ -300,10 +351,9 @@ const Header = () => {
                       handleSignOut();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all font-black uppercase tracking-widest text-[10px] border border-rose-500/20 shadow-lg shadow-rose-950/20"
+                    className="w-full py-4 rounded-2xl bg-rose-500/10 text-rose-500 font-black uppercase tracking-widest text-[10px] border border-rose-500/20"
                   >
-                    <FaSignOutAlt />
-                    <span>Sign Out</span>
+                    Sign Out
                   </button>
               </div>
             </motion.aside>

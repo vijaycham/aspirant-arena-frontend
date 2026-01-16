@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
 
-const ThemeToggle = () => {
+const ThemeToggle = ({ className = "" }) => {
   // 1. Initialize state from LocalStorage (or default to light)
   const [theme, setTheme] = useState(
     localStorage.getItem("theme") || "light"
@@ -29,7 +29,7 @@ const ThemeToggle = () => {
     <button
       onClick={toggleTheme}
       className={`
-        p-2 rounded-full transition-transform duration-200 shadow-md
+        p-2 rounded-full transition-transform duration-200 shadow-md ${className}
         ${theme === "dark" 
           ? "bg-slate-800 text-yellow-400 hover:bg-slate-700" 
           : "bg-white text-orange-500 hover:bg-orange-50"
