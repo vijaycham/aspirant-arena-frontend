@@ -5,6 +5,23 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-01-16
+### Changed
+- **Hybrid Header Architecture**
+  - **Desktop**: Clean, right-aligned navigation (icon-free) visible at the `xl` breakpoint for improved layout stability.
+  - **Mobile**: Retained rich, icon-based drawer with descriptive actions.
+  - **UX Improvements**: Verification status moved into the profile dropdown with added outside-click and Escape key handling.
+
+- **Minimalist Footer**
+  - Unified with the Header using `slate-900/95` glassmorphism styling.
+  - Integrated authentic social links and a dedicated **Help & Support** route.
+
+- **Page Refinements**
+  - **About Page**: Updated professional contact links (LinkedIn and Support email).
+
+- **Bug Fixes**
+  - Fixed duplicate `ThemeToggle` rendering on mobile viewports.
+
 ## [1.3.0-leaderboard] - 2026-01-15
 ### Added
 - **Leaderboard System** 🏆
