@@ -74,17 +74,15 @@ const AboutUs = () => {
                     &quot;I built Aspirant Arena to solve the chaos of preparation. 
                     Merging technology with discipline, my goal is to give every serious aspirant the digital infrastructure they deserve to succeed.&quot;
                  </p>
-                 <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <div className="flex flex-wrap items-center gap-4 pt-2">
                     <Link to="/feedback" className="px-5 py-2 rounded-xl bg-primary-100 text-primary-700 font-black text-xs uppercase tracking-widest hover:bg-primary-200 transition-colors">
                       Get in Touch
                     </Link>
                     <span className="text-gray-300 hidden sm:inline">•</span>
                     <a href="https://github.com/vijaycham" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-400 hover:text-primary-600 transition-colors">GitHub</a>
                     <span className="text-gray-300">•</span>
-                    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-400 hover:text-primary-600 transition-colors">Twitter</a>
-                    <span className="text-gray-300">•</span>
-                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-400 hover:text-primary-600 transition-colors">LinkedIn</a>
-                 </div>
+                    <a href="https://www.linkedin.com/in/vijaycham/" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-gray-400 hover:text-primary-600 transition-colors">LinkedIn</a>
+                  </div>
               </div>
            </div>
         </div>
