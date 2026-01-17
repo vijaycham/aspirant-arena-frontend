@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { updateProfile } from "../redux/user/authSlice";
+import { updateProfile, signOut } from "../redux/user/authSlice";
 import api from "../utils/api";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,8 +22,10 @@ const Profile = () => {
   const { currentUser } = useSelector((state) => state.user);
   const userId = currentUser?._id;
   const [previewImage, setPreviewImage] = useState(currentUser?.photoUrl || "");
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showDangerZone, setShowDangerZone] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -359,6 +361,108 @@ const Profile = () => {
             </button>
           </div>
         </form>
+
+        {/* Collapsible Danger Zone */}
+        <div className="mt-12 pt-8 border-t border-white/5">
+          <button
+            type="button"
+            onClick={() => setShowDangerZone(!showDangerZone)}
+            className="flex items-center gap-2 text-gray-500 hover:text-rose-500 transition-colors text-sm font-bold uppercase tracking-wider group"
+          >
+            <svg 
+              className={`w-4 h-4 transition-transform duration-300 ${showDangerZone ? 'rotate-180' : ''}`} 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+            Advanced & Danger Zone
+          </button>
+
+          <div 
+            className={`grid transition-all duration-500 ease-in-out overflow-hidden ${
+              showDangerZone ? "grid-rows-[1fr] opacity-100 mt-6" : "grid-rows-[0fr] opacity-0"
+            }`}
+          >
+            <div className="min-h-0">
+              <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="text-white font-bold flex items-center gap-2">
+                    <svg className="w-5 h-5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    Delete Account
+                  </h4>
+                  <p className="text-rose-200/60 text-sm mt-1 max-w-md">
+                    Permanently delete your account and all of your content (Tasks, Arenas, Notes). This action is irreversible.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('delete-modal').showModal()}
+                  className="px-5 py-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/50 font-bold transition-all whitespace-nowrap shadow-lg shadow-rose-900/10"
+                >
+                  Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Delete Confirmation Modal using native dialog */}
+        <dialog id="delete-modal" className="modal bg-transparent p-0 backdrop:bg-black/80">
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+             <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl relative">
+                <h3 className="text-2xl font-black text-rose-500 mb-4">Delete Account?</h3>
+                <p className="text-gray-300 mb-6 font-medium">
+                  This cannot be undone. All your arenas, tasks, notes, and study history will be permanently erased.
+                </p>
+                
+                <p className="text-sm text-gray-500 mb-2 font-bold uppercase tracking-wider">Type <span className="text-white">DELETE</span> to confirm</p>
+                <input 
+                  type="text" 
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/10 text-white font-bold mb-6 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none"
+                  placeholder="DELETE"
+                />
+
+                <div className="flex gap-3 justify-end">
+                   <button 
+                     onClick={() => {
+                       document.getElementById('delete-modal').close();
+                       setDeleteConfirmation("");
+                     }}
+                     className="px-5 py-2.5 rounded-xl bg-slate-800 text-white font-bold hover:bg-slate-700 transition-colors"
+                   >
+                     Cancel
+                   </button>
+                   <button
+                     disabled={deleteConfirmation !== 'DELETE'}
+                     className={`px-5 py-2.5 rounded-xl text-white font-bold transition-all shadow-lg ${
+                       deleteConfirmation === 'DELETE' 
+                         ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20 cursor-pointer' 
+                         : 'bg-rose-600/50 cursor-not-allowed opacity-50'
+                     }`}
+                     onClick={async () => {
+                       try {
+                         const res = await api.delete('/auth/delete-account');
+                         if(res.status === 'success') {
+                            toast.success('Account deleted successfully');
+                            dispatch(signOut()); // Clear Redux state immediately
+                            window.location.href = '/'; 
+                         }
+                       } catch(err) {
+                         console.error("Deletion failed:", err);
+                         toast.error(err.response?.data?.message || 'Failed to delete account');
+                       }
+                     }}
+                   >
+                     Permanently Delete
+                   </button>
+                </div>
+             </div>
+          </div>
+        </dialog>
       </div>
     </div>
   );
