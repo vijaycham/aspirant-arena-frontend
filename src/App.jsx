@@ -12,6 +12,9 @@ import Timer from "./pages/Timer";
 import TestTracker from "./pages/TestTracker";
 import ArenaDashboard from "./pages/ArenaDashboard";
 import Leaderboard from "./pages/Leaderboard";
+
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
@@ -61,6 +64,8 @@ const App = () => {
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
         <Route element={<PrivateRoute />}>

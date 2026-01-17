@@ -5,6 +5,20 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-01-17
+### Added
+- **Password Recovery UI**
+  - Forgot Password screen with secure email validation.
+  - Reset Password flow with deep-link token support.
+
+### Changed
+- Refactored Profile “Danger Zone” into a collapsible **Advanced Settings** section.
+- Improved test stability for auth-related flows.
+
+### Testing
+- Stabilized toast mocking using `vi.hoisted()`.
+- Fixed async navigation timing issues using controlled fake timers.
+
 ## [1.3.1] - 2026-01-16
 ### Changed
 - **Hybrid Header Architecture**

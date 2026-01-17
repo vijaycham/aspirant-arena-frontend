@@ -9,12 +9,14 @@ import {
   clearError,
 } from "../redux/user/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
     emailId: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -76,14 +78,29 @@ const SignIn = () => {
           </div>
 
           <div>
-             <input
-              type="password"
-              placeholder="Password"
-              id="password"
-              className="w-full px-6 py-4 rounded-xl bg-gray-50 border border-gray-200 text-slate-900 font-medium placeholder-gray-400 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all"
-              required
-              onChange={handleChange}
-            />
+             <div className="relative">
+               <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                id="password"
+                className="w-full px-6 py-4 rounded-xl bg-gray-50 border border-gray-200 text-slate-900 font-medium placeholder-gray-400 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all"
+                required
+                onChange={handleChange}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                tabIndex="-1"
+              >
+                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+              </button>
+             </div>
+            <div className="flex justify-end mt-2">
+              <Link to="/forgot-password" className="text-sm font-bold text-primary-600 hover:text-primary-700 transition-colors">
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           <button
