@@ -35,6 +35,12 @@ For a deep dive into the system design, see [ARCHITECTURE.md](file:///home/vijay
 - **Mastery Analytics**:
   - **Consistency Heatmap**: Visualizing 365 days of focus activity.
   - **Focus Rhythm**: Data-driven insights into your daily efficiency peaks.
+- **Gamified Leaderboard**:
+  - **Global Rankings**: Compete with other aspirants on Daily/Weekly/Monthly boards.
+  - **Podium View**: visual celebration of top performers.
+- **Secure Account Management**:
+  - **Password Recovery**: Secure forgot/reset flow.
+  - **Account Control**: Full data ownership with cascade deletion.
 
 ---
 

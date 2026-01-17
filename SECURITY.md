@@ -24,8 +24,13 @@ For users in their 24-hour grace period, features are accessible but clearly mar
 Google OAuth is used via Firebase. We have implemented:
 - **Domain Whitelisting**: Google Auth only works for `aspirantarena.in` and `localhost`.
 - **API Key Restrictions**: Keys are restricted to specifically allow only Auth and Storage services.
+- **Server-Side Verification**: We send the ID Token to the backend, where it is rigorously verified against Google's public keys via `firebase-admin` before any session is created.
 
-### 3. Firebase Storage Rules
+### 3. Browser Hardening
+- **COOP Headers**: `Cross-Origin-Opener-Policy: same-origin-allow-popups` enforced to secure OAuth popups.
+- **DOM Security**: Inputs enforce `autocomplete` attributes to prevent browser heuristics from filling sensitive fields incorrectly.
+
+### 4. Firebase Storage Rules
 Bucket rules ensure that only authenticated users can upload and read their own profile photos:
 ```firebase
 match /users/{userId}/{allPaths=**} {

@@ -41,7 +41,18 @@ Instead of generic charts, the app employs specialized "Aspirant-First" metrics:
 - **Lost Marks Analyzer**: Real-time tallying logic ensuring all missed marks in a mock paper are accounted for.
 - **Mastery Analytics**: Uses `react-calendar-heatmap` for consistency tracking and `recharts` for focus rhythm visualization.
 
-### 2. The Focus Arena (Audio & Timing Hub)
+### 2. Leaderboard & Gamification (v1.3.0)
+The gamification engine uses a hybrid aggregation strategy:
+- **Podium Engine**: Visualizes Top 3 ranks with Gold/Silver/Bronze card systems.
+- **Smart Identity**: Determining user avatar falls back: `PhotoURL` -> `DiceBear Robot Avatar` -> `Initials`.
+- **GlassCard System**: Unified component architecture for consistent `backdrop-blur-xl` panels across the Leaderboard.
+
+### 3. Authentication & Security (v1.4.0)
+- **Recovery Architecture**: Cryptographically secure "Forgot Password" flow using deep-linked tokens.
+- **Danger Zone**: Account deletion logic with cascaded cleanup triggers.
+- **Verification Bridge**: Google OAuth flows are now verified server-side via `firebase-admin` to prevent token spoofing.
+
+### 4. The Focus Arena (Audio & Timing Hub)
 The `useTimer` hook is the heartbeat of the application, managing high-fidelity timing and atmosphere:
 - **Persistence 2.0 (Smart Resume)**: Implements a "Gap Calculation" logic. If a user returns after the tab was closed, the app calculates the elapsed time since `timer-lastUpdate` and resumes the countdown precisely.
 - **Web Worker Timing**: Timing logic is offloaded to `/workers/timerWorker.js` to bypass browser-level CPU throttling of background tabs.
