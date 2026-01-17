@@ -9,8 +9,7 @@ import {
   FaChartLine, 
   FaTrophy, 
   FaTasks, 
-  FaClock, 
-  FaSignOutAlt 
+  FaClock 
 } from "react-icons/fa";
 import { FiLayers } from "react-icons/fi";
 import { HiCheckCircle, HiXCircle, HiClock } from "react-icons/hi";

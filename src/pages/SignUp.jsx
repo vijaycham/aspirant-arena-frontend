@@ -107,6 +107,7 @@ const SignUp = () => {
               id="emailId"
               className="w-full px-6 py-4 rounded-xl bg-gray-50 border border-gray-200 text-slate-900 font-medium placeholder-gray-400 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all"
               required
+              autoComplete="email"
               onChange={handleChange}
             />
           </div>
@@ -119,6 +120,7 @@ const SignUp = () => {
                 id="password"
                 className="w-full px-6 py-4 rounded-xl bg-gray-50 border border-gray-200 text-slate-900 font-medium placeholder-gray-400 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all"
                 required
+                autoComplete="new-password"
                 onChange={handleChange}
               />
               <button
@@ -140,6 +142,7 @@ const SignUp = () => {
                 id="confirmPassword"
                 className="w-full px-6 py-4 rounded-xl bg-gray-50 border border-gray-200 text-slate-900 font-medium placeholder-gray-400 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all"
                 required
+                autoComplete="new-password"
                 onChange={handleChange}
               />
               <button
