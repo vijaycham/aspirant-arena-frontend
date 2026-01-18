@@ -4,6 +4,8 @@ export const DEFAULT_MODES = {
   LONG_BREAK: { label: "Long Break", time: 15 * 60 },
 };
 
+export const MIN_VALID_DURATION = 300; // 5 Minutes
+
 export const UPSC_PRESETS = [
   { name: "Mains Sprint", focus: 90, short: 15, long: 30, icon: "✍️" },
   { name: "Prelims Mock", focus: 120, short: 20, long: 40, icon: "📝" },
@@ -19,13 +21,15 @@ export const TIMER_STORAGE_KEYS = {
   SUBJECT: "timer-subject",
   TASK_ID: "timer-taskId",
   MODE_TIMINGS: "timer-modeTimings",
-  IS_ACTIVE: "timer-isActive",
   LAST_UPDATE: "timer-lastUpdate",
+  TARGET_TIME: "timer-targetTime",
+  PAUSED_REMAINING: "timer-pausedRemaining",
   ENABLE_REFLECTION: "timer-enableReflection",
   AMBIENT_SOUND_ENABLED: "timer-ambientEnabled",
   AMBIENT_SOUND_TYPE: "timer-ambientType",
   AMBIENT_VOLUME: "timer-ambientVolume",
   PENDING_SESSION: "timer-pendingSession",
+  SYNC_QUEUE: "timer-syncQueue",
 };
 
 export const AMBIENT_SOUNDS = [

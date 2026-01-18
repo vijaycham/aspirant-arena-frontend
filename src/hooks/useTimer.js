@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 import { toast } from "react-hot-toast";
-import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
+import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS, MIN_VALID_DURATION } from "../utils/timer/timerConstants";
 import { useDispatch } from "react-redux";
 import { syncNodeTime } from "../redux/slice/arenaSlice";
 
@@ -53,6 +53,7 @@ export const useTimer = () => {
   const startTimeRef = useRef(null);
   const ambientRef = useRef(null);
   const chimeRef = useRef(null);
+  const completedRef = useRef(false); // 🛡️ Prevents double completion
   const [notificationPermission, setNotificationPermission] = useState(
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
@@ -73,12 +74,41 @@ export const useTimer = () => {
       }
     };
     fetchStats();
+
+    // 🔄 Offline Sync: Process queued sessions
+    const processSyncQueue = async () => {
+      const queue = loadJSON(TIMER_STORAGE_KEYS.SYNC_QUEUE, []);
+      if (queue.length === 0) return;
+
+      const newQueue = [];
+      for (const session of queue) {
+        try {
+          await api.post("/focus", session);
+          toast.success("Offline session synced! ☁️");
+        } catch (err) {
+          newQueue.push(session); // Keep in queue if still failing
+        }
+      }
+
+      if (newQueue.length !== queue.length) {
+        // Update Stats if we synced something
+        fetchStats();
+      }
+
+      localStorage.setItem(TIMER_STORAGE_KEYS.SYNC_QUEUE, JSON.stringify(newQueue));
+    };
+
+    processSyncQueue();
+    window.addEventListener('online', processSyncQueue);
+
+    return () => window.removeEventListener('online', processSyncQueue);
   }, []);
 
   /* ------------------ CATCH UP LOGIC ------------------ */
   // If the timer was active when the tab closed, calculate how much time passed
   useEffect(() => {
-    const catchUp = () => {
+    // If the timer was active when the tab closed, calculate how much time passed
+    const catchUp = (notify = false) => {
       const lastUpdate = localStorage.getItem(TIMER_STORAGE_KEYS.LAST_UPDATE);
       const wasActive = localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true";
 
@@ -88,19 +118,22 @@ export const useTimer = () => {
         if (gapSeconds > 0) {
           setTimeLeft(prev => {
             const next = Math.max(0, prev - gapSeconds);
-            // If the timer should have finished while we were away, handleTimerComplete
-            // will be triggered by the timeLeft useEffect once this state updates.
             return next;
           });
+
+          // Only notify if it's a significant restore (reload/reopen), not just tab switching
+          if (notify && gapSeconds > 5) {
+            toast.success("Session restored 🔄");
+          }
         }
       }
     };
 
-    catchUp(); // Initial mount catch-up
+    catchUp(true); // Initial mount catch-up (Notify)
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        catchUp();
+        catchUp(false); // Tab switch catch-up (Silent)
       }
     };
 
@@ -109,9 +142,10 @@ export const useTimer = () => {
   }, []); // Run once on mount and setup listeners
 
   /* ------------------ LOCAL STORAGE SYNC ------------------ */
+  /* ------------------ LOCAL STORAGE SYNC (OPTIMIZED) ------------------ */
+  // 1. Config Sync (Low Frequency) - Only writes when settings change
   useEffect(() => {
     localStorage.setItem(TIMER_STORAGE_KEYS.MODE, mode);
-    localStorage.setItem(TIMER_STORAGE_KEYS.TIME_LEFT, timeLeft.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.CYCLE, cycleNumber.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.SESSIONS, sessionsCompleted.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.SUBJECT, subject);
@@ -119,18 +153,37 @@ export const useTimer = () => {
     localStorage.setItem('timer_arena_id', selectedArenaId);
     localStorage.setItem('timer_node_id', selectedNodeId);
     localStorage.setItem(TIMER_STORAGE_KEYS.MODE_TIMINGS, JSON.stringify(modeTimings));
-    localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, isActive.toString());
-    localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.ENABLE_REFLECTION, reflectionEnabled.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED, ambientEnabled.toString());
     localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE, ambientType);
     localStorage.setItem(TIMER_STORAGE_KEYS.AMBIENT_VOLUME, volume.toString());
+
+    // We do NOT write TIME_LEFT here to avoid 1Hz IO spikes.
+    // TIME_LEFT is handled by Pause Logic + beforeunload
+  }, [mode, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, reflectionEnabled, ambientEnabled, ambientType, volume, selectedArenaId, selectedNodeId]);
+
+  // 2. Active State Sync & Safety
+  useEffect(() => {
+    localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, isActive.toString());
     if (pendingSession) {
       localStorage.setItem(TIMER_STORAGE_KEYS.PENDING_SESSION, JSON.stringify(pendingSession));
     } else {
       localStorage.removeItem(TIMER_STORAGE_KEYS.PENDING_SESSION);
     }
-  }, [mode, timeLeft, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, isActive, reflectionEnabled, ambientEnabled, ambientType, volume, pendingSession, selectedArenaId, selectedNodeId]);
+  }, [isActive, pendingSession]);
+
+  // 3. Browser Close Safety Net
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // If closing while active, save current state to avoid loss
+      if (isActive) {
+        localStorage.setItem(TIMER_STORAGE_KEYS.TIME_LEFT, timeLeft.toString());
+        localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isActive, timeLeft]);
 
   /* ------------------ AMBIENT AUDIO LOGIC ------------------ */
   useEffect(() => {
@@ -150,6 +203,14 @@ export const useTimer = () => {
     } else {
       ambientRef.current.pause();
     }
+
+    // Cleanup to prevent memory leaks 🧹
+    return () => {
+      if (ambientRef.current) {
+        ambientRef.current.pause();
+        ambientRef.current = null;
+      }
+    };
   }, [ambientEnabled, ambientType, isActive, volume]);
 
   /* ------------------ MEDIA SESSION API (Mobile Controls) ------------------ */
@@ -252,6 +313,11 @@ export const useTimer = () => {
   };
 
   const playChime = () => {
+    // 📳 Vibration (Mobile)
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      navigator.vibrate([500, 200, 500]); // Long-Short-Long pattern
+    }
+
     if (!chimeRef.current) {
       chimeRef.current = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
     }
@@ -261,7 +327,13 @@ export const useTimer = () => {
 
   /* ------------------ ACTIONS ------------------ */
   const saveSession = useCallback(async (seconds, status = "completed", rating = 3, notes = "") => {
-    if (seconds < 60) return;
+    if (seconds < MIN_VALID_DURATION) {
+      if (status === "completed" || status === "interrupted") {
+        // Optional: Toast for user awareness (muted to avoid spam)
+        console.log(`Session too short to record (< ${MIN_VALID_DURATION / 60}m)`);
+      }
+      return;
+    }
 
     // If no rating is provided yet, we store it as a pending session for the UI to handle
     if (!rating && status === "completed") {
@@ -317,6 +389,28 @@ export const useTimer = () => {
       }
     } catch (err) {
       console.error("Save failed", err);
+      // 🛡️ Offline Fallback: Queue session
+      const queue = loadJSON(TIMER_STORAGE_KEYS.SYNC_QUEUE, []);
+
+      const sessionPayload = {
+        subject: subject || "General Study",
+        task: selectedTaskId || undefined,
+        arenaId: selectedArenaId || undefined,
+        nodeId: selectedNodeId || undefined,
+        startTime: startTimeRef.current || new Date(Date.now() - seconds * 1000),
+        endTime: new Date(),
+        duration: addedMinutes,
+        type: "focus",
+        cycleNumber,
+        source: "pomodoro",
+        status,
+        focusRating: rating || 3,
+        notes
+      };
+
+      queue.push(sessionPayload);
+      localStorage.setItem(TIMER_STORAGE_KEYS.SYNC_QUEUE, JSON.stringify(queue));
+      toast("Saved offline. Will sync when online 🌐", { icon: "💾" });
     }
   }, [subject, selectedTaskId, cycleNumber, dispatch, selectedArenaId, selectedNodeId]);
 
@@ -326,6 +420,10 @@ export const useTimer = () => {
   };
 
   const handleTimerComplete = useCallback((manual = false) => {
+    // 🛡️ Guard against double firing from worker/timeout race conditions
+    if (completedRef.current) return;
+    completedRef.current = true;
+
     setIsActive(false);
     const elapsed = modeTimings[mode].time - timeLeft;
 
@@ -338,9 +436,11 @@ export const useTimer = () => {
     }
 
     if (mode === "FOCUS") {
-      if (elapsed >= 60) {
+      if (elapsed >= MIN_VALID_DURATION) {
         // Only trigger modal if reflection is enabled
         saveSession(elapsed, manual ? "interrupted" : "completed", reflectionEnabled ? null : 3);
+      } else if (!manual) {
+        toast("Good warmup! Work > 5m to log it.", { icon: "🌱" });
       }
 
       if (cycleNumber < 4) {
@@ -364,8 +464,16 @@ export const useTimer = () => {
     }
   }, [mode, timeLeft, cycleNumber, modeTimings, saveSession, reflectionEnabled]);
 
+  // 🛡️ Reset completion guard whenever mode changes (allows Skipping multiple times)
+  useEffect(() => {
+    completedRef.current = false;
+  }, [mode]);
+
   const toggleTimer = () => {
     if (!isActive) {
+      // STARTING TIMER
+      completedRef.current = false; // Reset completion guard
+
       if (!startTimeRef.current) {
         startTimeRef.current = new Date();
       }
@@ -385,20 +493,21 @@ export const useTimer = () => {
 
   const resetTimer = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= 60) {
+    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     setIsActive(false);
     setTimeLeft(modeTimings[mode].time);
     startTimeRef.current = null;
     toast.success("Timer reset");
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const skipTimer = () => handleTimerComplete(true);
 
   const resetCycle = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= 60) {
+    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     setIsActive(false);
@@ -414,11 +523,12 @@ export const useTimer = () => {
     setSelectedNodeId("");
 
     toast.success("Cycle reset 🔁");
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const resetDay = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= 60) {
+    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     setIsActive(false);
@@ -433,6 +543,7 @@ export const useTimer = () => {
     setTimeLeft(modeTimings[mode].time);
     startTimeRef.current = null;
     toast.success("Daily dash reset 📅");
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const switchMode = (newMode) => {
@@ -440,6 +551,7 @@ export const useTimer = () => {
     setTimeLeft(modeTimings[newMode].time);
     setIsActive(false);
     startTimeRef.current = null;
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const applyPreset = (name, focus, short, long) => {
@@ -453,6 +565,7 @@ export const useTimer = () => {
     setTimeLeft(focus * 60);
     setIsActive(false);
     toast.success(`Strategy applied: ${name}`);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const setManualTime = (minutes) => {
@@ -463,24 +576,40 @@ export const useTimer = () => {
     setTimeLeft(seconds);
     setIsActive(false);
     toast.success(`${mode} duration set to ${minutes}m`);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
 
   /* ------------------ REFINED WEB WORKER INTERVAL ------------------ */
   useEffect(() => {
     // Initialize Worker
-    workerRef.current = new Worker("/workers/timerWorker.js");
+    workerRef.current = new Worker(new URL("../workers/timerWorker.js", import.meta.url));
 
     workerRef.current.onmessage = (e) => {
       if (e.data === "tick") {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            // We use 1 because the next tick will be 0, triggering handleTimerComplete
-            // But handleTimerComplete is called separately below to avoid dependency loops
-            return 0;
+        // ABSOLUTE TIME CHECK 🛡️
+        // Instead of blindly decrementing, we check against the fixed Target Time
+        const targetTime = parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME), 10);
+
+        if (targetTime) {
+          const now = Date.now();
+          const remaining = Math.ceil((targetTime - now) / 1000);
+
+          if (remaining <= 0) {
+            // Timer Finished
+            localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+            setTimeLeft(0);
+            handleTimerComplete();
+            // We return 0 here to update state, but handleTimerComplete does the heavy lifting
+          } else {
+            // Normal Tick
+            setTimeLeft(remaining);
           }
-          return prev - 1;
-        });
+        } else {
+          // If active but no target (rare edge case), fallback to decrement
+          // This self-heals by setting a new target in the effect below
+          setTimeLeft(prev => Math.max(0, prev - 1));
+        }
       }
     };
 
@@ -489,16 +618,40 @@ export const useTimer = () => {
     };
   }, []);
 
+  // Sync Start/Stop with Target Time
   useEffect(() => {
-    if (isActive && timeLeft > 0) {
-      workerRef.current.postMessage("start");
-    } else {
-      workerRef.current.postMessage("stop");
-      if (timeLeft === 0 && isActive) {
-        handleTimerComplete();
+    if (isActive) {
+      // If we don't have a target time yet (just started/resumed), set it
+      const currentTarget = localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+
+      if (!currentTarget && timeLeft > 0) {
+        // 🧠 Resume Logic: Check if we have a saved "paused remaining" time
+        let timeToApply = timeLeft;
+        const savedPaused = localStorage.getItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+
+        if (savedPaused) {
+          timeToApply = parseInt(savedPaused, 10);
+          setTimeLeft(timeToApply);
+          localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+        }
+
+        const newTarget = Date.now() + timeToApply * 1000;
+        localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
       }
+
+      if (timeLeft > 0) {
+        workerRef.current.postMessage("start");
+      }
+    } else {
+      // Paused
+      workerRef.current.postMessage("stop");
+      if (timeLeft > 0) {
+        localStorage.setItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING, timeLeft.toString());
+      }
+      localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
     }
-  }, [isActive, timeLeft, handleTimerComplete]);
+    // eslint-disable-next-line
+  }, [isActive]); // 🛡️ Removed timeLeft to prevent infinite loop spamming "start"
 
   const progress = (modeTimings[mode].time - timeLeft) / modeTimings[mode].time * 100;
 

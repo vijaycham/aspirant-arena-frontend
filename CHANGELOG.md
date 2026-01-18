@@ -5,6 +5,47 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-01-18
+### Added
+- **Mobile Timer Resilience** 📱
+  - **Absolute Time Architecture**: Replaced interval-based ticking with timestamp-driven calculation (`targetTime - Date.now()`).
+  - **Result**: Timer is immune to background throttling on mobile browsers (Safari/Chrome), remaining accurate even when the device is locked.
+  - **Offline Queue**: Focus sessions completed while offline are persisted locally and automatically synced when connectivity is restored.
+
+- **Smart Notifications**
+  - **Haptic Feedback**: Added `navigator.vibrate([500, 200, 500])` for tactile mobile alerts.
+  - **System Integration**: Audio, vibration, and browser notifications now fire together to ensure breaks are never missed.
+
+### Changed
+- **Battery Optimization**: Reduced `localStorage` writes from once per second to on-demand (Pause / Stop / unload), significantly improving mobile battery life.
+- **Minimum Valid Duration**: Increased focus session threshold from 60 seconds to **5 minutes** to prevent accidental micro-logs.
+- **UX Polish**: Added a *“Session Restored 🔄”* toast when recovering an active timer after reload.
+
+### Fixed
+- **Worker Path Resolution**: Migrated `timerWorker.js` to `src/workers/` and resolved via `new URL()` to fix production build issues.
+- **Double-Log Race Condition**: Added a `completedRef` guard to prevent duplicate session logging.
+- **Leaked Pause State**: Fixed an issue where paused focus time could incorrectly carry over when switching modes.
+
+### Added
+- **Mobile Timer Resilience** 📱
+  - **Absolute Time Architecture**: Replaced relative interval decrement with Timestamp-based calculation (`TargetTime - Now`).
+  - **Result**: Timer is now immune to background throttling on mobile devices (Safari/Chrome), maintaining 100% accuracy even when the phone is locked.
+  - **Offline Queue**: Focus sessions completed while offline are queued locally and automatically synced when the connection returns.
+
+- **Smart Notifications**
+  - **Haptic Feedback**: Added `navigator.vibrate([500, 200, 500])` for tactile alerts on mobile.
+  - **System Integrations**: Simultaneous Audio, Vibration, and Browser Notification firing ensures breaks are never missed.
+
+### Changed
+- **Battery Optimization**: Reduced `localStorage` write frequency from 60Hz (every second) to On-Demand (Pause/top), significantly extending battery life.
+- **Minimum Valid Duration**: Increased focus threshold from 60s to **5 minutes** to prevent accidental "micro-logs" from polluting stats.
+- **UX Polish**: Added "Session Restored 🔄" toast when recovering a timer session after a browser reload.
+
+### Fixed
+- **Worker Path**: Migrated `timerWorker.js` to `src/workers/` with `new URL()` resolution to fix production 404 errors.
+- **Double-Log Bug**: Implemented a `completedRef` latch to prevent race conditions where a single session could be logged twice.
+- **Leaked Pause State**: Fixed a bug where switching modes (Focus -> Break) would incorrectly carry over the paused remaining time.
+
 ## [1.4.0] - 2026-01-17
 ### Added
 - **Password Recovery UI**
