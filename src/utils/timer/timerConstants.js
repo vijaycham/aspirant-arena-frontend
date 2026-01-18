@@ -29,6 +29,7 @@ export const TIMER_STORAGE_KEYS = {
   AMBIENT_SOUND_TYPE: "timer-ambientType",
   AMBIENT_VOLUME: "timer-ambientVolume",
   PENDING_SESSION: "timer-pendingSession",
+  SYNC_QUEUE: "timer-syncQueue",
 };
 
 export const AMBIENT_SOUNDS = [
