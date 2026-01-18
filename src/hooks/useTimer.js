@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 import { toast } from "react-hot-toast";
-import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS } from "../utils/timer/timerConstants";
+import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS, MIN_VALID_DURATION } from "../utils/timer/timerConstants";
 import { useDispatch } from "react-redux";
 import { syncNodeTime } from "../redux/slice/arenaSlice";
 
@@ -53,6 +53,7 @@ export const useTimer = () => {
   const startTimeRef = useRef(null);
   const ambientRef = useRef(null);
   const chimeRef = useRef(null);
+  const completedRef = useRef(false); // 🛡️ Prevents double completion
   const [notificationPermission, setNotificationPermission] = useState(
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
@@ -150,6 +151,14 @@ export const useTimer = () => {
     } else {
       ambientRef.current.pause();
     }
+
+    // Cleanup to prevent memory leaks 🧹
+    return () => {
+      if (ambientRef.current) {
+        ambientRef.current.pause();
+        ambientRef.current = null;
+      }
+    };
   }, [ambientEnabled, ambientType, isActive, volume]);
 
   /* ------------------ MEDIA SESSION API (Mobile Controls) ------------------ */
@@ -261,7 +270,13 @@ export const useTimer = () => {
 
   /* ------------------ ACTIONS ------------------ */
   const saveSession = useCallback(async (seconds, status = "completed", rating = 3, notes = "") => {
-    if (seconds < 60) return;
+    if (seconds < MIN_VALID_DURATION) {
+      if (status === "completed" || status === "interrupted") {
+        // Optional: Toast for user awareness (muted to avoid spam)
+        console.log(`Session too short to record (< ${MIN_VALID_DURATION / 60}m)`);
+      }
+      return;
+    }
 
     // If no rating is provided yet, we store it as a pending session for the UI to handle
     if (!rating && status === "completed") {
@@ -326,6 +341,10 @@ export const useTimer = () => {
   };
 
   const handleTimerComplete = useCallback((manual = false) => {
+    // 🛡️ Guard against double firing from worker/timeout race conditions
+    if (completedRef.current) return;
+    completedRef.current = true;
+
     setIsActive(false);
     const elapsed = modeTimings[mode].time - timeLeft;
 
@@ -338,9 +357,11 @@ export const useTimer = () => {
     }
 
     if (mode === "FOCUS") {
-      if (elapsed >= 60) {
+      if (elapsed >= MIN_VALID_DURATION) {
         // Only trigger modal if reflection is enabled
         saveSession(elapsed, manual ? "interrupted" : "completed", reflectionEnabled ? null : 3);
+      } else if (!manual) {
+        toast("Good warmup! Work > 5m to log it.", { icon: "🌱" });
       }
 
       if (cycleNumber < 4) {
@@ -366,6 +387,9 @@ export const useTimer = () => {
 
   const toggleTimer = () => {
     if (!isActive) {
+      // STARTING TIMER
+      completedRef.current = false; // Reset completion guard
+
       if (!startTimeRef.current) {
         startTimeRef.current = new Date();
       }
@@ -385,7 +409,7 @@ export const useTimer = () => {
 
   const resetTimer = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= 60) {
+    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     setIsActive(false);
@@ -398,7 +422,7 @@ export const useTimer = () => {
 
   const resetCycle = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= 60) {
+    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     setIsActive(false);
@@ -418,7 +442,7 @@ export const useTimer = () => {
 
   const resetDay = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= 60) {
+    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     setIsActive(false);
@@ -469,18 +493,33 @@ export const useTimer = () => {
   /* ------------------ REFINED WEB WORKER INTERVAL ------------------ */
   useEffect(() => {
     // Initialize Worker
-    workerRef.current = new Worker("/workers/timerWorker.js");
+    workerRef.current = new Worker(new URL("../workers/timerWorker.js", import.meta.url));
 
     workerRef.current.onmessage = (e) => {
       if (e.data === "tick") {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            // We use 1 because the next tick will be 0, triggering handleTimerComplete
-            // But handleTimerComplete is called separately below to avoid dependency loops
-            return 0;
+        // ABSOLUTE TIME CHECK 🛡️
+        // Instead of blindly decrementing, we check against the fixed Target Time
+        const targetTime = parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME), 10);
+
+        if (targetTime) {
+          const now = Date.now();
+          const remaining = Math.ceil((targetTime - now) / 1000);
+
+          if (remaining <= 0) {
+            // Timer Finished
+            localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+            setTimeLeft(0);
+            handleTimerComplete();
+            // We return 0 here to update state, but handleTimerComplete does the heavy lifting
+          } else {
+            // Normal Tick
+            setTimeLeft(remaining);
           }
-          return prev - 1;
-        });
+        } else {
+          // If active but no target (rare edge case), fallback to decrement
+          // This self-heals by setting a new target in the effect below
+          setTimeLeft(prev => Math.max(0, prev - 1));
+        }
       }
     };
 
@@ -489,16 +528,41 @@ export const useTimer = () => {
     };
   }, []);
 
+  // Sync Start/Stop with Target Time
   useEffect(() => {
-    if (isActive && timeLeft > 0) {
-      workerRef.current.postMessage("start");
-    } else {
-      workerRef.current.postMessage("stop");
-      if (timeLeft === 0 && isActive) {
-        handleTimerComplete();
+    if (isActive) {
+      if (timeLeft > 0) {
+        // If we don't have a target time yet (just started/resumed), set it
+        const currentTarget = localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+
+        if (!currentTarget) {
+          // 🧠 Resume Logic: Check if we have a saved "paused remaining" time
+          // This handles the edge case where tab reloaded while paused
+          let timeToApply = timeLeft;
+          const savedPaused = localStorage.getItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+
+          if (savedPaused) {
+            timeToApply = parseInt(savedPaused, 10);
+            setTimeLeft(timeToApply); // Sync state immediately
+            localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+          }
+
+          const newTarget = Date.now() + timeToApply * 1000;
+          localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
+        }
+        workerRef.current.postMessage("start");
       }
+    } else {
+      // Paused
+      workerRef.current.postMessage("stop");
+      // 🧠 Pause Logic: Persist exact remaining time
+      // ensuring we don't lose a second if the tab is killed while paused
+      if (timeLeft > 0) {
+        localStorage.setItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING, timeLeft.toString());
+      }
+      localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
     }
-  }, [isActive, timeLeft, handleTimerComplete]);
+  }, [isActive, timeLeft]);
 
   const progress = (modeTimings[mode].time - timeLeft) / modeTimings[mode].time * 100;
 
