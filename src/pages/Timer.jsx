@@ -26,6 +26,7 @@ import TimerControls from "../components/timer/TimerControls";
 import FocusRhythm from "../components/timer/FocusRhythm";
 import WisdomQuote from "../components/timer/WisdomQuote";
 import DailyIntel from "../components/timer/DailyIntel";
+import DailyGoalWidget from "../components/timer/DailyGoalWidget";
 import QuickStrategy from "../components/timer/QuickStrategy";
 import TimerResetModal from "../components/timer/TimerResetModal";
 import FocusRatingModal from "../components/timer/FocusRatingModal";
@@ -120,9 +121,16 @@ const Timer = () => {
 
   /* ------------------ FORMATTERS ------------------ */
   const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    if (isNaN(seconds)) return "00:00"; // 🛡️ Safety fallback
+    
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    
+    if (h > 0) {
+      return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    }
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
   const formatTotalTime = (minutes) => {
@@ -325,6 +333,11 @@ const Timer = () => {
               animate={{ opacity: 1, y: 0 }}
               className="glass-card dark:bg-slate-900/60 dark:border-white/10 dark:shadow-black/50 p-6 md:p-12 rounded-[2.5rem] shadow-xl border border-white/60 text-center relative h-full flex flex-col justify-center min-h-[500px]"
             >
+              {/* 🎯 Daily Goal - Responsive Placement */}
+              <div className="md:absolute md:top-6 md:right-6 z-20 mb-6 md:mb-0 flex justify-center md:block">
+                <DailyGoalWidget totalMinutesToday={totalMinutesToday} />
+              </div>
+
               <TimerDisplay 
                   mode={mode}
                   modes={modes}

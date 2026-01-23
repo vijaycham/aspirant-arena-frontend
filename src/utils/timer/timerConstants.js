@@ -2,9 +2,11 @@ export const DEFAULT_MODES = {
   FOCUS: { label: "Focus", time: 25 * 60 },
   SHORT_BREAK: { label: "Short Break", time: 5 * 60 },
   LONG_BREAK: { label: "Long Break", time: 15 * 60 },
+  STOPWATCH: { label: "Stopwatch", time: 0 }, // ⏱️ Count-up mode
 };
 
 export const MIN_VALID_DURATION = 299; // 5 Minutes
+export const STOPWATCH_MAX_DURATION = 4 * 60 * 60; // 4 Hours (Health Cap)
 
 export const UPSC_PRESETS = [
   { name: "Mains Sprint", focus: 90, short: 15, long: 30, icon: "✍️" },

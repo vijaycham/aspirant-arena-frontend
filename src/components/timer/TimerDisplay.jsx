@@ -20,21 +20,81 @@ const TimerDisplay = ({
 }) => {
   return (
     <>
-      <div className="inline-flex p-1 bg-gray-100 dark:bg-slate-800/60 backdrop-blur-md rounded-xl mb-12 self-center border border-transparent dark:border-white/5">
-        {Object.entries(modes || {}).map(([key, value]) => (
-          <button
-            key={key}
-            onClick={() => {
-              switchMode(key);
-              setIsEditing(false);
+      {/* 🛡️ Mode Toggle Switch */}
+      <div className="inline-flex bg-gray-100 dark:bg-slate-800/60 backdrop-blur-md rounded-2xl p-1.5 mb-10 self-center border border-transparent dark:border-white/5 relative">
+         {/* Slider Background */}
+         <motion.div 
+            className="absolute top-1.5 bottom-1.5 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-black/5 dark:border-white/5 z-0"
+            initial={false}
+            animate={{ 
+               left: mode === 'STOPWATCH' ? '50%' : '6px',
+               right: mode === 'STOPWATCH' ? '6px' : '50%'
             }}
-            className={`px-6 md:px-8 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-transform duration-200 ${
-              mode === key ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-white shadow-sm scale-105 ring-1 ring-black/5 dark:ring-white/10" : "text-gray-400 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+         />
+
+         {/* Countdown Option */}
+         <button
+            onClick={() => {
+               if (mode === 'STOPWATCH') switchMode('FOCUS');
+            }}
+            className={`relative z-10 px-4 md:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors w-24 md:w-32 ${
+               mode !== 'STOPWATCH' ? 'text-primary-600 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500'
             }`}
-          >
-            {value.label}
-          </button>
-        ))}
+         >
+            Countdown
+         </button>
+
+         {/* Stopwatch Option */}
+         <button
+            onClick={() => switchMode('STOPWATCH')}
+            className={`relative z-10 px-4 md:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors w-24 md:w-32 ${
+               mode === 'STOPWATCH' ? 'text-primary-600 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500'
+            }`}
+         >
+            Stopwatch
+         </button>
+      </div>
+
+      {/* 🍅 Pomodoro Tabs (Only visible in Countdown Mode) */}
+      {/* 🛡️ Fixed height container prevents layout shift when tabs disappear */}
+      <div className="h-8 mb-8 flex justify-center w-full">
+        <AnimatePresence>
+           {mode !== 'STOPWATCH' ? (
+              <motion.div 
+                 initial={{ opacity: 0, scale: 0.95 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 exit={{ opacity: 0, scale: 0.95 }}
+                 className="flex gap-2"
+              >
+                 {Object.entries(modes || {}).filter(([k]) => k !== 'STOPWATCH').map(([key, value]) => (
+                    <button
+                       key={key}
+                       onClick={() => {
+                          switchMode(key);
+                          setIsEditing(false);
+                       }}
+                       className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
+                          mode === key 
+                             ? "bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800 text-primary-600 dark:text-primary-400" 
+                             : "bg-transparent border-transparent text-gray-300 dark:text-gray-600 hover:text-gray-500"
+                       }`}
+                    >
+                       {value.label}
+                    </button>
+                 ))}
+              </motion.div>
+           ) : (
+             <motion.div
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               className="flex items-center gap-2 text-[9px] font-bold text-gray-300 uppercase tracking-widest"
+             >
+                <span>Health Cap: 4 Hours Max</span>
+             </motion.div>
+           )}
+        </AnimatePresence>
       </div>
 
       <div className="relative mb-10">
@@ -45,8 +105,10 @@ const TimerDisplay = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="group cursor-pointer relative inline-block"
+              className={`group relative inline-block ${mode === 'STOPWATCH' ? 'cursor-default' : 'cursor-pointer'}`}
               onClick={() => {
+                if (mode === 'STOPWATCH') return;
+                
                 if (isActive) {
                   toast("Pause timer to edit duration", { icon: "⏸️" });
                 } else {
@@ -57,9 +119,11 @@ const TimerDisplay = ({
               <h1 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">
                 {formatTime(timeLeft)}
               </h1>
-              <div className="absolute -top-4 -right-8 opacity-0 group-hover:opacity-100 transition-opacity text-primary-500">
-                <FaEdit size={18} />
-              </div>
+              {mode !== 'STOPWATCH' && (
+                <div className="absolute -top-4 -right-8 opacity-0 group-hover:opacity-100 transition-opacity text-primary-500">
+                  <FaEdit size={18} />
+                </div>
+              )}
             </motion.div>
           ) : (
             <motion.form
@@ -94,16 +158,18 @@ const TimerDisplay = ({
         </AnimatePresence>
         
         <div className="mt-8 flex flex-col items-center gap-6">
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map((num) => (
-              <div
-                key={num}
-                className={`h-2 w-10 rounded-full transition-all duration-500 ${
-                  num < cycleNumber ? "bg-primary-600 shadow-sm" : num === cycleNumber && isActive ? "bg-primary-400 animate-pulse" : "bg-gray-200"
-                }`}
-              />
-            ))}
-          </div>
+          {mode !== 'STOPWATCH' && (
+            <div className="flex gap-2">
+              {[1, 2, 3, 4].map((num) => (
+                <div
+                  key={num}
+                  className={`h-2 w-10 rounded-full transition-all duration-500 ${
+                    num < cycleNumber ? "bg-primary-600 shadow-sm" : num === cycleNumber && isActive ? "bg-primary-400 animate-pulse" : "bg-gray-200"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
 
           <button
             onClick={onFullScreen}
