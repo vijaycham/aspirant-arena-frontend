@@ -112,6 +112,9 @@ const FocusRatingModal = ({ isOpen, onClose, onComplete, sessionData }) => {
                 >
                   Skip Rating (Auto-Save 3★)
                 </button>
+                <p className="text-[9px] text-gray-400 text-center font-medium mt-[-4px]">
+                  Closing will save this session as &ldquo;Average Focus&rdquo;.
+                </p>
               </div>
             </form>
           </motion.div>

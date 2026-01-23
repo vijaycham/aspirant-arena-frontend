@@ -1,7 +1,9 @@
+// ⚠️ TIMER CORE — DO NOT MODIFY WITHOUT FULL REVIEW
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 import { toast } from "react-hot-toast";
 import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS, MIN_VALID_DURATION } from "../utils/timer/timerConstants";
+import { safeUUID } from "../utils/safeUUID";
 import { useDispatch } from "react-redux";
 import { syncNodeTime } from "../redux/slice/arenaSlice";
 
@@ -17,19 +19,42 @@ export const useTimer = () => {
     }
   };
 
+  const rehydrateTime = useCallback(() => {
+    const target = localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    if (target) {
+      const remaining = Math.ceil((parseInt(target, 10) - Date.now()) / 1000);
+      return Math.max(0, remaining);
+    }
+    const paused = localStorage.getItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    if (paused) return parseInt(paused, 10);
+
+    const timings = loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES);
+    const currentMode = localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS";
+    return (timings[currentMode] || DEFAULT_MODES.FOCUS).time;
+  }, []);
+
   /* ------------------ STATE ------------------ */
   const [mode, setMode] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS");
   const [modeTimings, setModeTimings] = useState(() => loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES));
 
   const [timeLeft, setTimeLeft] = useState(() => {
-    const saved = localStorage.getItem(TIMER_STORAGE_KEYS.TIME_LEFT);
-    if (saved) return parseInt(saved, 10);
+    const targetTime = localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    if (targetTime) {
+      const remaining = Math.ceil((parseInt(targetTime, 10) - Date.now()) / 1000);
+      return Math.max(0, remaining);
+    }
+    const pausedRemaining = localStorage.getItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    if (pausedRemaining) return parseInt(pausedRemaining, 10);
+
     const timings = loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES);
     const currentMode = localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS";
     return (timings[currentMode] || DEFAULT_MODES.FOCUS).time;
   });
 
-  const [isActive, setIsActive] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true");
+  // Derived state for reactivity (forces re-renders on storage changes)
+  const [, setActiveTick] = useState(0);
+  const isActive = !!localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+  const isLockedRef = useRef(false); // For toggle throttling
   const [cycleNumber, setCycleNumber] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.CYCLE), 10) || 1);
   const [sessionsCompleted, setSessionsCompleted] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.SESSIONS), 10) || 0);
   const [totalMinutesToday, setTotalMinutesToday] = useState(0);
@@ -54,9 +79,11 @@ export const useTimer = () => {
   const ambientRef = useRef(null);
   const chimeRef = useRef(null);
   const completedRef = useRef(false); // 🛡️ Prevents double completion
+  const sessionIdRef = useRef(null); // 🆔 Persists session ID across pauses/retries
   const [notificationPermission, setNotificationPermission] = useState(
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
+
 
   /* ------------------ API SYNC ------------------ */
   useEffect(() => {
@@ -85,7 +112,7 @@ export const useTimer = () => {
         try {
           await api.post("/focus", session);
           toast.success("Offline session synced! ☁️");
-        } catch (err) {
+        } catch {
           newQueue.push(session); // Keep in queue if still failing
         }
       }
@@ -104,42 +131,52 @@ export const useTimer = () => {
     return () => window.removeEventListener('online', processSyncQueue);
   }, []);
 
-  /* ------------------ CATCH UP LOGIC ------------------ */
-  // If the timer was active when the tab closed, calculate how much time passed
+  /* ------------------ CROSS-TAB SYNC ------------------ */
   useEffect(() => {
-    // If the timer was active when the tab closed, calculate how much time passed
-    const catchUp = (notify = false) => {
-      const lastUpdate = localStorage.getItem(TIMER_STORAGE_KEYS.LAST_UPDATE);
-      const wasActive = localStorage.getItem(TIMER_STORAGE_KEYS.IS_ACTIVE) === "true";
+    const handleStorage = (e) => {
+      const syncKeys = [
+        TIMER_STORAGE_KEYS.TARGET_TIME,
+        TIMER_STORAGE_KEYS.PAUSED_REMAINING,
+        TIMER_STORAGE_KEYS.MODE,
+        TIMER_STORAGE_KEYS.SUBJECT,
+        TIMER_STORAGE_KEYS.TASK_ID,
+        'timer_arena_id',
+        'timer_node_id',
+        TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED,
+        TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE,
+        TIMER_STORAGE_KEYS.AMBIENT_VOLUME,
+        TIMER_STORAGE_KEYS.ENABLE_REFLECTION,
+        TIMER_STORAGE_KEYS.MODE_TIMINGS
+      ];
 
-      if (wasActive && lastUpdate) {
-        const now = Date.now();
-        const gapSeconds = Math.floor((now - parseInt(lastUpdate, 10)) / 1000);
-        if (gapSeconds > 0) {
-          setTimeLeft(prev => {
-            const next = Math.max(0, prev - gapSeconds);
-            return next;
-          });
+      if (syncKeys.includes(e.key)) {
+        if (e.key === TIMER_STORAGE_KEYS.TARGET_TIME) {
+          setActiveTick(t => t + 1);
+        }
+        setTimeLeft(rehydrateTime);
 
-          // Only notify if it's a significant restore (reload/reopen), not just tab switching
-          if (notify && gapSeconds > 5) {
-            toast.success("Session restored 🔄");
+        if (e.newValue !== null) {
+          switch (e.key) {
+            case TIMER_STORAGE_KEYS.MODE: setMode(e.newValue); break;
+            case TIMER_STORAGE_KEYS.SUBJECT: setSubject(e.newValue); break;
+            case TIMER_STORAGE_KEYS.TASK_ID: setSelectedTaskId(e.newValue); break;
+            case 'timer_arena_id': setSelectedArenaId(e.newValue); break;
+            case 'timer_node_id': setSelectedNodeId(e.newValue); break;
+            case TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED: setAmbientEnabled(e.newValue === "true"); break;
+            case TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE: setAmbientType(e.newValue); break;
+            case TIMER_STORAGE_KEYS.MODE_TIMINGS:
+              setModeTimings(JSON.parse(e.newValue));
+              break;
+            case TIMER_STORAGE_KEYS.AMBIENT_VOLUME: setVolume(parseFloat(e.newValue)); break;
+            case TIMER_STORAGE_KEYS.ENABLE_REFLECTION: setReflectionEnabled(e.newValue !== "false"); break;
+            default: break;
           }
         }
       }
     };
-
-    catchUp(true); // Initial mount catch-up (Notify)
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        catchUp(false); // Tab switch catch-up (Silent)
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, []); // Run once on mount and setup listeners
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [rehydrateTime]);
 
   /* ------------------ LOCAL STORAGE SYNC ------------------ */
   /* ------------------ LOCAL STORAGE SYNC (OPTIMIZED) ------------------ */
@@ -162,28 +199,15 @@ export const useTimer = () => {
     // TIME_LEFT is handled by Pause Logic + beforeunload
   }, [mode, cycleNumber, sessionsCompleted, subject, selectedTaskId, modeTimings, reflectionEnabled, ambientEnabled, ambientType, volume, selectedArenaId, selectedNodeId]);
 
-  // 2. Active State Sync & Safety
+  // 2. Sync Pending Sessions
   useEffect(() => {
-    localStorage.setItem(TIMER_STORAGE_KEYS.IS_ACTIVE, isActive.toString());
     if (pendingSession) {
       localStorage.setItem(TIMER_STORAGE_KEYS.PENDING_SESSION, JSON.stringify(pendingSession));
     } else {
       localStorage.removeItem(TIMER_STORAGE_KEYS.PENDING_SESSION);
     }
-  }, [isActive, pendingSession]);
+  }, [pendingSession]);
 
-  // 3. Browser Close Safety Net
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // If closing while active, save current state to avoid loss
-      if (isActive) {
-        localStorage.setItem(TIMER_STORAGE_KEYS.TIME_LEFT, timeLeft.toString());
-        localStorage.setItem(TIMER_STORAGE_KEYS.LAST_UPDATE, Date.now().toString());
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isActive, timeLeft]);
 
   /* ------------------ AMBIENT AUDIO LOGIC ------------------ */
   useEffect(() => {
@@ -205,36 +229,16 @@ export const useTimer = () => {
     }
 
     // Cleanup to prevent memory leaks 🧹
+    // Cleanup to prevent memory leaks 🧹
     return () => {
+      // We only pause, we don't nullify to avoid recreation churn
       if (ambientRef.current) {
         ambientRef.current.pause();
-        ambientRef.current = null;
       }
     };
   }, [ambientEnabled, ambientType, isActive, volume]);
 
-  /* ------------------ MEDIA SESSION API (Mobile Controls) ------------------ */
-  useEffect(() => {
-    if ("mediaSession" in navigator) {
-      const modeLabel = mode.replace("_", " ").toLowerCase();
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = (timeLeft % 60).toString().padStart(2, '0');
 
-      if (typeof MediaMetadata !== "undefined") {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: `${modeLabel === 'focus' ? '🎯' : '☕'} ${minutes}:${seconds}`,
-          artist: "Aspirant Arena",
-          album: subject || "Deep Work Session",
-          artwork: [
-            { src: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", sizes: "512x512", type: "image/png" }
-          ]
-        });
-      }
-
-      navigator.mediaSession.setActionHandler("play", () => setIsActive(true));
-      navigator.mediaSession.setActionHandler("pause", () => setIsActive(false));
-    }
-  }, [timeLeft, mode, subject]);
 
   /* ------------------ BROWSER TAB TITLE ------------------ */
   useEffect(() => {
@@ -346,6 +350,9 @@ export const useTimer = () => {
     setTotalMinutesToday(prev => prev + addedMinutes);
     setSessionsCompleted(prev => prev + 1);
 
+    // Use existing ID or generate one if missing (fallback)
+    const sessionId = sessionIdRef.current || safeUUID();
+
     try {
       const endTime = new Date();
       const startTime = startTimeRef.current || new Date(endTime.getTime() - seconds * 1000);
@@ -358,12 +365,13 @@ export const useTimer = () => {
         startTime,
         endTime,
         duration: addedMinutes,
-        type: "focus",
+        type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break" }[mode] || "focus",
         cycleNumber,
         source: "pomodoro",
         status,
         focusRating: rating || 3,
-        notes
+        notes,
+        sessionId
       });
 
       // ⛩️ Sync syllabus progress if a node is linked
@@ -372,6 +380,7 @@ export const useTimer = () => {
       }
 
       startTimeRef.current = null;
+      sessionIdRef.current = null; // Reset ID for next session
       setPendingSession(null);
       toast.success("Focus logged 🎯");
 
@@ -400,19 +409,20 @@ export const useTimer = () => {
         startTime: startTimeRef.current || new Date(Date.now() - seconds * 1000),
         endTime: new Date(),
         duration: addedMinutes,
-        type: "focus",
+        type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break" }[mode] || "focus",
         cycleNumber,
         source: "pomodoro",
         status,
         focusRating: rating || 3,
-        notes
+        notes,
+        sessionId
       };
 
       queue.push(sessionPayload);
       localStorage.setItem(TIMER_STORAGE_KEYS.SYNC_QUEUE, JSON.stringify(queue));
       toast("Saved offline. Will sync when online 🌐", { icon: "💾" });
     }
-  }, [subject, selectedTaskId, cycleNumber, dispatch, selectedArenaId, selectedNodeId]);
+  }, [subject, selectedTaskId, cycleNumber, dispatch, selectedArenaId, selectedNodeId, mode]);
 
   const completeRating = async (rating, notes) => {
     if (!pendingSession) return;
@@ -424,7 +434,11 @@ export const useTimer = () => {
     if (completedRef.current) return;
     completedRef.current = true;
 
-    setIsActive(false);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    setActiveTick(t => t + 1);
+    setTimeLeft(rehydrateTime);
+    // ✅ ALWAYS subtract current timeLeft from total time for accuracy
     const elapsed = modeTimings[mode].time - timeLeft;
 
     if (!manual) {
@@ -458,21 +472,35 @@ export const useTimer = () => {
         setSelectedArenaId("");
         setSelectedNodeId("");
       }
-    } else {
-      setMode("FOCUS");
-      setTimeLeft(modeTimings.FOCUS.time);
     }
-  }, [mode, timeLeft, cycleNumber, modeTimings, saveSession, reflectionEnabled]);
+  }, [mode, timeLeft, cycleNumber, modeTimings, saveSession, reflectionEnabled, rehydrateTime]);
+
+  // 🛡️ Ref for handleTimerComplete to avoid stale closures in worker/events
+  const onCompleteRef = useRef(handleTimerComplete);
+  useEffect(() => {
+    onCompleteRef.current = handleTimerComplete;
+  }, [handleTimerComplete]);
 
   // 🛡️ Reset completion guard whenever mode changes (allows Skipping multiple times)
   useEffect(() => {
     completedRef.current = false;
   }, [mode]);
 
-  const toggleTimer = () => {
+  const toggleTimer = useCallback((overrideSeconds) => {
+    if (isLockedRef.current) return;
+    isLockedRef.current = true;
+    setTimeout(() => { isLockedRef.current = false; }, 150);
+
     if (!isActive) {
       // STARTING TIMER
       completedRef.current = false; // Reset completion guard
+
+      // 🧠 Smart Start: Use override if provided (e.g. immediate start after edit)
+      const duration = (typeof overrideSeconds === 'number' && overrideSeconds > 0) ? overrideSeconds : timeLeft;
+
+      const newTarget = Date.now() + duration * 1000;
+      localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
+      localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
 
       if (!startTimeRef.current) {
         startTimeRef.current = new Date();
@@ -487,20 +515,32 @@ export const useTimer = () => {
         ambientRef.current.loop = true;
         ambientRef.current.load();
       }
+
+      // 🆔 Generate Session ID on start if not exists
+      if (!sessionIdRef.current) {
+        sessionIdRef.current = safeUUID();
+      }
+    } else {
+      // PAUSING TIMER
+      localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+      localStorage.setItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING, timeLeft.toString());
     }
-    setIsActive(prev => !prev);
-  };
+    setActiveTick(t => t + 1);
+    setTimeLeft(rehydrateTime);
+  }, [isActive, timeLeft, rehydrateTime]);
 
   const resetTimer = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
     if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
-    setIsActive(false);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    setActiveTick(t => t + 1);
     setTimeLeft(modeTimings[mode].time);
     startTimeRef.current = null;
+    sessionIdRef.current = null; // Clear ID on reset
     toast.success("Timer reset");
-    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const skipTimer = () => handleTimerComplete(true);
@@ -510,11 +550,14 @@ export const useTimer = () => {
     if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
-    setIsActive(false);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    setActiveTick(t => t + 1);
     setMode("FOCUS");
     setCycleNumber(1);
     setTimeLeft(modeTimings.FOCUS.time);
     startTimeRef.current = null;
+    sessionIdRef.current = null; // Clear ID on cycle reset
 
     // Clear task on manual cycle reset
     setSubject("");
@@ -523,7 +566,6 @@ export const useTimer = () => {
     setSelectedNodeId("");
 
     toast.success("Cycle reset 🔁");
-    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const resetDay = () => {
@@ -531,7 +573,9 @@ export const useTimer = () => {
     if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
-    setIsActive(false);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    setActiveTick(t => t + 1);
     setTotalMinutesToday(0);
     setEffectiveMinutesToday(0);
     setSessionsCompleted(0);
@@ -542,16 +586,18 @@ export const useTimer = () => {
     setSelectedNodeId("");
     setTimeLeft(modeTimings[mode].time);
     startTimeRef.current = null;
+    sessionIdRef.current = null; // Clear ID on day reset
     toast.success("Daily dash reset 📅");
-    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const switchMode = (newMode) => {
     setMode(newMode);
     setTimeLeft(modeTimings[newMode].time);
-    setIsActive(false);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    setActiveTick(t => t + 1);
     startTimeRef.current = null;
-    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
+    sessionIdRef.current = null; // Clear ID on mode switch
   };
 
   const applyPreset = (name, focus, short, long) => {
@@ -563,9 +609,12 @@ export const useTimer = () => {
     setModeTimings(newTimings);
     setMode("FOCUS");
     setTimeLeft(focus * 60);
-    setIsActive(false);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    setActiveTick(t => t + 1);
+    startTimeRef.current = null;
+    sessionIdRef.current = null;
     toast.success(`Strategy applied: ${name}`);
-    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
   const setManualTime = (minutes) => {
@@ -574,9 +623,12 @@ export const useTimer = () => {
     const newTimings = { ...modeTimings, [mode]: { ...modeTimings[mode], time: seconds } };
     setModeTimings(newTimings);
     setTimeLeft(seconds);
-    setIsActive(false);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    setActiveTick(t => t + 1);
+    startTimeRef.current = null;
+    sessionIdRef.current = null;
     toast.success(`${mode} duration set to ${minutes}m`);
-    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING); // 🛡️ Clear paused state
   };
 
 
@@ -597,18 +649,15 @@ export const useTimer = () => {
 
           if (remaining <= 0) {
             // Timer Finished
-            localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
             setTimeLeft(0);
-            handleTimerComplete();
-            // We return 0 here to update state, but handleTimerComplete does the heavy lifting
+            onCompleteRef.current();
           } else {
             // Normal Tick
             setTimeLeft(remaining);
           }
         } else {
-          // If active but no target (rare edge case), fallback to decrement
-          // This self-heals by setting a new target in the effect below
-          setTimeLeft(prev => Math.max(0, prev - 1));
+          // If active but no target, stop worker
+          workerRef.current.postMessage("stop");
         }
       }
     };
@@ -634,26 +683,63 @@ export const useTimer = () => {
           setTimeLeft(timeToApply);
           localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
         }
-
         const newTarget = Date.now() + timeToApply * 1000;
         localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
       }
-
       if (timeLeft > 0) {
         workerRef.current.postMessage("start");
       }
     } else {
       // Paused
       workerRef.current.postMessage("stop");
-      if (timeLeft > 0) {
-        localStorage.setItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING, timeLeft.toString());
-      }
-      localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
     }
     // eslint-disable-next-line
-  }, [isActive]); // 🛡️ Removed timeLeft to prevent infinite loop spamming "start"
+  }, [isActive]); // 🛡️ Reduced triggers
 
-  const progress = (modeTimings[mode].time - timeLeft) / modeTimings[mode].time * 100;
+  // 🛡️ Safe progress calculation (prevent NaN/Infinity)
+  const totalTime = modeTimings[mode]?.time || 1;
+  const progress = Math.min(100, Math.max(0, ((totalTime - timeLeft) / totalTime) * 100));
+
+  /* ------------------ MEDIA SESSION API (Mobile Controls) ------------------ */
+  // 1. Dynamic Metadata Updates (Tick-based)
+  useEffect(() => {
+    if ("mediaSession" in navigator) {
+      const modeLabel = mode.replace("_", " ").toLowerCase();
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = (timeLeft % 60).toString().padStart(2, '0');
+
+      if (typeof MediaMetadata !== "undefined") {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: `${modeLabel === 'focus' ? '🎯' : '☕'} ${minutes}:${seconds}`,
+          artist: "Aspirant Arena",
+          album: subject || "Deep Work Session",
+          artwork: [
+            { src: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", sizes: "512x512", type: "image/png" }
+          ]
+        });
+      }
+    }
+  }, [timeLeft, mode, subject]);
+
+  // 2. Static Action Handlers (Registered Once)
+  const toggleTimerRef = useRef(toggleTimer);
+  useEffect(() => {
+    toggleTimerRef.current = toggleTimer;
+  }, [toggleTimer]);
+
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+
+    const handler = () => toggleTimerRef.current();
+
+    navigator.mediaSession.setActionHandler("play", handler);
+    navigator.mediaSession.setActionHandler("pause", handler);
+
+    return () => {
+      navigator.mediaSession.setActionHandler("play", null);
+      navigator.mediaSession.setActionHandler("pause", null);
+    };
+  }, []);
 
   return {
     mode,

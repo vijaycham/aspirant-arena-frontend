@@ -147,6 +147,36 @@ const Timer = () => {
     }
   };
 
+  // 🧠 Smart Toggle: Handles the case where user edits and clicks "Start" without saving
+  const handleSmartToggle = () => {
+    // If not active and user is editing, we try to use the input value
+    if (!isActive && isEditing) {
+      if (!manualMin) {
+        // Empty input -> Just cancel edit and start normally
+        setIsEditing(false);
+        toggleTimer();
+        return;
+      }
+
+      const mins = parseInt(manualMin);
+      if (mins > 0 && mins <= 300) {
+        // VALID INPUT: Save properly AND start with explicit duration
+        setManualTime(mins); // Updates state/storage for persistence
+        toggleTimer(mins * 60); // Starts worker/localStorage with explicit time immediately
+        setIsEditing(false);
+        setManualMin("");
+        return;
+      } else {
+        // INVALID INPUT: Complain and don't start
+        toast.error("Please enter 1-300 mins");
+        return;
+      }
+    }
+    
+    // Normal Toggle (Pause/Resume)
+    toggleTimer();
+  };
+
   const dropdownRef = React.useRef(null);
   const btnRef = React.useRef(null);
 
@@ -419,7 +449,7 @@ const Timer = () => {
 
               <TimerControls 
                 isActive={isActive}
-                onToggle={toggleTimer}
+                onToggle={handleSmartToggle}
                 onReset={resetTimer}
                 onSkip={skipTimer}
               />
@@ -430,7 +460,7 @@ const Timer = () => {
 
             
             <div className="mt-6">
-              <FocusHeatmap />
+              <FocusHeatmap key={sessionsCompleted} />
             </div>
           </div>
 

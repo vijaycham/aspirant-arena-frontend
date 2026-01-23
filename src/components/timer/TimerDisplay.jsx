@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaEdit, FaExpand } from "react-icons/fa";
 
@@ -45,7 +46,13 @@ const TimerDisplay = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="group cursor-pointer relative inline-block"
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                if (isActive) {
+                  toast("Pause timer to edit duration", { icon: "⏸️" });
+                } else {
+                  setIsEditing(true);
+                }
+              }}
             >
               <h1 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">
                 {formatTime(timeLeft)}
