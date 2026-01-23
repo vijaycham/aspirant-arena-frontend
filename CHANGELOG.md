@@ -5,6 +5,11 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.2] – 2026-01-23
+### Fixed
+- Removed deprecated `@testing-library/react-hooks` which was incompatible with React 19.
+- Restored CI and Vercel builds.
+
 ## [1.5.1] - 2026-01-23
 ### Added
 - **Production-Grade Timer Core**
