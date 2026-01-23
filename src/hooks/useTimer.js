@@ -4,8 +4,9 @@ import api from "../utils/api";
 import { toast } from "react-hot-toast";
 import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS, MIN_VALID_DURATION } from "../utils/timer/timerConstants";
 import { safeUUID } from "../utils/safeUUID";
-import { useDispatch } from "react-redux";
-import { syncNodeTime } from "../redux/slice/arenaSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { syncNodeTime } from "../redux/user/syllabusSlice";
+import posthog from 'posthog-js'; // 🦔
 
 export const useTimer = () => {
   const dispatch = useDispatch();
