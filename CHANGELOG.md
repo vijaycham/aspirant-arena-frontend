@@ -5,6 +5,35 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-01-23
+### Added
+- **Production-Grade Timer Core**
+  - Absolute time–based timer using a fixed `TARGET_TIME` anchor.
+  - Stable session identifiers (`sessionId`) generated once per session to prevent duplicate logs.
+  - Offline-first session queue with automatic sync on reconnect.
+  - Cross-tab timer synchronization using `localStorage` and storage events.
+  - Media Session API support for lock-screen and Bluetooth controls.
+  - Guaranteed reflection recovery if the tab is closed mid-reflection.
+
+### Changed
+- **Timer Accuracy & Persistence**
+  - Pause / Resume logic now preserves only active focus time.
+  - Reduced high-frequency `localStorage` writes to improve performance and battery life.
+  - Unified timer state initialization to prevent flicker and race conditions on reload.
+- **UX & Feedback**
+  - Optimized ambient audio lifecycle (no unnecessary recreation).
+  - Improved offline save feedback for better user clarity.
+
+### Fixed
+- Timer drift caused by browser throttling and backgrounding.
+- `0:00` flicker and refresh-loop bugs on reload.
+- Stale closure issues between Web Worker and completion logic.
+- Duplicate session logging caused by reloads or multi-tab usage.
+- Edge cases leading to NaN / invalid progress calculations.
+
+### Notes
+This changes safely reintroduces timer reliability improvements that were reverted in **v1.5.0**, after isolating and fixing architectural and lifecycle issues.  
+
 ## [1.5.0] - 2026-01-18
 ### Added
 - **Mobile Timer Resilience** 📱
