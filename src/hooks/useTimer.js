@@ -347,7 +347,7 @@ export const useTimer = () => {
     }
 
     // Optimistic Update
-    const addedMinutes = Math.floor(seconds / 60);
+    const addedMinutes = Math.round(seconds / 60);
     setTotalMinutesToday(prev => prev + addedMinutes);
     setSessionsCompleted(prev => prev + 1);
 
