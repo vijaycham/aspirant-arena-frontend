@@ -384,6 +384,15 @@ export const useTimer = () => {
       setPendingSession(null);
       toast.success("Focus logged 🎯");
 
+      // 🦔 PostHog Event
+      posthog.capture('focus_session_logged', {
+        duration_minutes: addedMinutes,
+        mode: mode,
+        subject: subject || "General",
+        status: status,
+        rating: rating
+      });
+
       // Re-fetch stats to update efficiency and rhythm
       try {
         const tzOffset = new Date().getTimezoneOffset();

@@ -7,6 +7,14 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import posthog from 'posthog-js';
+import { PostHogProvider } from 'posthog-js/react';
+
+posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
+  api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
+  person_profiles: 'identified_only',
+  capture_pageview: false, // We handle this manually if needed, or let standard auto-capture work. Let's default false to avoid duplicates if using router integration, or true if lazy.
+});
 
 import * as Sentry from "@sentry/react";
 import ErrorFallback from "./components/ErrorFallback";
@@ -38,11 +46,13 @@ const router = createBrowserRouter([
 const root = createRoot(document.getElementById("root"));
 root.render(
   <Sentry.ErrorBoundary fallback={ErrorFallback} showDialog>
-    <Provider store={store}>
-      <PersistGate persistor={persistor} loading={null}>
-        <RouterProvider router={router} />
-        <SpeedInsights />
-      </PersistGate>
-    </Provider>
+    <PostHogProvider client={posthog}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor} loading={null}>
+          <RouterProvider router={router} />
+          <SpeedInsights />
+        </PersistGate>
+      </Provider>
+    </PostHogProvider>
   </Sentry.ErrorBoundary>
 );
