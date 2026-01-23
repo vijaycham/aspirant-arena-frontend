@@ -5,6 +5,20 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.3] – 2026-01-24
+### Added
+- Product analytics integration using PostHog.
+- Page view tracking via Google Analytics 4.
+- UX insights via Microsoft Clarity (heatmaps & session replays).
+- Secure user identification for analytics events.
+
+### Changed
+- Focus session analytics are now fired only after successful persistence.
+- Improved reliability of analytics events in multi-tab and offline recovery scenarios.
+
+### Notes
+Analytics are optional and enabled only when environment variables are provided.
+
 ## [1.5.2] – 2026-01-23
 ### Fixed
 - Removed deprecated `@testing-library/react-hooks` which was incompatible with React 19.
