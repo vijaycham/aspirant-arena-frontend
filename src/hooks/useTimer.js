@@ -4,7 +4,7 @@ import api from "../utils/api";
 import { toast } from "react-hot-toast";
 import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS, MIN_VALID_DURATION } from "../utils/timer/timerConstants";
 import { safeUUID } from "../utils/safeUUID";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { syncNodeTime } from "../redux/slice/arenaSlice";
 import posthog from 'posthog-js'; // 🦔
 
@@ -482,6 +482,10 @@ export const useTimer = () => {
         setSelectedArenaId("");
         setSelectedNodeId("");
       }
+    } else {
+      // Break Complete -> Back to Focus
+      setMode("FOCUS");
+      setTimeLeft(modeTimings.FOCUS.time);
     }
   }, [mode, timeLeft, cycleNumber, modeTimings, saveSession, reflectionEnabled, rehydrateTime]);
 

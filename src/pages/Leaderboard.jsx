@@ -14,7 +14,8 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await api.get(`/leaderboard?range=${range}`);
+        const offset = new Date().getTimezoneOffset();
+        const res = await api.get(`/leaderboard?range=${range}&offset=${offset}`);
         // Interceptor unwraps response, so res is the body. 
         // Backend returns { data: [...] }, so res.data is the array.
         setLeaderboard(Array.isArray(res.data) ? res.data : []);
