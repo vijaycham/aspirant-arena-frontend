@@ -28,7 +28,7 @@ vi.mock("react-hot-toast", () => ({
 const mockStore = configureStore({
     reducer: {
         // Add any reducers if needed, or just a dummy one
-        arena: (state = {}, action) => state,
+        arena: (state = {}, _action) => state,
     },
 });
 
@@ -42,7 +42,7 @@ class MockWorker {
         this.url = stringUrl;
         this.onmessage = () => { };
     }
-    postMessage(msg) {
+    postMessage(_msg) {
         // We can simulate tick back if needed, or just ignore
     }
     terminate() { }

@@ -4,8 +4,9 @@ import api from "../utils/api";
 import { toast } from "react-hot-toast";
 import { DEFAULT_MODES, TIMER_STORAGE_KEYS, AMBIENT_SOUNDS, MIN_VALID_DURATION } from "../utils/timer/timerConstants";
 import { safeUUID } from "../utils/safeUUID";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { syncNodeTime } from "../redux/slice/arenaSlice";
+import posthog from 'posthog-js'; // 🦔
 
 export const useTimer = () => {
   const dispatch = useDispatch();
@@ -383,6 +384,15 @@ export const useTimer = () => {
       sessionIdRef.current = null; // Reset ID for next session
       setPendingSession(null);
       toast.success("Focus logged 🎯");
+
+      // 🦔 PostHog Event
+      posthog.capture('focus_session_logged', {
+        duration_minutes: addedMinutes,
+        mode: mode,
+        subject: subject || "General",
+        status: status,
+        rating: rating
+      });
 
       // Re-fetch stats to update efficiency and rhythm
       try {

@@ -24,14 +24,34 @@ import PrivateRoute from "./components/PrivateRoute";
 import ScrollToTop from "./components/ScrollToTop";
 import { Toaster } from "react-hot-toast";
 import { ToastContainer } from "react-toastify";
+import { Analytics } from "@vercel/analytics/react";
+import posthog from 'posthog-js';
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfile } from "./redux/user/authSlice";
 import api from "./utils/api";
 import { useEffect } from "react";
+import useClarity from "./hooks/useClarity";
+import useGA from "./hooks/useGA";
+import usePostHogPageView from "./hooks/usePostHogPageView";
 
 const App = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  useClarity();
+  useGA();
+  usePostHogPageView();
+
+  // 🦔 PostHog Identification
+  useEffect(() => {
+    if (currentUser) {
+      posthog.identify(currentUser._id, {
+        email: currentUser.email,
+        name: currentUser.name,
+      });
+    } else {
+      posthog.reset();
+    }
+  }, [currentUser]);
 
   // 🔄 Sync user profile (especially verification status) when window gains focus
   useEffect(() => {
@@ -82,6 +102,7 @@ const App = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
+      <Analytics />
     </>
   );
 };
