@@ -4,7 +4,7 @@ export const DEFAULT_MODES = {
   LONG_BREAK: { label: "Long Break", time: 15 * 60 },
 };
 
-export const MIN_VALID_DURATION = 300; // 5 Minutes
+export const MIN_VALID_DURATION = 299; // 5 Minutes
 
 export const UPSC_PRESETS = [
   { name: "Mains Sprint", focus: 90, short: 15, long: 30, icon: "✍️" },
@@ -15,7 +15,6 @@ export const UPSC_PRESETS = [
 
 export const TIMER_STORAGE_KEYS = {
   MODE: "timer-mode",
-  TIME_LEFT: "timer-timeLeft",
   CYCLE: "timer-cycle",
   SESSIONS: "timer-sessions",
   SUBJECT: "timer-subject",
