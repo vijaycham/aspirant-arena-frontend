@@ -18,6 +18,15 @@ const TimerDisplay = ({
   isActive,
   onFullScreen
 }) => {
+  // Helper for Context Label (e.g., "FOCUS · Session 1 of 4")
+  const getContextLabel = () => {
+    if (mode === 'STOPWATCH') return 'Open Session · Infinity';
+    if (mode === 'FOCUS') return `Focus Mode · Session ${cycleNumber} of 4`;
+    if (mode === 'SHORT_BREAK') return 'Break · Recharge';
+    if (mode === 'LONG_BREAK') return 'Long Break · Reset';
+    return '';
+  };
+
   return (
     <>
       {/* 🛡️ Mode Toggle Switch */}
@@ -116,9 +125,9 @@ const TimerDisplay = ({
           {!isEditing ? (
             <motion.div
               key="timer"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               className={`group relative inline-block ${mode === 'STOPWATCH' ? 'cursor-default' : 'cursor-pointer'}`}
               onClick={() => {
                 if (mode === 'STOPWATCH') return;
@@ -130,9 +139,10 @@ const TimerDisplay = ({
                 }
               }}
             >
-              <h1 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tighter leading-none">
+              <h1 className="text-6xl md:text-8xl font-black text-gray-900 dark:text-white tracking-tighter leading-none transition-all">
                 {formatTime(timeLeft)}
               </h1>
+              
               {mode !== 'STOPWATCH' && (
                 <div className="absolute -top-4 -right-8 opacity-0 group-hover:opacity-100 transition-opacity text-primary-500">
                   <FaEdit size={18} />
@@ -171,17 +181,47 @@ const TimerDisplay = ({
           )}
         </AnimatePresence>
         
+        {/* Context Label - Stable Layout */}
+        <div className="h-6 mt-2 flex items-center justify-center">
+           <motion.p 
+             key={mode + cycleNumber} 
+             initial={{ opacity: 0, y: 5 }} 
+             animate={{ opacity: 1, y: 0 }}
+             className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-500 text-center"
+           >
+             {getContextLabel()}
+           </motion.p>
+        </div>
+        
         <div className="mt-8 flex flex-col items-center gap-6">
           {mode !== 'STOPWATCH' && (
             <div className="flex gap-2">
-              {[1, 2, 3, 4].map((num) => (
-                <div
-                  key={num}
-                  className={`h-2 w-10 rounded-full transition-all duration-500 ${
-                    num < cycleNumber ? "bg-primary-600 shadow-sm" : num === cycleNumber && isActive ? "bg-primary-400 animate-pulse" : "bg-gray-200"
-                  }`}
-                />
-              ))}
+              {[1, 2, 3, 4].map((num) => {
+                const isCompleted = num < cycleNumber;
+                const isCurrent = num === cycleNumber;
+                
+                return (
+                  <div key={num} className="relative group/cycle">
+                    <div
+                      className={`h-2 w-12 rounded-full transition-all duration-500 ${
+                        isCompleted 
+                          ? "bg-primary-600 shadow-sm" 
+                          : isCurrent && isActive 
+                            ? "bg-primary-400 animate-pulse" 
+                            : isCurrent 
+                              ? "bg-primary-300" 
+                              : "bg-gray-200 dark:bg-white/10"
+                      }`}
+                    />
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg opacity-0 group-hover/cycle:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                      <p className="text-[9px] font-black uppercase text-white tracking-wider">
+                        {isCompleted ? "Completed" : isCurrent ? "Current Session" : "Upcoming"}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
 

@@ -5,6 +5,14 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.3] – 2026-01-24
+### UI Polish
+- **Smart Focus Lock**: "Focus Mission" input now behaves like a solid commitment chip while the timer is running. It becomes read-only and displays a lock icon (if a task is set) to reduce distraction.
+- **Context Labels**: Added clear subtitles below the timer digits (e.g., `FOCUS MODE · Session 2 of 4`) to improve state awareness.
+- **Semantic Feedback**:
+  - Upgraded cycle indicators to Primary Blue with hover tooltips ("Completed", "Current", "Upcoming").
+  - Added a "Flow / Zone / Drift" legend to the Focus Rhythm chart for easier interpretation.
+
 ## [1.6.2] – 2026-01-24
 ### Fixed
 - Auto-complete focus sessions that finished while the app was closed or device was asleep

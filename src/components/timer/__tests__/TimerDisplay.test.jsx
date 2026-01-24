@@ -7,6 +7,7 @@ vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, onClick, className }) => <div onClick={onClick} className={className}>{children}</div>,
     form: ({ children, onSubmit, className }) => <form onSubmit={onSubmit} className={className}>{children}</form>,
+    p: ({ children, className }) => <p className={className}>{children}</p>,
   },
   AnimatePresence: ({ children }) => <>{children}</>,
 }));
@@ -135,9 +136,9 @@ describe('TimerDisplay Component', () => {
     // In Countdown, we expect 4 bars
     // Note: Zen Mode button and Toggle buttons also use .rounded-*, so specific class targeting is tricky.
     // relying on structure logic
-    expect(container.querySelectorAll('.h-2.w-10').length).toBe(4);
+    expect(container.querySelectorAll('.h-2.w-12').length).toBe(4);
 
     rerender(<TimerDisplay {...defaultProps} mode="STOPWATCH" />);
-    expect(container.querySelectorAll('.h-2.w-10').length).toBe(0);
+    expect(container.querySelectorAll('.h-2.w-12').length).toBe(0);
   });
 });
