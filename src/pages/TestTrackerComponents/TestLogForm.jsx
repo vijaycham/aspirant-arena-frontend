@@ -9,7 +9,6 @@ const TestLogForm = ({
   showAdvance,
   setShowAdvance,
   subjects,
-  arenas,
   marksLost,
   accountedMarks
 }) => {

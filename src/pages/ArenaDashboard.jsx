@@ -7,7 +7,7 @@ import ArenaModal from '../components/arena/ArenaModal';
 import ExamCountdown from '../components/arena/ExamCountdown';
 import LegacyLinker from '../components/arena/LegacyLinker';
 import { motion } from 'framer-motion';
-import { FiPlus, FiRefreshCcw, FiLayers, FiTarget, FiTrash2, FiStar, FiEdit2, FiCheck, FiX } from 'react-icons/fi';
+import { FiPlus, FiRefreshCcw, FiLayers, FiTrash2, FiStar, FiEdit2, FiCheck, FiX } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../utils/api';
 

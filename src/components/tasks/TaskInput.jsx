@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiLayers, FiTarget, FiSearch, FiPlus, FiX } from "react-icons/fi";
+import { FiLayers, FiTarget, FiPlus, FiX } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchArenas, fetchSyllabus } from "../../redux/slice/arenaSlice";
 import { toLocalDateTimeInput, fromLocalDateTimeInput } from "../../utils/tasks/taskHelpers";
@@ -21,10 +21,9 @@ const TaskInput = ({
   selectedNodeId,
   setSelectedNodeId
 }) => {
-  const { arenas, syllabus, currentArenaId } = useSelector(state => state.arena);
+  const { arenas, syllabus } = useSelector(state => state.arena);
   const dispatch = useDispatch();
   const [showArenaDropdown, setShowArenaDropdown] = useState(false);
-  const [nodeSearch, setNodeSearch] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Auto-suggestions based on what the user is typing in the task input
@@ -79,32 +78,9 @@ const TaskInput = ({
     }
   }, [selectedArenaId, dispatch, syllabus]);
 
-  // REMOVED: Auto-selection of currentArenaId. Default to Global (No selection).
-  // React.useEffect(() => {
-  //   if (!selectedArenaId && currentArenaId) {
-  //     setSelectedArenaId(currentArenaId);
-  //   }
-  // }, [currentArenaId, selectedArenaId, setSelectedArenaId]);
-
   const selectedNode = selectedNodeId && selectedArenaId && syllabus[selectedArenaId]?.byId[selectedNodeId];
-  const selectedArena = arenas.find(a => a._id === selectedArenaId);
-
-  // Search results for the dropdown
-  const searchResults = React.useMemo(() => {
-    if (!selectedArenaId || !syllabus[selectedArenaId]) return [];
-    const allNodes = Object.values(syllabus[selectedArenaId].byId);
-
-    const query = nodeSearch.toLowerCase().trim();
-    if (!query) return allNodes.filter(n => !['root', 'category', 'subject'].includes(n.type)).slice(0, 10);
-
-    return allNodes.filter(n =>
-      !['root', 'category', 'subject'].includes(n.type) &&
-      n.title.toLowerCase().includes(query)
-    ).slice(0, 20);
-  }, [selectedArenaId, syllabus, nodeSearch]);
 
   const dropdownRef = React.useRef(null);
-  // btnRef is no longer needed as we wrap the whole interactable area
 
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -164,7 +140,7 @@ const TaskInput = ({
                     onClick={() => {
                       setSelectedArenaId(suggestion.arenaId);
                       setSelectedNodeId(suggestion._id);
-                      // Don't auto-complete text, just link it.
+                      setTask(suggestion.title);
                       setShowSuggestions(false);
                     }}
                     className="w-full text-left p-3 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors group flex items-center justify-between"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../utils/api';
 import { toast } from 'react-hot-toast';
-import { FiLink, FiAlertCircle, FiCheckCircle, FiChevronRight, FiLoader } from 'react-icons/fi';
+import { FiLink, FiAlertCircle, FiLoader } from 'react-icons/fi';
 
 const LegacyLinker = ({ arenas }) => {
     const [loading, setLoading] = useState(false);
@@ -14,8 +14,8 @@ const LegacyLinker = ({ arenas }) => {
         try {
             const res = await api.get('/arenas/legacy-unlinked');
             setUnlinkedData(res.data);
-        } catch (err) {
-            console.error('Failed to fetch unlinked data', err);
+        } catch {
+            // Silent fail
         } finally {
             setLoading(false);
         }
@@ -31,7 +31,7 @@ const LegacyLinker = ({ arenas }) => {
             return;
         }
 
-        if (!window.confirm(`⚠️ Permanent Action\n\nAre you sure you want to link ALL ${totalItems} unlinked items to this Arena?\n\nThis cannot be undone.`)) {
+        if (!window.confirm(`⚠️ Permanent Action\n\nAre you sure you want to link ALL ${totalItems} unlinked items to this Arena ?\n\nThis cannot be undone.`)) {
             return;
         }
 
@@ -44,7 +44,7 @@ const LegacyLinker = ({ arenas }) => {
             });
             toast.success('Legacy data linked successfully! 🎉');
             setUnlinkedData({ tests: [], sessions: [] });
-        } catch (err) {
+        } catch {
             toast.error('Linking failed');
         } finally {
             setLinking(false);

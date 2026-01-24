@@ -34,7 +34,6 @@ const useTestTracker = () => {
     reflection: "",
     timeTaken: "",
     startTime: "",
-    startTime: "",
     arenaId: currentArenaId || ""
   });
 
@@ -81,12 +80,11 @@ const useTestTracker = () => {
       reflection: "",
       timeTaken: "",
       startTime: "",
-      startTime: "",
       arenaId: currentArenaId || ""
     });
     setEditingId(null);
     setShowAdvance(false);
-  }, []);
+  }, [currentArenaId]);
 
   // Helper to sync revision tasks
   const syncRevisionTask = async (payload) => {

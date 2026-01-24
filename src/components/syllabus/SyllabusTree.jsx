@@ -200,7 +200,7 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
         <div className="pl-9 py-2 flex gap-2">
           <input
             autoFocus
-            className="border rounded px-2 py-1 text-sm flex-1"
+            className="border border-gray-200 dark:border-white/10 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded px-2 py-1 text-sm flex-1 outline-none focus:border-primary-500"
             placeholder={`Add ${childType?.charAt(0).toUpperCase() + childType?.slice(1)}...`}
             value={newChildTitle}
             onChange={(e) => setNewChildTitle(e.target.value)}

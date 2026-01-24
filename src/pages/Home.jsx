@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import Shimmer from "../components/Shimmer";
 import LockedOverlay from "../components/LockedOverlay";
 import { hasAccess } from "../utils/auth/verifyHelpers";
-import { FiLayers, FiStar, FiTarget, FiActivity, FiChevronRight, FiZap } from "react-icons/fi";
+import { FiActivity, FiTarget, FiLayers, FiZap } from 'react-icons/fi';
 
 const getStrategyNote = (stats, primaryArena) => {
   if (!stats) return null;
@@ -102,7 +102,7 @@ const Home = () => {
               const completedCount = microTopics.filter(n => n.status === 'completed').length;
               const progress = microTopics.length > 0 ? Math.round((completedCount / microTopics.length) * 100) : 0;
               setPrimaryArena({ ...primary, progress });
-            } catch (err) {
+            } catch {
               setPrimaryArena(primary);
             }
           } else {

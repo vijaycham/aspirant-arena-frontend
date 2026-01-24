@@ -157,7 +157,7 @@ export const useTimer = () => {
     window.addEventListener('online', processSyncQueue);
 
     return () => window.removeEventListener('online', processSyncQueue);
-  }, []);
+  }, [selectedArenaId]);
 
   /* ------------------ CROSS-TAB SYNC ------------------ */
   useEffect(() => {
@@ -208,7 +208,7 @@ export const useTimer = () => {
 
   // 🛡️ Data Safety: Handle Tab Close/Refresh
   useEffect(() => {
-    const handleBeforeUnload = (e) => {
+    const handleBeforeUnload = () => {
       // We don't block unload, but we ensure localStorage is up-to-date
       // Note: We cannot reliable run async saveSession here.
       // But our LocalStorage based rehydration handles the state restoration perfectly
@@ -611,7 +611,7 @@ export const useTimer = () => {
     }
     setActiveTick(t => t + 1);
     setTimeLeft(rehydrateTime);
-  }, [isActive, timeLeft, rehydrateTime]);
+  }, [isActive, timeLeft, rehydrateTime, mode]);
 
   const resetTimer = () => {
     const elapsed = modeTimings[mode].time - timeLeft;

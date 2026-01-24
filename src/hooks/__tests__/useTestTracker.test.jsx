@@ -4,15 +4,18 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import useTestTracker from "../useTestTracker";
 import authReducer from "../../redux/user/authSlice";
+import arenaReducer from "../../redux/slice/arenaSlice";
 import api from "../../utils/api";
 
 const createMockStore = (currentUser = { _id: "123", isEmailVerified: true }) => {
   return configureStore({
     reducer: {
       user: authReducer,
+      arena: arenaReducer,
     },
     preloadedState: {
       user: { currentUser, loading: false, error: null },
+      arena: { currentArenaId: null, arenas: [], syllabus: {} }
     },
   });
 };
@@ -27,6 +30,7 @@ vi.mock("../../utils/api", () => ({
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),
+    patch: vi.fn(),
     delete: vi.fn(),
   },
 }));
@@ -63,6 +67,10 @@ describe("useTestTracker hook", () => {
       if (url === "/test/subjects") return Promise.resolve({ data: { subjects: mockSubjects } });
       return Promise.resolve({ data: {} });
     });
+    api.post.mockResolvedValue({ data: {} });
+    api.patch.mockResolvedValue({ data: {} });
+    api.put.mockResolvedValue({ data: {} });
+    api.delete.mockResolvedValue({ data: {} });
   });
 
   it("should fetch data on mount", async () => {
