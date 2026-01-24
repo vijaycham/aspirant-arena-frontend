@@ -5,13 +5,13 @@ import SyllabusTree from '../components/syllabus/SyllabusTree';
 import ArenaModal from '../components/arena/ArenaModal';
 import ExamCountdown from '../components/arena/ExamCountdown';
 import { motion } from 'framer-motion';
-import { FiPlus, FiRefreshCcw, FiLayers, FiTarget, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiRefreshCcw, FiLayers, FiTarget, FiTrash2, FiStar } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../utils/api';
 
 const ArenaDashboard = () => {
   const dispatch = useDispatch();
-  const { arenas, currentArenaId, syllabus } = useSelector(state => state.arena);
+  const { arenas, currentArenaId, syllabus, syllabusLoading } = useSelector(state => state.arena);
   const [modalType, setModalType] = useState(null); // 'create' | 'delete' | 'reset'
 
   useEffect(() => {
@@ -74,20 +74,20 @@ const ArenaDashboard = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={() => setModalType('create')}
               className="px-6 py-3 rounded-2xl bg-gray-900 hover:bg-black text-white font-black transition-transform flex items-center gap-2 shadow-2xl shadow-gray-200 dark:shadow-none hover:scale-[1.02] active:scale-95"
             >
               <FiPlus /> New Arena
             </button>
-            <button 
+            <button
               onClick={() => setModalType('reset')}
               className="p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-gray-200 transition-all text-gray-400 hover:text-gray-900 dark:hover:text-white shadow-sm"
               title="Reset to Master"
             >
               <FiRefreshCcw />
             </button>
-            <button 
+            <button
               onClick={() => setModalType('delete')}
               disabled={!currentArenaId}
               className="p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 transition-all text-gray-400 hover:text-rose-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
@@ -100,35 +100,34 @@ const ArenaDashboard = () => {
 
         {/* Dash Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
+
           {/* Sidebar - Arena List & Widgets */}
           <div className="lg:col-span-3 space-y-6">
             <ExamCountdown />
-            
+
             <div className="space-y-4">
-            <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Active Tracks</h2>
-            {arenas.map(arena => (
-              <motion.div
-                key={arena._id}
-                whileHover={{ x: 4 }}
-                onClick={() => dispatch(setCurrentArena(arena._id))}
-                className={`p-5 rounded-[1.5rem] border cursor-pointer transition-all ${
-                  currentArenaId === arena._id 
-                  ? 'bg-white dark:bg-slate-800 border-primary-200 dark:border-primary-500/30 shadow-xl shadow-primary-100/50 dark:shadow-primary-900/20 ring-2 ring-primary-100 dark:ring-primary-500/20' 
-                  : 'bg-white/50 dark:bg-slate-900/50 border-white dark:border-white/5 hover:bg-white dark:hover:bg-slate-800 hover:border-gray-200 dark:hover:border-white/10 hover:shadow-lg hover:shadow-gray-100 dark:hover:shadow-black/50'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className={`font-black truncate text-sm ${currentArenaId === arena._id ? 'text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'}`}>
-                    {arena.title}
-                  </h3>
-                  {arena.isPrimary && <FiTarget className="text-primary-500 text-xs animate-pulse" />}
-                </div>
-                <div className={`text-[9px] uppercase tracking-wider font-bold ${currentArenaId === arena._id ? 'text-primary-400' : 'text-gray-400'}`}>
-                  Template: {arena.templateId}
-                </div>
-              </motion.div>
-            ))}
+              <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Active Tracks</h2>
+              {arenas.map(arena => (
+                <motion.div
+                  key={arena._id}
+                  whileHover={{ x: 4 }}
+                  onClick={() => dispatch(setCurrentArena(arena._id))}
+                  className={`p-5 rounded-[1.5rem] border cursor-pointer transition-all ${currentArenaId === arena._id
+                    ? 'bg-white dark:bg-slate-800 border-primary-200 dark:border-primary-500/30 shadow-xl shadow-primary-100/50 dark:shadow-primary-900/20 ring-2 ring-primary-100 dark:ring-primary-500/20'
+                    : 'bg-white/50 dark:bg-slate-900/50 border-white dark:border-white/5 hover:bg-white dark:hover:bg-slate-800 hover:border-gray-200 dark:hover:border-white/10 hover:shadow-lg hover:shadow-gray-100 dark:hover:shadow-black/50'
+                    }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className={`font-black truncate text-sm ${currentArenaId === arena._id ? 'text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                      {arena.title}
+                    </h3>
+                    {arena.isPrimary && <FiStar className="text-amber-500 fill-amber-500 text-xs" title="Primary Arena" />}
+                  </div>
+                  <div className={`text-[9px] uppercase tracking-wider font-bold ${currentArenaId === arena._id ? 'text-primary-400' : 'text-gray-400'}`}>
+                    Template: {arena.templateId}
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
 
@@ -142,23 +141,30 @@ const ArenaDashboard = () => {
                   </div>
                   <div>
                     <h2 className="font-black text-xl text-gray-900 dark:text-white">{currentArena?.title || 'Select an Arena'}</h2>
-                    <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Recursive Roadmap • {syllabus[currentArenaId]?.length || 0} Nodes</p>
+                    <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      Recursive Roadmap • {Object.keys(syllabus[currentArenaId]?.byId || {}).length} Nodes
+                    </p>
                   </div>
                 </div>
-                
+
                 {/* Progress Mini-Chart */}
                 <div className="hidden sm:flex items-center gap-4 bg-white dark:bg-slate-800 px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
                   <div className="text-right">
                     <p className="text-[9px] text-gray-400 uppercase font-black tracking-widest">Progress</p>
                     <p className="font-mono text-primary-600 font-black text-lg">
-                      {Math.round((syllabus[currentArenaId]?.filter(n => n.status === 'completed').length / syllabus[currentArenaId]?.length) * 100) || 0}%
+                      {currentArenaId && syllabus[currentArenaId] ?
+                        Math.round((Object.values(syllabus[currentArenaId].byId).filter(n => n.status === 'completed').length / Object.keys(syllabus[currentArenaId].byId).length) * 100)
+                        : 0}%
                     </p>
                   </div>
                   <div className="w-24 h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(syllabus[currentArenaId]?.filter(n => n.status === 'completed').length / syllabus[currentArenaId]?.length) * 100 || 0}%` }}
-                      className="h-full bg-gradient-to-r from-primary-500 to-indigo-500" 
+                    <div
+                      style={{
+                        width: `${currentArenaId && syllabus[currentArenaId] ?
+                          (Object.values(syllabus[currentArenaId].byId).filter(n => n.status === 'completed').length / Object.keys(syllabus[currentArenaId].byId).length) * 100
+                          : 0}%`
+                      }}
+                      className="h-full bg-gradient-to-r from-primary-500 to-indigo-500"
                     />
                   </div>
                 </div>
@@ -166,7 +172,11 @@ const ArenaDashboard = () => {
 
               <div className="p-8">
                 {currentArenaId ? (
-                  <SyllabusTree nodes={syllabus[currentArenaId] || []} />
+                  <SyllabusTree
+                    syllabusData={syllabus[currentArenaId]}
+                    arenaId={currentArenaId}
+                    isLoading={syllabusLoading}
+                  />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-[500px] text-center px-6">
                     <div className="w-24 h-24 rounded-3xl bg-gray-50 dark:bg-slate-800 border-2 border-gray-100 dark:border-gray-700 flex items-center justify-center text-gray-300 dark:text-gray-600 mb-6">
@@ -177,14 +187,14 @@ const ArenaDashboard = () => {
                       You haven&apos;t initialized a syllabus track yet. Choose a template to begin your strategic preparation.
                     </p>
                     <div className="flex flex-wrap gap-4 justify-center">
-                      <button 
+                      <button
                         onClick={() => setModalType('create')}
                         className="px-8 py-3.5 rounded-2xl bg-gray-900 text-white font-black hover:bg-black hover:scale-[1.03] transition-all shadow-xl shadow-gray-200 text-sm uppercase tracking-wider"
                       >
                         UPSC GS Master
                       </button>
-                      <button 
-                         onClick={() => setModalType('create')}
+                      <button
+                        onClick={() => setModalType('create')}
                         className="px-8 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-white font-black hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 hover:border-gray-200 transition-all text-sm uppercase tracking-wider"
                       >
                         Custom / General
@@ -197,15 +207,15 @@ const ArenaDashboard = () => {
           </div>
         </div>
       </div>
-      
+
       <ArenaModal
         isOpen={!!modalType}
         type={modalType}
         onClose={() => setModalType(null)}
         onConfirm={
-           modalType === 'delete' ? handleDeleteConfirm : 
-           modalType === 'reset' ? handleResetConfirm : 
-           handleCreateConfirm
+          modalType === 'delete' ? handleDeleteConfirm :
+            modalType === 'reset' ? handleResetConfirm :
+              handleCreateConfirm
         }
       />
     </div>
