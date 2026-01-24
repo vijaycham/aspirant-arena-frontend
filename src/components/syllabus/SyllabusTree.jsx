@@ -12,7 +12,9 @@ import { toast } from 'react-hot-toast';
 import { getChildType } from '../../domain/syllabusRules';
 
 const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap, arenaId, depth = 0 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  // 📂 Auto-expand to Topic level (Depth 2: root=0, category=1, subject=2)
+  // Let's set it to depth <= 1 so root and categories are open, topics (at depth 2) are visible.
+  const [isOpen, setIsOpen] = useState(depth <= 1);
   const dispatch = useDispatch();
 
   const [isAddingChild, setIsAddingChild] = useState(false);

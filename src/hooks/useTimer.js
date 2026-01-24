@@ -77,6 +77,7 @@ export const useTimer = () => {
   const [cycleNumber, setCycleNumber] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.CYCLE), 10) || 1);
   const [sessionsCompleted, setSessionsCompleted] = useState(() => parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.SESSIONS), 10) || 0);
   const [totalMinutesToday, setTotalMinutesToday] = useState(0);
+  const [goalMinutesToday, setGoalMinutesToday] = useState(0);
   const [effectiveMinutesToday, setEffectiveMinutesToday] = useState(0);
   const [todaySessions, setTodaySessions] = useState([]);
   const [streak, setStreak] = useState(0);
@@ -109,12 +110,20 @@ export const useTimer = () => {
     const fetchStats = async () => {
       try {
         const tzOffset = new Date().getTimezoneOffset();
-        const { data } = await api.get(`/focus/stats/today?offset=${tzOffset}`);
-        setTotalMinutesToday(data.totalMinutes || 0);
-        setEffectiveMinutesToday(data.effectiveMinutes || 0);
-        setSessionsCompleted(data.sessionCount || 0);
-        setStreak(data.streak || 0);
-        setTodaySessions(data.todaySessions || []);
+        const globalRes = await api.get(`/focus/stats/today?offset=${tzOffset}`);
+
+        setTotalMinutesToday(globalRes.data.totalMinutes || 0);
+        setEffectiveMinutesToday(globalRes.data.effectiveMinutes || 0);
+        setSessionsCompleted(globalRes.data.sessionCount || 0);
+        setStreak(globalRes.data.streak || 0);
+        setTodaySessions(globalRes.data.todaySessions || []);
+
+        if (selectedArenaId) {
+          const goalRes = await api.get(`/focus/stats/today?offset=${tzOffset}&arenaId=${selectedArenaId}`);
+          setGoalMinutesToday(goalRes.data.totalMinutes || 0);
+        } else {
+          setGoalMinutesToday(0);
+        }
       } catch (err) {
         console.error("Stats fetch failed", err);
       }
@@ -883,6 +892,7 @@ export const useTimer = () => {
     sessionsCompleted,
     totalMinutesToday,
     effectiveMinutesToday,
+    goalMinutesToday,
     efficiencyScore: totalMinutesToday > 0 ? Math.round((effectiveMinutesToday / totalMinutesToday) * 100) : 0,
     todaySessions,
     streak,

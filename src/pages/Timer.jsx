@@ -64,6 +64,7 @@ const Timer = () => {
     setReflectionEnabled,
     todaySessions,
     effectiveMinutesToday,
+    goalMinutesToday,
     efficiencyScore,
     streak,
     ambientEnabled,
@@ -122,11 +123,11 @@ const Timer = () => {
   /* ------------------ FORMATTERS ------------------ */
   const formatTime = (seconds) => {
     if (isNaN(seconds)) return "00:00"; // 🛡️ Safety fallback
-    
+
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    
+
     if (h > 0) {
       return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
     }
@@ -180,7 +181,7 @@ const Timer = () => {
         return;
       }
     }
-    
+
     // Normal Toggle (Pause/Resume)
     toggleTimer();
   };
@@ -210,9 +211,8 @@ const Timer = () => {
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none">
         <div
-          className={`absolute top-[20%] right-[10%] w-[50%] h-[50%] rounded-full blur-[120px] opacity-20 mix-blend-multiply animate-blob transition-colors duration-1000 ${
-            mode === "FOCUS" ? "bg-primary-300" : mode === "SHORT_BREAK" ? "bg-emerald-300" : "bg-indigo-300"
-          }`}
+          className={`absolute top-[20%] right-[10%] w-[50%] h-[50%] rounded-full blur-[120px] opacity-20 mix-blend-multiply animate-blob transition-colors duration-1000 ${mode === "FOCUS" ? "bg-primary-300" : mode === "SHORT_BREAK" ? "bg-emerald-300" : "bg-indigo-300"
+            }`}
         />
       </div>
 
@@ -230,17 +230,16 @@ const Timer = () => {
             <div className="relative group/notify h-[34px]">
               <button
                 onClick={requestNotificationPermission}
-                className={`flex items-center justify-center w-[34px] h-full rounded-lg border transition-all shadow-sm active:scale-90 ${
-                  notificationPermission === "granted" 
-                    ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400" 
+                className={`flex items-center justify-center w-[34px] h-full rounded-lg border transition-all shadow-sm active:scale-90 ${notificationPermission === "granted"
+                    ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
                     : notificationPermission === "denied"
-                    ? "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800 text-rose-600 dark:text-rose-400"
-                    : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-primary-600 hover:border-primary-100"
-                }`}
+                      ? "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800 text-rose-600 dark:text-rose-400"
+                      : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-primary-600 hover:border-primary-100"
+                  }`}
               >
                 {notificationPermission === "denied" ? <FaBellSlash size={12} /> : <FaBell size={12} />}
               </button>
-              
+
               <div className="absolute top-full right-0 mt-3 w-44 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl opacity-0 group-hover/notify:opacity-100 pointer-events-none transition-all z-[60] shadow-2xl text-center">
                 <p className="text-[8px] font-black text-primary-400 uppercase tracking-widest mb-1">Notifications</p>
                 <p className="text-[10px] font-black text-white uppercase tracking-tighter">
@@ -258,7 +257,7 @@ const Timer = () => {
             {streak > 0 && (
               <div className="flex items-center gap-1.5 px-3 py-2 bg-orange-50 border border-orange-100 rounded-lg group/streak relative cursor-pointer mr-2 shadow-sm shadow-orange-100/50">
                 <motion.div
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.2, 1],
                     filter: ["drop-shadow(0 0 2px #f97316)", "drop-shadow(0 0 8px #f97316)", "drop-shadow(0 0 2px #f97316)"]
                   }}
@@ -267,7 +266,7 @@ const Timer = () => {
                   <FaFire className="text-orange-500 text-sm" />
                 </motion.div>
                 <span className="text-[10px] font-black text-orange-600 tabular-nums tracking-tight">{streak}</span>
-                
+
                 <div className="absolute top-full right-0 mt-3 w-40 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl opacity-0 group-hover/streak:opacity-100 pointer-events-none transition-all z-[60] shadow-2xl text-center">
                   <p className="text-[8px] font-black text-primary-400 uppercase tracking-widest mb-1">Consistency</p>
                   <p className="text-[10px] font-black text-white uppercase tracking-tighter tabular-nums">{streak} Day Streak! 🔥</p>
@@ -293,13 +292,12 @@ const Timer = () => {
               <button
                 disabled={isActive}
                 onClick={() => setReflectionEnabled(!reflectionEnabled)}
-                className={`flex items-center gap-2 px-3 sm:px-4 py-2 border rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 h-full ${
-                  isActive 
-                    ? "opacity-60 cursor-not-allowed bg-gray-50 dark:bg-slate-800/50 border-gray-100 dark:border-slate-700 text-gray-400" 
-                    : reflectionEnabled 
-                      ? "bg-primary-50 dark:bg-primary-900/20 border-primary-100 dark:border-primary-800 text-primary-600 dark:text-primary-400 hover:bg-primary-100" 
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 border rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 h-full ${isActive
+                    ? "opacity-60 cursor-not-allowed bg-gray-50 dark:bg-slate-800/50 border-gray-100 dark:border-slate-700 text-gray-400"
+                    : reflectionEnabled
+                      ? "bg-primary-50 dark:bg-primary-900/20 border-primary-100 dark:border-primary-800 text-primary-600 dark:text-primary-400 hover:bg-primary-100"
                       : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
-                }`}
+                  }`}
               >
                 <div className="relative flex items-center">
                   <FaLightbulb className={reflectionEnabled && !isActive ? "animate-pulse" : ""} />
@@ -308,14 +306,14 @@ const Timer = () => {
                 <span className="hidden xs:inline">Reflect</span>
               </button>
 
-               {/* Info Tooltip - Dark Glass Style */}
+              {/* Info Tooltip - Dark Glass Style */}
               <div className="absolute top-full right-0 mt-3 w-60 p-4 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl opacity-0 group-hover/reflect:opacity-100 pointer-events-none transition-all z-[60] shadow-2xl">
                 <p className={`uppercase tracking-[0.2em] text-[8px] font-black mb-2 ${isActive ? "text-rose-400" : "text-primary-400"}`}>
                   {isActive ? "⚠️ Reflection Locked" : "Self-Reflection"}
                 </p>
                 <p className="text-[10px] font-bold text-gray-300 leading-relaxed tracking-tight">
-                  {isActive 
-                    ? "You cannot change reflection settings while a session is active. Please pause or reset the timer to modify." 
+                  {isActive
+                    ? "You cannot change reflection settings while a session is active. Please pause or reset the timer to modify."
                     : "When enabled, you'll be asked to rate your focus intensity and add notes after every focus session. Helps track quality, not just quantity."
                   }
                 </p>
@@ -338,40 +336,40 @@ const Timer = () => {
                 <DailyGoalWidget totalMinutesToday={totalMinutesToday} />
               </div>
 
-              <TimerDisplay 
-                  mode={mode}
-                  modes={modes}
-                  switchMode={switchMode}
-                  timeLeft={timeLeft}
-                  isEditing={isEditing}
-                  setIsEditing={setIsEditing}
-                  manualMin={manualMin}
-                  setManualMin={setManualMin}
-                   handleManualSubmit={handleManualSubmit}
-                   formatTime={formatTime}
-                   cycleNumber={cycleNumber}
-                   isActive={isActive}
-                   onFullScreen={() => {
-                     setIsFullScreen(true);
-                     if (document.documentElement.requestFullscreen) {
-                       document.documentElement.requestFullscreen().catch(err => {
-                         console.warn("Fullscreen request failed:", err);
-                       });
-                     }
-                   }}
-                  />
+              <TimerDisplay
+                mode={mode}
+                modes={modes}
+                switchMode={switchMode}
+                timeLeft={timeLeft}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
+                manualMin={manualMin}
+                setManualMin={setManualMin}
+                handleManualSubmit={handleManualSubmit}
+                formatTime={formatTime}
+                cycleNumber={cycleNumber}
+                isActive={isActive}
+                onFullScreen={() => {
+                  setIsFullScreen(true);
+                  if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                      console.warn("Fullscreen request failed:", err);
+                    });
+                  }
+                }}
+              />
 
               {/* Focus Mission Input - Restored */}
               <div className="max-w-md mx-auto mb-10 w-full relative">
                 <div className="flex gap-2 mb-2 px-2 items-center justify-between">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Focus Mission</label>
                   {tasks?.length > 0 ? (
-                    <button 
+                    <button
                       ref={btnRef}
                       onClick={() => setShowTaskDropdown(!showTaskDropdown)}
                       className="text-[10px] font-black text-primary-600 uppercase tracking-widest hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-lg transition-all flex items-center gap-1.5"
                     >
-                      <FaTasks className="text-primary-500" size={10} /> 
+                      <FaTasks className="text-primary-500" size={10} />
                       {selectedTaskId ? "Change Task" : "Lock a Focus Goal"}
                     </button>
                   ) : (
@@ -388,7 +386,7 @@ const Timer = () => {
                       </svg>
                     </div>
                   )}
-                  
+
                   <div className={`absolute inset-0 bg-primary-100/20 blur-xl rounded-full opacity-0 group-focus-within/input:opacity-100 transition-opacity duration-500 ${isActive ? 'opacity-0' : ''}`}></div>
                   <input
                     type="text"
@@ -399,24 +397,24 @@ const Timer = () => {
                     onChange={(e) => {
                       if (isActive && !!subject) return; // Prevent edit only if locked
                       setSubject(e.target.value);
-                      setSelectedTaskId(""); 
+                      setSelectedTaskId("");
                       setSelectedNodeId("");
                     }}
                     className={`relative w-full px-6 py-4 rounded-2xl outline-none text-center font-bold text-base transition-all duration-300
                       ${isActive && subject
-                        ? "bg-primary-50/50 dark:bg-primary-900/10 border-2 border-primary-200 dark:border-primary-800 text-primary-800 dark:text-primary-100 pl-10 cursor-not-allowed shadow-inner" 
+                        ? "bg-primary-50/50 dark:bg-primary-900/10 border-2 border-primary-200 dark:border-primary-800 text-primary-800 dark:text-primary-100 pl-10 cursor-not-allowed shadow-inner"
                         : "bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/60 dark:border-white/10 focus:border-primary-300 focus:bg-white/60 dark:focus:bg-slate-800/60 text-gray-800 dark:text-white placeholder:text-gray-400 shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
                       }
                     `}
                   />
-                  
+
                   {/* Task Metadata Indicator (if linked to Syllabus) */}
                   {selectedNodeId && (
                     <div className="mt-4 flex justify-center">
-                       <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-100 text-[10px] font-black uppercase tracking-widest text-primary-600 transition-all flex items-center gap-2 shadow-sm">
-                          <FiTarget size={12} className="animate-pulse" /> 
-                          Linked to Roadmap
-                        </div>
+                      <div className="px-4 py-2 rounded-xl bg-primary-50 border border-primary-100 text-[10px] font-black uppercase tracking-widest text-primary-600 transition-all flex items-center gap-2 shadow-sm">
+                        <FiTarget size={12} className="animate-pulse" />
+                        Linked to Roadmap
+                      </div>
                     </div>
                   )}
 
@@ -443,15 +441,14 @@ const Timer = () => {
                                   setSelectedTaskId(t._id);
                                   setSelectedArenaId(t.arenaId || "");
                                   setSelectedNodeId(t.nodeId || "");
-                                  setShowTaskDropdown(false); 
+                                  setShowTaskDropdown(false);
                                 }}
                                 className="w-full text-left p-4 hover:bg-white hover:shadow-sm rounded-xl transition-all group flex items-start gap-3 border border-transparent hover:border-white/50"
                               >
                                 <div className="flex items-center gap-3 w-full">
-                                  <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 shadow-sm ${
-                                    t.priority === 'high' ? 'bg-rose-500 shadow-rose-200' : 
-                                    t.priority === 'medium' ? 'bg-amber-500 shadow-amber-200' : 'bg-emerald-500 shadow-emerald-200'
-                                  }`} />
+                                  <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 shadow-sm ${t.priority === 'high' ? 'bg-rose-500 shadow-rose-200' :
+                                      t.priority === 'medium' ? 'bg-amber-500 shadow-amber-200' : 'bg-emerald-500 shadow-emerald-200'
+                                    }`} />
                                   <span className="text-sm font-bold text-gray-700 group-hover:text-primary-600 truncate flex-1">{t.text}</span>
                                   {t.nodeId && <FiTarget className="text-primary-400 animate-pulse flex-shrink-0" size={14} />}
                                 </div>
@@ -477,7 +474,7 @@ const Timer = () => {
                 </div>
               </div>
 
-              <TimerControls 
+              <TimerControls
                 isActive={isActive}
                 onToggle={handleSmartToggle}
                 onReset={resetTimer}
@@ -488,99 +485,100 @@ const Timer = () => {
               <FocusRhythm todaySessions={todaySessions} />
             </motion.div>
 
-            
+
             <div className="mt-6">
               <FocusHeatmap key={sessionsCompleted} />
             </div>
           </div>
 
-            {/* Sidebar (Right) */}
-            <div className="lg:col-span-4 space-y-6">
-              <WisdomQuote />
+          {/* Sidebar (Right) */}
+          <div className="lg:col-span-4 space-y-6">
+            <WisdomQuote />
 
-              {/* Daily Intel */}
-              <DailyIntel 
-                totalMinutesToday={totalMinutesToday}
-                effectiveMinutesToday={effectiveMinutesToday}
-                efficiencyScore={efficiencyScore}
-                sessionsCompleted={sessionsCompleted}
-                formatTotalTime={formatTotalTime}
-              />
+            {/* Daily Intel */}
+            <DailyIntel
+              totalMinutesToday={totalMinutesToday}
+              goalMinutesToday={goalMinutesToday}
+              effectiveMinutesToday={effectiveMinutesToday}
+              efficiencyScore={efficiencyScore}
+              sessionsCompleted={sessionsCompleted}
+              formatTotalTime={formatTotalTime}
+              selectedArenaId={selectedArenaId}
+            />
 
-              {/* Ambient Atmosphere */}
-              <div className="glass-card dark:bg-slate-900/60 dark:border-white/10 dark:shadow-black/50 p-6 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4 px-1">
-                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                    <FaCloudRain className="text-primary-500" /> Ambient Focus
-                  </h3>
-                  <button 
-                    onClick={() => setAmbientEnabled(!ambientEnabled)}
-                    className={`w-10 h-[22px] rounded-full transition-all duration-300 relative ${ambientEnabled ? 'bg-primary-500' : 'bg-gray-200'} shadow-inner`}
-                  >
-                    <motion.div 
-                      layout
-                      animate={{ x: ambientEnabled ? 20 : 2 }}
-                      initial={false}
-                      className="absolute top-[2.5px] left-0 w-[17px] h-[17px] bg-white rounded-full shadow-sm"
-                    />
-                  </button>
-                </div>
-
-                <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-hide px-1">
-                  {AMBIENT_SOUNDS.filter(s => s.id !== 'none').map(sound => (
-                    <button
-                      key={sound.id}
-                      onClick={() => {
-                        setAmbientType(sound.id);
-                        if (!ambientEnabled) setAmbientEnabled(true);
-                      }}
-                      className={`flex-shrink-0 px-4 py-3 rounded-2xl border text-[9px] font-black uppercase tracking-tight transition-all flex items-center gap-2 relative overflow-hidden group/sbtn ${
-                        ambientType === sound.id && ambientEnabled 
-                          ? 'bg-primary-50/50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-400 shadow-sm' 
-                          : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400 hover:border-gray-200 dark:hover:border-slate-600 hover:text-gray-600 dark:hover:text-gray-300'
-                      }`}
-                    >
-                      {ambientType === sound.id && ambientEnabled && (
-                        <motion.div 
-                          layoutId="activeSound"
-                          className="absolute inset-0 bg-primary-100/20"
-                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                        />
-                      )}
-                      <span className="relative z-10 flex items-center gap-2">
-                        {sound.id === 'rain' && <FaCloudRain size={10} />}
-                        {sound.id === 'droplets' && <FaCloudRain size={10} />}
-                        {sound.id === 'river' && <FaWater size={10} />}
-                        {sound.id === 'lofi' && <FaMusic size={10} />}
-                        {sound.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-3 px-1">
-                  <div className="text-gray-400 flex-shrink-0">
-                    {volume === 0 || !ambientEnabled ? <FaVolumeMute size={12} /> : <FaVolumeUp size={12} className="text-primary-500" />}
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="1" 
-                    step="0.01" 
-                    value={volume}
-                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="flex-1 h-1.5 bg-gray-100 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+            {/* Ambient Atmosphere */}
+            <div className="glass-card dark:bg-slate-900/60 dark:border-white/10 dark:shadow-black/50 p-6 rounded-[2rem] border border-white/60 shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between mb-4 px-1">
+                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                  <FaCloudRain className="text-primary-500" /> Ambient Focus
+                </h3>
+                <button
+                  onClick={() => setAmbientEnabled(!ambientEnabled)}
+                  className={`w-10 h-[22px] rounded-full transition-all duration-300 relative ${ambientEnabled ? 'bg-primary-500' : 'bg-gray-200'} shadow-inner`}
+                >
+                  <motion.div
+                    layout
+                    animate={{ x: ambientEnabled ? 20 : 2 }}
+                    initial={false}
+                    className="absolute top-[2.5px] left-0 w-[17px] h-[17px] bg-white rounded-full shadow-sm"
                   />
-                  <span className="text-[10px] font-black text-gray-400 w-8 tabular-nums text-right">{Math.round(volume * 100)}%</span>
-                </div>
+                </button>
               </div>
 
-              <QuickStrategy 
-                applyPreset={applyPreset}
-                setIsEditing={setIsEditing}
-                upscPresets={UPSC_PRESETS}
-              />
+              <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-hide px-1">
+                {AMBIENT_SOUNDS.filter(s => s.id !== 'none').map(sound => (
+                  <button
+                    key={sound.id}
+                    onClick={() => {
+                      setAmbientType(sound.id);
+                      if (!ambientEnabled) setAmbientEnabled(true);
+                    }}
+                    className={`flex-shrink-0 px-4 py-3 rounded-2xl border text-[9px] font-black uppercase tracking-tight transition-all flex items-center gap-2 relative overflow-hidden group/sbtn ${ambientType === sound.id && ambientEnabled
+                        ? 'bg-primary-50/50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-400 shadow-sm'
+                        : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400 hover:border-gray-200 dark:hover:border-slate-600 hover:text-gray-600 dark:hover:text-gray-300'
+                      }`}
+                  >
+                    {ambientType === sound.id && ambientEnabled && (
+                      <motion.div
+                        layoutId="activeSound"
+                        className="absolute inset-0 bg-primary-100/20"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      {sound.id === 'rain' && <FaCloudRain size={10} />}
+                      {sound.id === 'droplets' && <FaCloudRain size={10} />}
+                      {sound.id === 'river' && <FaWater size={10} />}
+                      {sound.id === 'lofi' && <FaMusic size={10} />}
+                      {sound.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3 px-1">
+                <div className="text-gray-400 flex-shrink-0">
+                  {volume === 0 || !ambientEnabled ? <FaVolumeMute size={12} /> : <FaVolumeUp size={12} className="text-primary-500" />}
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => setVolume(parseFloat(e.target.value))}
+                  className="flex-1 h-1.5 bg-gray-100 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                />
+                <span className="text-[10px] font-black text-gray-400 w-8 tabular-nums text-right">{Math.round(volume * 100)}%</span>
+              </div>
             </div>
+
+            <QuickStrategy
+              applyPreset={applyPreset}
+              setIsEditing={setIsEditing}
+              upscPresets={UPSC_PRESETS}
+            />
+          </div>
         </div>
       </div>
 
@@ -593,30 +591,30 @@ const Timer = () => {
       />
 
       {/* Reset Confirmation Modal */}
-       <TimerResetModal 
-         isOpen={showResetConfirm}
-         onClose={() => setShowResetConfirm(false)}
-         onConfirm={() => {
-           resetDay();
-           setShowResetConfirm(false);
-         }}
-       />
+      <TimerResetModal
+        isOpen={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        onConfirm={() => {
+          resetDay();
+          setShowResetConfirm(false);
+        }}
+      />
 
-       {/* Simple Full Screen Timer */}
-       <FullScreenTimer
-         isOpen={isFullScreen}
-         timeLeft={timeLeft}
-         isActive={isActive}
-         toggleTimer={toggleTimer}
-         progress={progress}
-         onClose={() => {
-           setIsFullScreen(false);
-           if (document.fullscreenElement) {
-             document.exitFullscreen().catch(() => {});
-           }
-         }}
-       />
-     </div>
+      {/* Simple Full Screen Timer */}
+      <FullScreenTimer
+        isOpen={isFullScreen}
+        timeLeft={timeLeft}
+        isActive={isActive}
+        toggleTimer={toggleTimer}
+        progress={progress}
+        onClose={() => {
+          setIsFullScreen(false);
+          if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => { });
+          }
+        }}
+      />
+    </div>
   );
 };
 

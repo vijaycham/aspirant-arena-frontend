@@ -238,11 +238,18 @@ const arenaSlice = createSlice({
         delete state.syllabus[action.payload];
       })
       .addCase(togglePrimaryArena.fulfilled, (state, action) => {
-        state.arenas = state.arenas.map(a => ({
-          ...a,
-          isPrimary: a._id === action.payload._id
-        }));
-        toast.success(`Primary Arena set to ${action.payload.title} ⭐`);
+        const updatedArena = action.payload;
+        state.arenas = state.arenas.map(a => {
+          if (a._id === updatedArena._id) return updatedArena;
+          if (updatedArena.isPrimary) return { ...a, isPrimary: false };
+          return a;
+        });
+
+        if (updatedArena.isPrimary) {
+          toast.success(`Primary Arena set to ${updatedArena.title} ⭐`);
+        } else {
+          toast.success(`Primary Goal removed. Global mode active. 🌍`);
+        }
       })
       .addCase(togglePrimaryArena.rejected, (state, action) => {
         toast.error(action.payload);

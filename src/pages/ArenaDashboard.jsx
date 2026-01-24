@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTimer } from '../hooks/useTimer';
 import { fetchArenas, fetchSyllabus, setCurrentArena, createArena, deleteArena, togglePrimaryArena } from '../redux/slice/arenaSlice';
 import SyllabusTree from '../components/syllabus/SyllabusTree';
 import ArenaModal from '../components/arena/ArenaModal';
 import ExamCountdown from '../components/arena/ExamCountdown';
+import LegacyLinker from '../components/arena/LegacyLinker';
 import { motion } from 'framer-motion';
 import { FiPlus, FiRefreshCcw, FiLayers, FiTarget, FiTrash2, FiStar } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
@@ -11,6 +13,7 @@ import api from '../utils/api';
 
 const ArenaDashboard = () => {
   const dispatch = useDispatch();
+  const { isActive: isTimerActive } = useTimer();
   const { arenas, currentArenaId, syllabus, syllabusLoading } = useSelector(state => state.arena);
   const [modalType, setModalType] = useState(null); // 'create' | 'delete' | 'reset'
 
@@ -98,6 +101,8 @@ const ArenaDashboard = () => {
           </div>
         </div>
 
+        <LegacyLinker arenas={arenas} />
+
         {/* Dash Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
@@ -124,6 +129,10 @@ const ArenaDashboard = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (isTimerActive) {
+                          toast.error("Finish your session before changing primary goals! ⏳", { id: 'timer-lock' });
+                          return;
+                        }
                         dispatch(togglePrimaryArena(arena._id));
                       }}
                       className="transition-transform hover:scale-125 p-1"
