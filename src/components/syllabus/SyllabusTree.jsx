@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FiChevronRight, FiPlus, FiBook,
+  FiChevronRight, FiPlus, FiBook, FiEdit2,
   FiClock, FiCheckCircle, FiCircle, FiCornerDownRight, FiTrash2, FiList
 } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
@@ -17,6 +17,8 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
 
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [newChildTitle, setNewChildTitle] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(node.title || "");
 
   if (!node) return null;
 
@@ -43,6 +45,19 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
       nodeId: node._id,
       status: nextStatus[node.status] || 'in-progress'
     }));
+  };
+
+  const handleRename = async () => {
+    if (!editTitle.trim() || editTitle === node.title) {
+      setIsEditing(false);
+      return;
+    }
+    await dispatch(updateNode({
+      arenaId,
+      nodeId: node._id,
+      title: editTitle
+    }));
+    setIsEditing(false);
   };
 
   const handleAddChild = async () => {
@@ -105,19 +120,33 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
 
         {/* Title & Stats */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className={`truncate font-medium ${node.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-gray-200'}`}>
-              {node.title}
-            </span>
-            {node.timeSpent > 0 && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono font-bold">
-                {node.timeSpent}m
+          {isEditing ? (
+            <input
+              autoFocus
+              className="w-full bg-white dark:bg-slate-700 border-2 border-primary-500 rounded px-2 py-0.5 font-medium text-gray-900 dark:text-white outline-none"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              onBlur={handleRename}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRename();
+                if (e.key === 'Escape') { setEditTitle(node.title); setIsEditing(false); }
+              }}
+            />
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className={`truncate font-medium ${node.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-gray-200'}`}>
+                {node.title}
               </span>
-            )}
-            {node.resources?.length > 0 && (
-              <FiBook className="text-primary-500 h-3 w-3" title="Resources available" />
-            )}
-          </div>
+              {node.timeSpent > 0 && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-mono font-bold">
+                  {node.timeSpent}m
+                </span>
+              )}
+              {node.resources?.length > 0 && (
+                <FiBook className="text-primary-500 h-3 w-3" title="Resources available" />
+              )}
+            </div>
+          )}
         </div>
 
         {/* Actions */}
@@ -127,7 +156,19 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
               <FiCornerDownRight size={14} />
             </button>
           )}
-          {node.type !== 'subject' && (
+          {node.type !== 'root' && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                setIsEditing(true);
+              }}
+              className="p-1.5 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-500 hover:bg-primary-600 hover:text-white transition-all shadow-sm"
+              title="Rename Topic"
+            >
+              <FiEdit2 size={12} />
+            </button>
+          )}
+          {node.type !== 'subject' && node.type !== 'root' && node.type !== 'category' && (
             <button
               onClick={async (e) => {
                 e.stopPropagation();
@@ -141,10 +182,11 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
               <FiList size={14} />
             </button>
           )}
-          {node.isCustom && (
+          {node.type !== 'root' && (
             <button
               onClick={(e) => { e.stopPropagation(); handleDelete(); }}
               className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-900/10 text-rose-500 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+              title="Delete Topic"
             >
               <FiTrash2 size={14} />
             </button>
