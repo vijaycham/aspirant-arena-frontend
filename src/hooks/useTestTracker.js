@@ -6,6 +6,7 @@ import { hasAccess } from "../utils/auth/verifyHelpers";
 
 const useTestTracker = () => {
   const user = useSelector((state) => state.user.currentUser);
+  const { currentArenaId } = useSelector((state) => state.arena);
   const [tests, setTests] = useState([]);
   const [stats, setStats] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -32,7 +33,8 @@ const useTestTracker = () => {
     difficulty: "Medium",
     reflection: "",
     timeTaken: "",
-    startTime: ""
+    startTime: "",
+    arenaId: currentArenaId || ""
   });
 
   const fetchData = useCallback(async () => {
@@ -77,11 +79,12 @@ const useTestTracker = () => {
       difficulty: "Medium",
       reflection: "",
       timeTaken: "",
-      startTime: ""
+      startTime: "",
+      arenaId: currentArenaId || ""
     });
     setEditingId(null);
     setShowAdvance(false);
-  }, []);
+  }, [currentArenaId]);
 
   // Helper to sync revision tasks
   const syncRevisionTask = async (payload) => {
@@ -135,8 +138,8 @@ const useTestTracker = () => {
 
     try {
       if (editingId) {
-        await api.put(`/test/${editingId}`, payload);
-        await syncRevisionTask(payload); // Now runs on update too
+        await api.patch(`/test/${editingId}`, payload);
+        await syncRevisionTask(payload);
         toast.success("Test record updated! ✨");
       } else {
         await api.post("/test", payload);
@@ -166,7 +169,8 @@ const useTestTracker = () => {
       difficulty: test.difficulty || "Medium",
       reflection: test.reflection || "",
       timeTaken: test.timeTaken || "",
-      startTime: test.startTime || ""
+      startTime: test.startTime || "",
+      arenaId: test.arenaId || ""
     });
     setEditingId(test._id);
     setShowAdvance(true);
@@ -284,6 +288,7 @@ const useTestTracker = () => {
   }, [stats, selectedSubject]);
 
   return {
+    arenas: useSelector((state) => state.arena.arenas),
     tests,
     stats,
     subjects,

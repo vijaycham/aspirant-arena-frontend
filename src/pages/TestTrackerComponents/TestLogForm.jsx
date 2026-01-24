@@ -14,16 +14,14 @@ const TestLogForm = ({
 }) => {
   return (
     <div
-      className={`p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-white/5 lg:sticky lg:top-32 transition-all duration-500 ${
-        editingId ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-500/20" : "bg-white dark:bg-slate-900"
-      }`}
+      className={`p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-xl shadow-gray-200/50 dark:shadow-black/50 border border-gray-100 dark:border-white/5 lg:sticky lg:top-32 transition-all duration-500 ${editingId ? "bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-500/20" : "bg-white dark:bg-slate-900"
+        }`}
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg md:text-xl font-black text-gray-900 dark:text-white flex items-center gap-3">
           <span
-            className={`w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg text-sm ${
-              editingId ? "bg-indigo-600 text-white" : "bg-black text-white"
-            }`}
+            className={`w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-lg text-sm ${editingId ? "bg-indigo-600 text-white" : "bg-black text-white"
+              }`}
           >
             {editingId ? "✏️" : "✍️"}
           </span>
@@ -40,6 +38,7 @@ const TestLogForm = ({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+
         <div className="space-y-1">
           <label className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase ml-1 tracking-wider">
             Subject Name
@@ -302,11 +301,10 @@ const TestLogForm = ({
 
         <button
           type="submit"
-          className={`w-full py-3.5 md:py-4 mt-2 text-white font-black rounded-xl md:rounded-2xl hover:scale-[1.02] transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[10px] md:text-xs ${
-            editingId
-              ? "bg-indigo-600 shadow-indigo-200 dark:shadow-indigo-900/30 hover:bg-indigo-700"
-              : "bg-gray-900 dark:bg-white dark:text-gray-900 shadow-gray-200 dark:shadow-none hover:bg-black dark:hover:bg-gray-200"
-          }`}
+          className={`w-full py-3.5 md:py-4 mt-2 text-white font-black rounded-xl md:rounded-2xl hover:scale-[1.02] transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[10px] md:text-xs ${editingId
+            ? "bg-indigo-600 shadow-indigo-200 dark:shadow-indigo-900/30 hover:bg-indigo-700"
+            : "bg-gray-900 dark:bg-white dark:text-gray-900 shadow-gray-200 dark:shadow-none hover:bg-black dark:hover:bg-gray-200"
+            }`}
         >
           {editingId ? "Save Changes" : "Analyze & Save"}
         </button>

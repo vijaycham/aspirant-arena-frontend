@@ -5,6 +5,29 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] – 2026-01-25
+### Added
+- **Search-First Task Engine**: Completely redesigned `TaskInput` to prioritize a predictive type-ahead search over manual dropdown selection.
+- **Arena Star System**: Introduced "Primary Arena" pining, allowing users to choose which exam track dominates their global dashboard.
+- **Mission-Aware Dashboard**: Dynamic Home Page that adapts its Hero section and "Strategic Pillars" (Map/Analyze/Command) to the active Arena.
+- **Flexible Roadmaps**: Unlocked manual editing (Rename/Add/Delete) for all syllabus levels including root categories and subjects.
+- **Context Switcher**: Added an interactive "Arena Badge" in the task bar that doubles as a minimalist workspace switcher.
+- **Micro-Topic Fallback**: Inline creation of new syllabus topics directly from the task input search.
+
+### Changed
+- **Architectural Shift (Normalization)**: Refactored `arenaSlice` into a high-performance normalized state (`byId`, `childrenMap`), reducing complex tree updates to $O(1)$.
+- **Hero Layout Refit**: Upgraded the Home Page with premium typography (Outfit), dynamic gradients, and strategic consistency widgets.
+- **Leaderboard UX**: Integrated user photos and score profiles into the competitive ranking view.
+
+### Fixed
+- **UI Quality Pass**: Fixed corrupted spacing in Tailwind classes for `TestLogForm.jsx` (Regression Fix).
+- **Theme Integrity**: Corrected white-background leaks in dark mode for Syllabus add-node inputs and Arena creation modals.
+- **Timer Resilience**: Hardened cross-tab synchronization and background accuracy for the Focus Timer.
+
+### Quality
+- **100% Core Verification**: Updated 109 test files to support the new normalized V2 architecture.
+- **Zero-Warning State**: achieved a perfectly clean linting score across all frontend source files.
+
 ## [1.6.3] – 2026-01-24
 ### UI Polish
 - **Smart Focus Lock**: "Focus Mission" input now behaves like a solid commitment chip while the timer is running. It becomes read-only and displays a lock icon (if a task is set) to reduce distraction.

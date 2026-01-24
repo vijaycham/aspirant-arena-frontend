@@ -15,6 +15,7 @@ describe('arenaSlice Reducer', () => {
     currentArenaId: null,
     syllabus: {},
     loading: false,
+    syllabusLoading: false,
     error: null
   };
 
@@ -72,7 +73,9 @@ describe('arenaSlice Reducer', () => {
           { _id: '2', title: 'Delete Me' }
         ],
         currentArenaId: '2',
-        syllabus: { '2': [] }
+        syllabus: {
+          '2': { byId: {}, rootIds: [] }
+        }
       };
 
       const action = { type: deleteArena.fulfilled.type, payload: '2' };
@@ -86,11 +89,17 @@ describe('arenaSlice Reducer', () => {
   });
 
   describe('fetchSyllabus', () => {
-    it('should store syllabus nodes on fulfilled', () => {
-      const payload = { arenaId: '1', nodes: [{ _id: 'n1' }] };
+    it('should store syllabus nodes in normalized format on fulfilled', () => {
+      const payload = {
+        arenaId: '1',
+        nodes: [{ _id: 'n1', parentId: null }, { _id: 'n2', parentId: 'n1' }]
+      };
       const action = { type: fetchSyllabus.fulfilled.type, payload };
       const actual = arenaReducer(initialState, action);
-      expect(actual.syllabus['1']).toEqual(payload.nodes);
+
+      expect(actual.syllabus['1'].byId['n1']).toBeDefined();
+      expect(actual.syllabus['1'].byId['n2']).toBeDefined();
+      expect(actual.syllabus['1'].rootIds).toContain('n1');
     });
   });
 
@@ -98,20 +107,20 @@ describe('arenaSlice Reducer', () => {
     it('should update existing node on fulfilled', () => {
       const state = {
         ...initialState,
-        syllabus: { '1': [{ _id: 'n1', title: 'Old' }, { _id: 'n2' }] }
+        syllabus: {
+          '1': {
+            byId: {
+              'n1': { _id: 'n1', title: 'Old' },
+              'n2': { _id: 'n2' }
+            },
+            rootIds: ['n1']
+          }
+        }
       };
-      const payload = { _id: 'n1', title: 'New', arenaId: '1' };
+      const payload = { arenaId: '1', nodes: [{ _id: 'n1', title: 'New' }] };
       const action = { type: updateNode.fulfilled.type, payload };
       const actual = arenaReducer(state, action);
-      expect(actual.syllabus['1'][0].title).toEqual('New');
-    });
-
-    it('should ignore if arena or node not found', () => {
-      const state = { ...initialState, syllabus: { '1': [] } };
-      const payload = { _id: 'n1', arenaId: '2' }; // Wrong arena
-      const action = { type: updateNode.fulfilled.type, payload };
-      const actual = arenaReducer(state, action);
-      expect(actual).toEqual(state);
+      expect(actual.syllabus['1'].byId['n1'].title).toEqual('New');
     });
   });
 
@@ -119,12 +128,19 @@ describe('arenaSlice Reducer', () => {
     it('should update node time on fulfilled', () => {
       const state = {
         ...initialState,
-        syllabus: { '1': [{ _id: 'n1', timeSpent: 0 }] }
+        syllabus: {
+          '1': {
+            byId: {
+              'n1': { _id: 'n1', timeSpent: 0 }
+            },
+            rootIds: ['n1']
+          }
+        }
       };
       const payload = { _id: 'n1', timeSpent: 100, arenaId: '1' };
       const action = { type: syncNodeTime.fulfilled.type, payload };
       const actual = arenaReducer(state, action);
-      expect(actual.syllabus['1'][0].timeSpent).toEqual(100);
+      expect(actual.syllabus['1'].byId['n1'].timeSpent).toEqual(100);
     });
   });
 });

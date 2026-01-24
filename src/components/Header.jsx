@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { 
-  FaBars, 
-  FaTimes, 
-  FaUserCircle, 
-  FaHome, 
-  FaChartLine, 
-  FaTrophy, 
-  FaTasks, 
-  FaClock 
+import {
+  FaBars,
+  FaTimes,
+  FaUserCircle,
+  FaHome,
+  FaChartLine,
+  FaTrophy,
+  FaTasks,
+  FaClock
 } from "react-icons/fa";
 import { FiLayers } from "react-icons/fi";
 import { HiCheckCircle, HiXCircle, HiClock } from "react-icons/hi";
@@ -21,6 +21,7 @@ import api from "../utils/api";
 import { signOut } from "../redux/user/authSlice";
 import { persistor } from "../redux/store";
 import { getRemainingGraceHours } from "../utils/auth/verifyHelpers";
+import { FiZap } from "react-icons/fi";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ const Header = () => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [streak, setStreak] = useState(0);
   const profileRef = useRef(null);
 
   // 🖱️ Close dropdown on outside click
@@ -66,6 +68,22 @@ const Header = () => {
       console.error("Logout error", err);
     }
   };
+
+  // ⚡ Fetch Streak on Mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchStreak = async () => {
+        try {
+          const tzOffset = new Date().getTimezoneOffset();
+          const { data: res } = await api.get(`/focus/stats/today?offset=${tzOffset}`);
+          setStreak(res.streak || 0);
+        } catch (err) {
+          console.error("Streak fetch failed", err);
+        }
+      };
+      fetchStreak();
+    }
+  }, [isAuthenticated]);
 
   return (
     <>
@@ -110,6 +128,18 @@ const Header = () => {
               </nav>
             ) : (
               <div className="flex items-center gap-4">
+                {streak > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 shadow-lg shadow-orange-500/10"
+                    title={`${streak} Day Streak!`}
+                  >
+                    <FiZap className="fill-current text-sm animate-pulse" />
+                    <span className="text-xs font-black tabular-nums">{streak}</span>
+                  </motion.div>
+                )}
+
                 <ThemeToggle className="hidden xl:block" />
 
                 {/* Profile Dropdown */}
@@ -142,7 +172,7 @@ const Header = () => {
                           <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Account Context</p>
                           <p className="text-sm font-bold text-white truncate">{user.firstName} {user.lastName}</p>
                           <p className="text-[10px] text-gray-500 truncate mt-0.5">{user.emailId}</p>
-                          
+
                           {/* Verification in Dropdown (Clean) */}
                           <div className="mt-2 text-[10px] font-black uppercase tracking-widest">
                             {user.isEmailVerified ? (
@@ -151,7 +181,7 @@ const Header = () => {
                               </span>
                             ) : (
                               <span className={getRemainingGraceHours(user) > 0 ? "text-amber-500 flex items-center gap-1" : "text-rose-500 flex items-center gap-1"}>
-                                {getRemainingGraceHours(user) > 0 ? <HiClock /> : <HiXCircle />} 
+                                {getRemainingGraceHours(user) > 0 ? <HiClock /> : <HiXCircle />}
                                 {getRemainingGraceHours(user) > 0 ? "Grace Period" : "Unverified Access"}
                               </span>
                             )}
@@ -304,8 +334,8 @@ const Header = () => {
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                       <span className="text-sm">Focus Arena</span>
-                       <span className="bg-primary-500 text-[7px] px-1.5 py-0.5 rounded-full text-white font-black">NEW</span>
+                      <span className="text-sm">Focus Arena</span>
+                      <span className="bg-primary-500 text-[7px] px-1.5 py-0.5 rounded-full text-white font-black">NEW</span>
                     </div>
                     <span className="text-[10px] text-gray-500 font-medium">Deep Work Timer</span>
                   </div>
@@ -324,36 +354,36 @@ const Header = () => {
 
               {/* Footer Account Section */}
               <div className="p-6 mt-auto bg-black/20 border-t border-white/5">
-                 <Link 
-                   to="/profile" 
-                   onClick={() => setMobileMenuOpen(false)}
-                   className="flex items-center gap-4 mb-6 group"
-                 >
-                    {user.photoUrl ? (
-                      <img src={user.photoUrl} alt="User" className="w-12 h-12 rounded-2xl object-cover border border-white/10" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-gray-500 text-2xl">
-                        <FaUserCircle />
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-black text-white">{user.firstName}</span>
-                        {user.isEmailVerified ? <HiCheckCircle className="text-emerald-500" /> : <HiClock className="text-amber-500" />}
-                      </div>
-                      <span className="text-[10px] text-primary-400 font-black uppercase tracking-widest">Profile &rarr;</span>
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-4 mb-6 group"
+                >
+                  {user.photoUrl ? (
+                    <img src={user.photoUrl} alt="User" className="w-12 h-12 rounded-2xl object-cover border border-white/10" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-gray-500 text-2xl">
+                      <FaUserCircle />
                     </div>
-                 </Link>
+                  )}
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-black text-white">{user.firstName}</span>
+                      {user.isEmailVerified ? <HiCheckCircle className="text-emerald-500" /> : <HiClock className="text-amber-500" />}
+                    </div>
+                    <span className="text-[10px] text-primary-400 font-black uppercase tracking-widest">Profile &rarr;</span>
+                  </div>
+                </Link>
 
-                 <button
-                    onClick={() => {
-                      handleSignOut();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full py-4 rounded-2xl bg-rose-500/10 text-rose-500 font-black uppercase tracking-widest text-[10px] border border-rose-500/20"
-                  >
-                    Sign Out
-                  </button>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full py-4 rounded-2xl bg-rose-500/10 text-rose-500 font-black uppercase tracking-widest text-[10px] border border-rose-500/20"
+                >
+                  Sign Out
+                </button>
               </div>
             </motion.aside>
           </>

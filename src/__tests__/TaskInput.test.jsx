@@ -18,7 +18,9 @@ vi.mock('react-icons/fi', () => ({
   FiTarget: () => <span data-testid="icon-target" />,
   FiSearch: () => <span data-testid="icon-search" />,
   FiChevronRight: () => <span data-testid="icon-chevron" />,
-  FiPlus: () => <span data-testid="icon-plus" />
+  FiPlus: () => <span data-testid="icon-plus" />,
+  FiX: () => <span data-testid="icon-x" />,
+  FiZap: () => <span data-testid="icon-zap" />
 }));
 
 // Mock Redux Actions
@@ -30,10 +32,13 @@ vi.mock('../redux/slice/arenaSlice', () => ({
 const mockStore = configureStore([]);
 
 const mockSyllabus = {
-  'arena-1': [
-    { _id: '1', title: 'History', type: 'subject', children: ['2'] },
-    { _id: '2', title: 'Ancient India', type: 'topic', parentId: '1' }
-  ]
+  'arena-1': {
+    byId: {
+      '1': { _id: '1', title: 'History', type: 'subject', children: ['2'] },
+      '2': { _id: '2', title: 'Ancient India', type: 'topic', parentId: '1' }
+    },
+    rootIds: ['1']
+  }
 };
 
 const mockArenas = [
@@ -101,10 +106,10 @@ describe('TaskInput Component', () => {
     const { container } = renderComponent();
     const dateInput = container.querySelector('input[type="date"]');
     const timeInput = container.querySelector('input[type="time"]');
-    
+
     // Simulate picking a date: 2023-12-31
     fireEvent.change(dateInput, { target: { value: '2023-12-31' } });
-    
+
     // Default time is 09:00. This is local time.
     // The helpers convert Local '2023-12-31T09:00' -> ISO (UTC).
     const expectedISO1 = new Date('2023-12-31T09:00').toISOString();
@@ -112,7 +117,7 @@ describe('TaskInput Component', () => {
 
     // Simulate picking a time: 14:30
     fireEvent.change(timeInput, { target: { value: '14:30' } });
-    
+
     // Uses "today" if date isn't set in state (mocked).
     // Local 'YYYY-MM-DDT14:30' -> ISO (UTC).
     const today = new Date().toISOString().split('T')[0];
@@ -129,7 +134,7 @@ describe('TaskInput Component', () => {
   it('shows and calls onCancel in edit mode', () => {
     renderComponent({ isEditing: true });
     expect(screen.getByText('Update Task')).toBeInTheDocument();
-    
+
     const cancelBtn = screen.getByText('Cancel');
     fireEvent.click(cancelBtn);
     expect(props.onCancel).toHaveBeenCalled();
@@ -139,7 +144,7 @@ describe('TaskInput Component', () => {
     // We need 'task' prop to match mock syllabus title for suggestion logic to trigger
     // The component derives suggestions from 'task' prop, not internal state (it's controlled)
     renderComponent({ task: 'Ancient' }); // Should match 'Ancient India'
-    
+
     // Focus input to trigger showSuggestions(true)
     const input = screen.getByPlaceholderText(/What needs to be done?/i);
     fireEvent.focus(input);
@@ -150,19 +155,19 @@ describe('TaskInput Component', () => {
   it('selects suggestion when clicked', () => {
     renderComponent({ task: 'Ancient' });
     fireEvent.focus(screen.getByPlaceholderText(/What needs to be done?/i));
-    
+
     const suggestion = screen.getByText('Ancient India');
     fireEvent.click(suggestion);
-    
+
     expect(props.setSelectedNodeId).toHaveBeenCalledWith('2');
     expect(props.setTask).toHaveBeenCalledWith('Ancient India');
   });
 
   it('opens arena selector when Link Roadmap is clicked', () => {
     renderComponent({ selectedNodeId: null });
-    fireEvent.click(screen.getByText(/Link Roadmap Topic/i));
-    
+    fireEvent.click(screen.getByText('UPSC GS'));
+
     // Checks if the dropdown appeared (mocked motion div renders children)
-    expect(screen.getByText('Master Roadmap Link')).toBeInTheDocument();
+    expect(screen.getByText('Select Context')).toBeInTheDocument();
   });
 });
