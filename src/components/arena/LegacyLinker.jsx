@@ -31,6 +31,10 @@ const LegacyLinker = ({ arenas }) => {
             return;
         }
 
+        if (!window.confirm(`⚠️ Permanent Action\n\nAre you sure you want to link ALL ${totalItems} unlinked items to this Arena?\n\nThis cannot be undone.`)) {
+            return;
+        }
+
         setLinking(true);
         try {
             await api.post('/arenas/legacy-link', {
@@ -65,32 +69,37 @@ const LegacyLinker = ({ arenas }) => {
                         <FiAlertCircle size={24} />
                     </div>
                     <div>
-                        <h4 className="font-black text-amber-900 dark:text-amber-400 uppercase tracking-tight">Legacy Data Detected</h4>
+                        <h4 className="font-black text-amber-900 dark:text-amber-400 uppercase tracking-tight">Unorganized Records Found</h4>
                         <p className="text-xs font-bold text-amber-700/70 dark:text-amber-500/60 leading-relaxed max-w-sm">
-                            You have {unlinkedData.tests.length} mock tests and {unlinkedData.sessions.length} sessions that aren't linked to an Arena. Link them now to fix your analytics.
+                            You have {unlinkedData.tests.length} tests and {unlinkedData.sessions.length} sessions not attached to any Arena. Organize them to unlock full analytics.
                         </p>
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                    <select
-                        value={selectedArena}
-                        onChange={(e) => setSelectedArena(e.target.value)}
-                        className="w-full sm:w-48 p-3 bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-500/30 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 outline-none focus:ring-2 focus:ring-amber-500/20"
-                    >
-                        <option value="">Select Target Arena</option>
-                        {arenas.map(a => (
-                            <option key={a._id} value={a._id}>{a.title}</option>
-                        ))}
-                    </select>
+                <div className="flex flex-col sm:flex-row items-end sm:items-start gap-3 w-full md:w-auto">
+                    <div className="flex flex-col w-full sm:w-auto">
+                        <select
+                            value={selectedArena}
+                            onChange={(e) => setSelectedArena(e.target.value)}
+                            className="w-full sm:w-48 h-12 px-4 bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-500/30 rounded-xl text-xs font-bold text-gray-700 dark:text-gray-300 outline-none focus:ring-2 focus:ring-amber-500/20"
+                        >
+                            <option value="">Select Destination Arena</option>
+                            {arenas.map(a => (
+                                <option key={a._id} value={a._id}>{a.title}</option>
+                            ))}
+                        </select>
+                        <span className="text-[9px] font-bold text-amber-600 dark:text-amber-500 mt-1 ml-1 opacity-80">
+                            ⚠️ Action cannot be undone
+                        </span>
+                    </div>
 
                     <button
                         onClick={handleLink}
                         disabled={linking || !selectedArena}
-                        className="w-full sm:w-auto px-6 py-3 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-200 dark:shadow-none"
+                        className="w-full sm:w-auto h-12 px-6 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300 text-white font-black rounded-xl text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 mb-4 sm:mb-0"
                     >
                         {linking ? <FiLoader className="animate-spin" /> : <FiLink />}
-                        Link All Data
+                        Move to Roadmap
                     </button>
                 </div>
             </div>
