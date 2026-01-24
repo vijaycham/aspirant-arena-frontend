@@ -6,6 +6,7 @@ import { hasAccess } from "../utils/auth/verifyHelpers";
 
 const useTestTracker = () => {
   const user = useSelector((state) => state.user.currentUser);
+  const { currentArenaId } = useSelector((state) => state.arena);
   const [tests, setTests] = useState([]);
   const [stats, setStats] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -33,7 +34,8 @@ const useTestTracker = () => {
     reflection: "",
     timeTaken: "",
     startTime: "",
-    arenaId: ""
+    startTime: "",
+    arenaId: currentArenaId || ""
   });
 
   const fetchData = useCallback(async () => {
@@ -79,7 +81,8 @@ const useTestTracker = () => {
       reflection: "",
       timeTaken: "",
       startTime: "",
-      arenaId: ""
+      startTime: "",
+      arenaId: currentArenaId || ""
     });
     setEditingId(null);
     setShowAdvance(false);

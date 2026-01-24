@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -34,6 +35,7 @@ import FocusHeatmap from "../components/timer/FocusHeatmap";
 import FullScreenTimer from "../components/timer/FullScreenTimer";
 
 const Timer = () => {
+  const location = useLocation();
   const {
     mode,
     setMode: switchMode,
@@ -101,6 +103,21 @@ const Timer = () => {
       dispatch(fetchArenas());
     }
   }, [arenas.length, dispatch]);
+
+  // ⚡ Quick-Loop Integration (From Home)
+  React.useEffect(() => {
+    if (location.state?.autoTask && !isActive) {
+      const task = location.state.autoTask;
+      setSubject(task.text);
+      setSelectedTaskId(task._id);
+      if (task.arenaId) setSelectedArenaId(task.arenaId);
+      if (task.nodeId) setSelectedNodeId(task.nodeId);
+
+      // Clear location state to prevent re-fill on refresh
+      window.history.replaceState({}, document.title);
+      toast(`Ready to focus: ${task.text}`, { icon: "🎯" });
+    }
+  }, [location.state, isActive, setSubject, setSelectedTaskId, setSelectedArenaId, setSelectedNodeId]);
 
   React.useEffect(() => {
     if (selectedArenaId && !syllabus[selectedArenaId]) {
@@ -231,10 +248,10 @@ const Timer = () => {
               <button
                 onClick={requestNotificationPermission}
                 className={`flex items-center justify-center w-[34px] h-full rounded-lg border transition-all shadow-sm active:scale-90 ${notificationPermission === "granted"
-                    ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
-                    : notificationPermission === "denied"
-                      ? "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800 text-rose-600 dark:text-rose-400"
-                      : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-primary-600 hover:border-primary-100"
+                  ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
+                  : notificationPermission === "denied"
+                    ? "bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800 text-rose-600 dark:text-rose-400"
+                    : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-primary-600 hover:border-primary-100"
                   }`}
               >
                 {notificationPermission === "denied" ? <FaBellSlash size={12} /> : <FaBell size={12} />}
@@ -253,26 +270,6 @@ const Timer = () => {
               </div>
             </div>
 
-            {/* Streak Indicator */}
-            {streak > 0 && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-orange-50 border border-orange-100 rounded-lg group/streak relative cursor-pointer mr-2 shadow-sm shadow-orange-100/50">
-                <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    filter: ["drop-shadow(0 0 2px #f97316)", "drop-shadow(0 0 8px #f97316)", "drop-shadow(0 0 2px #f97316)"]
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <FaFire className="text-orange-500 text-sm" />
-                </motion.div>
-                <span className="text-[10px] font-black text-orange-600 tabular-nums tracking-tight">{streak}</span>
-
-                <div className="absolute top-full right-0 mt-3 w-40 p-3 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl opacity-0 group-hover/streak:opacity-100 pointer-events-none transition-all z-[60] shadow-2xl text-center">
-                  <p className="text-[8px] font-black text-primary-400 uppercase tracking-widest mb-1">Consistency</p>
-                  <p className="text-[10px] font-black text-white uppercase tracking-tighter tabular-nums">{streak} Day Streak! 🔥</p>
-                </div>
-              </div>
-            )}
 
             <button
               onClick={resetCycle}
@@ -293,10 +290,10 @@ const Timer = () => {
                 disabled={isActive}
                 onClick={() => setReflectionEnabled(!reflectionEnabled)}
                 className={`flex items-center gap-2 px-3 sm:px-4 py-2 border rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-sm active:scale-95 h-full ${isActive
-                    ? "opacity-60 cursor-not-allowed bg-gray-50 dark:bg-slate-800/50 border-gray-100 dark:border-slate-700 text-gray-400"
-                    : reflectionEnabled
-                      ? "bg-primary-50 dark:bg-primary-900/20 border-primary-100 dark:border-primary-800 text-primary-600 dark:text-primary-400 hover:bg-primary-100"
-                      : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
+                  ? "opacity-60 cursor-not-allowed bg-gray-50 dark:bg-slate-800/50 border-gray-100 dark:border-slate-700 text-gray-400"
+                  : reflectionEnabled
+                    ? "bg-primary-50 dark:bg-primary-900/20 border-primary-100 dark:border-primary-800 text-primary-600 dark:text-primary-400 hover:bg-primary-100"
+                    : "bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
                   }`}
               >
                 <div className="relative flex items-center">
@@ -447,7 +444,7 @@ const Timer = () => {
                               >
                                 <div className="flex items-center gap-3 w-full">
                                   <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 shadow-sm ${t.priority === 'high' ? 'bg-rose-500 shadow-rose-200' :
-                                      t.priority === 'medium' ? 'bg-amber-500 shadow-amber-200' : 'bg-emerald-500 shadow-emerald-200'
+                                    t.priority === 'medium' ? 'bg-amber-500 shadow-amber-200' : 'bg-emerald-500 shadow-emerald-200'
                                     }`} />
                                   <span className="text-sm font-bold text-gray-700 group-hover:text-primary-600 truncate flex-1">{t.text}</span>
                                   {t.nodeId && <FiTarget className="text-primary-400 animate-pulse flex-shrink-0" size={14} />}
@@ -534,8 +531,8 @@ const Timer = () => {
                       if (!ambientEnabled) setAmbientEnabled(true);
                     }}
                     className={`flex-shrink-0 px-4 py-3 rounded-2xl border text-[9px] font-black uppercase tracking-tight transition-all flex items-center gap-2 relative overflow-hidden group/sbtn ${ambientType === sound.id && ambientEnabled
-                        ? 'bg-primary-50/50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-400 shadow-sm'
-                        : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400 hover:border-gray-200 dark:hover:border-slate-600 hover:text-gray-600 dark:hover:text-gray-300'
+                      ? 'bg-primary-50/50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-400 shadow-sm'
+                      : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400 hover:border-gray-200 dark:hover:border-slate-600 hover:text-gray-600 dark:hover:text-gray-300'
                       }`}
                   >
                     {ambientType === sound.id && ambientEnabled && (

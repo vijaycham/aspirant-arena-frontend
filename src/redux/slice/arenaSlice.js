@@ -32,6 +32,18 @@ export const togglePrimaryArena = createAsyncThunk(
   }
 );
 
+export const updateArenaTitle = createAsyncThunk(
+  'arena/updateTitle',
+  async ({ arenaId, title }, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(`/arenas/${arenaId}/details`, { title });
+      return response.data.arena;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to update title');
+    }
+  }
+);
+
 export const createArena = createAsyncThunk('arena/createArena', async (arenaData, { rejectWithValue }) => {
   try {
     const response = await api.post('/arenas', arenaData);
@@ -250,6 +262,11 @@ const arenaSlice = createSlice({
         } else {
           toast.success(`Primary Goal removed. Global mode active. 🌍`);
         }
+      })
+      .addCase(updateArenaTitle.fulfilled, (state, action) => {
+        const updatedArena = action.payload;
+        state.arenas = state.arenas.map(a => a._id === updatedArena._id ? updatedArena : a);
+        toast.success('Arena title updated! 📝');
       })
       .addCase(togglePrimaryArena.rejected, (state, action) => {
         toast.error(action.payload);

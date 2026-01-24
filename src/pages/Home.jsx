@@ -5,11 +5,12 @@ import api from "../utils/api";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfile } from "../redux/user/authSlice";
 import { fetchArenas } from "../redux/slice/arenaSlice";
+import { useTimer } from "../hooks/useTimer";
 import toast from "react-hot-toast";
 import Shimmer from "../components/Shimmer";
 import LockedOverlay from "../components/LockedOverlay";
 import { hasAccess } from "../utils/auth/verifyHelpers";
-import { FiLayers, FiStar, FiTarget, FiActivity, FiChevronRight } from "react-icons/fi";
+import { FiLayers, FiStar, FiTarget, FiActivity, FiChevronRight, FiZap } from "react-icons/fi";
 
 const getStrategyNote = (stats, primaryArena) => {
   if (!stats) return null;
@@ -50,6 +51,7 @@ const getStrategyNote = (stats, primaryArena) => {
 };
 
 const Home = () => {
+  const { isActive: isTimerActive, timeLeft, mode: timerMode } = useTimer();
   const { currentUser: user } = useSelector((state) => state.user);
   const { arenas } = useSelector((state) => state.arena);
   const userId = user?._id;
@@ -96,7 +98,7 @@ const Home = () => {
             try {
               const syllabusRes = await api.get(`/arenas/${primary._id}/syllabus`);
               const nodes = syllabusRes.data.nodes || [];
-              const microTopics = nodes.filter(n => n.type === 'micro-topic');
+              const microTopics = nodes.filter(n => ['micro-topic', 'topic', 'subtopic'].includes(n.type));
               const completedCount = microTopics.filter(n => n.status === 'completed').length;
               const progress = microTopics.length > 0 ? Math.round((completedCount / microTopics.length) * 100) : 0;
               setPrimaryArena({ ...primary, progress });
@@ -171,47 +173,68 @@ const Home = () => {
       <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start lg:pt-6">
 
         {/* Hero Section */}
-        <div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
-          <span className="text-[10px] md:text-xs font-black text-gray-500 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2 justify-center lg:justify-start">
-            <FiActivity className="text-primary-600" /> High Performance Dashboard
-          </span>
-
+        <div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left pt-4 lg:pt-24">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-600 dark:text-primary-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2 animate-in fade-in slide-in-from-left-4">
+            Aspirant Arena
+          </div>
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 dark:text-white leading-[1.1] tracking-tighter transition-colors duration-200">
             {primaryArena ? (
-              <>Master your <span className="bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">{primaryArena.title}</span></>
+              <>Master your <br className="hidden lg:block" /><span className="bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">{primaryArena.title}</span></>
             ) : (
-              <>Elite Focus <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">Architecture</span></>
+              <>
+                Where Ambition Meets <br className="hidden lg:block" />
+                <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">
+                  High Performance
+                </span>
+              </>
             )}
           </h1>
-
-          <p className="text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-400 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0 transition-colors duration-200">
+          <p className="text-base md:text-md lg:text-lg text-gray-500 dark:text-gray-400 font-bold max-w-2xl mx-auto lg:mx-0 leading-relaxed tracking-tight transition-all duration-500">
             {primaryArena
               ? `You are currently focusing on ${primaryArena.title}. Track your syllabus, automate revision loops, and master every micro-topic with elite precision.`
-              : "Welcome back. Track your mock tests, automate revision loops, and sync your study sessions across specialized Roadmap Arenas."}
+              : "The all-in-one strategic hub for aspirants. Track mock tests, automate revision loops, and master your syllabus with data-driven precision."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-            <Link to="/arena" className="px-8 py-4 rounded-[2rem] bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black shadow-xl hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base border border-transparent">
-              Roadmap Arenas ⛩️
-            </Link>
-            <Link to="/test-tracker" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
-              Performance 📈
-            </Link>
+            {!isTimerActive ? (
+              <>
+                <Link to="/timer" className="px-8 py-4 rounded-[2rem] bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black shadow-xl hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base border border-transparent">
+                  Focus Arena ⚡
+                </Link>
+                <Link to="/test-tracker" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                  Analyze Performance 📈
+                </Link>
+                <Link to="/tasks" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                  Manage Tasks 📝
+                </Link>
+              </>
+            ) : (
+              <div className="flex flex-wrap gap-4">
+                <Link to="/test-tracker" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                  Analyze Performance 📈
+                </Link>
+                <Link to="/arena" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                  Master Syllabus ⛩️
+                </Link>
+                <Link to="/tasks" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                  Manage Tasks 📝
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Strategic Pillars - New Meaningful Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="pt-12 grid grid-cols-3 gap-8 border-t border-gray-100 dark:border-white/5 mt-10"
+            className="pt-16 grid grid-cols-3 gap-8 border-t border-gray-200 dark:border-white/5 mt-24"
           >
             <div className="space-y-2">
               <div className="w-8 h-8 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                 <FiLayers size={16} />
               </div>
               <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Map</h5>
-              <p className="text-[9px] text-gray-500 font-bold leading-relaxed uppercase tracking-tighter">Recursive Roadmap Tracking</p>
+              <p className="text-[9px] text-gray-700 dark:text-gray-400 font-bold leading-relaxed uppercase tracking-tighter">Recursive Roadmap</p>
             </div>
 
             <div className="space-y-2">
@@ -219,7 +242,7 @@ const Home = () => {
                 <FiActivity size={16} />
               </div>
               <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Analyze</h5>
-              <p className="text-[9px] text-gray-500 font-bold leading-relaxed uppercase tracking-tighter">Error-First Intelligence</p>
+              <p className="text-[9px] text-gray-700 dark:text-gray-400 font-bold leading-relaxed uppercase tracking-tighter">Error-First Intel</p>
             </div>
 
             <div className="space-y-2">
@@ -227,7 +250,7 @@ const Home = () => {
                 <FiTarget size={16} />
               </div>
               <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Command</h5>
-              <p className="text-[9px] text-gray-500 font-bold leading-relaxed uppercase tracking-tighter">Deep Focus Automation</p>
+              <p className="text-[9px] text-gray-700 dark:text-gray-400 font-bold leading-relaxed uppercase tracking-tighter">Deep Focus Auto</p>
             </div>
           </motion.div>
         </div>
@@ -240,66 +263,89 @@ const Home = () => {
 
                 {user && !hasAccess(user) && <LockedOverlay />}
 
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Live Command</h3>
-                  <div className="w-10 h-10 bg-primary-50 dark:bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 text-xl font-black italic">
-                    <FiTarget />
+                <div className="flex justify-between items-start mb-8">
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                    {isTimerActive ? "Live Command" : "Progress Intel"}
+                  </h3>
+                  <div className="w-12 h-12 bg-primary-50 dark:bg-primary-500/20 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 text-2xl font-black italic">
+                    {isTimerActive ? <FiTarget /> : "!"}
                   </div>
                 </div>
 
-                {primaryArena ? (
-                  <div className="flex flex-col items-center justify-center py-2">
-                    <div className="flex flex-col items-center text-center">
-                      <div className="relative w-28 h-28 shrink-0 mb-4">
+                {isTimerActive ? (
+                  <div className="flex flex-col items-center justify-center py-6 bg-primary-50/50 dark:bg-primary-500/5 rounded-[2.5rem] border border-primary-100 dark:border-primary-500/10 mb-4 scale-105 shadow-lg shadow-primary-500/5">
+                    <div className="relative w-36 h-36 shrink-0 mb-4">
+                      <div className="relative w-full h-full">
                         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                          <circle className="text-gray-100 dark:text-gray-800 stroke-current" strokeWidth="8" fill="transparent" r="40" cx="50" cy="50" />
+                          <circle className="text-gray-100 dark:text-gray-800 stroke-current" strokeWidth="4" fill="transparent" r="46" cx="50" cy="50" />
                           <circle
-                            className="text-primary-600 stroke-current transition-all duration-1000"
-                            strokeWidth="8" strokeLinecap="round" fill="transparent" r="40" cx="50" cy="50"
-                            strokeDasharray={`${2.51 * (primaryArena.progress || 0)} 251`}
+                            className="text-primary-600 stroke-current animate-pulse transition-all duration-1000"
+                            strokeWidth="6" strokeLinecap="round" fill="transparent" r="46" cx="50" cy="50"
+                            strokeDasharray="289"
                           />
                         </svg>
-                        <div className="absolute inset-0 flex items-center justify-center font-black text-xl text-gray-900 dark:text-white">{primaryArena.progress || 0}%</div>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-3xl font-black text-gray-900 dark:text-white tabular-nums leading-none tracking-tighter">
+                            {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+                          </span>
+                          <span className="text-[9px] font-black text-primary-500 uppercase tracking-[0.2em] mt-2">
+                            {timerMode === 'FOCUS' ? 'Focusing' : 'Break'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Active Mission</span>
-                        <h4 className="text-xl font-black text-gray-900 dark:text-white max-w-[280px] leading-tight truncate">{primaryArena.title}</h4>
-                        <Link to="/arena" className="text-[10px] font-bold text-primary-600 hover:underline flex items-center justify-center gap-1">
-                          Roadmap Tracker <FiStar className="fill-current" />
-                        </Link>
-                      </div>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-[10px] font-black text-primary-600/60 dark:text-primary-400/60 uppercase tracking-widest block mb-1">Current Command</span>
+                      <h4 className="text-lg font-black text-gray-900 dark:text-white max-w-[280px] leading-tight truncate">
+                        {primaryArena ? primaryArena.title : "Deep Work Depth"}
+                      </h4>
+                      <Link to="/timer" className="text-[10px] font-bold text-primary-600 hover:underline mt-1 inline-block">Open Focus Arena &rarr;</Link>
                     </div>
                   </div>
                 ) : (
-                  <div className="py-6 bg-gray-50 dark:bg-slate-800/50 rounded-[2rem] border border-dashed border-gray-200 dark:border-white/5 text-center flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/10 flex items-center justify-center text-amber-500 mb-2 animate-pulse">
-                      <FiLayers size={20} />
+                  <div className="grid grid-cols-2 gap-8 mb-4 px-4">
+                    <div className="text-center">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Arena Progress</span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-4xl font-black text-gray-900 dark:text-white">
+                          {primaryArena ? (primaryArena.progress || 0) : 0}<span className="text-lg text-gray-400 ml-1">%</span>
+                        </span>
+                        {!primaryArena && (
+                          <Link to="/arena" className="text-[10px] font-bold text-primary-600 hover:underline mt-1 uppercase tracking-wide">
+                            Set Map
+                          </Link>
+                        )}
+                      </div>
                     </div>
-                    <h4 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-tight">No Primary Roadmap</h4>
-                    <Link to="/arena" className="text-[9px] font-black text-primary-600 uppercase hover:underline mt-1 flex items-center gap-1">Set One Now <FiChevronRight /></Link>
+
+                    <div className="text-center">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Focus Today</span>
+                      <div>
+                        <span className="text-4xl font-black text-gray-900 dark:text-white">
+                          {stats ? Math.round(stats.focusedToday / 60 * 10) / 10 : 0}<span className="text-lg text-gray-400 ml-1">h</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Accuracy</span>
+                      <div>
+                        <span className="text-4xl font-black text-gray-900 dark:text-white">
+                          {stats ? stats.accuracy : 0}<span className="text-lg text-gray-400 ml-1">%</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Tests Logged</span>
+                      <div>
+                        <span className="text-4xl font-black text-gray-900 dark:text-white">
+                          {stats ? stats.count : 0}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
-
-                <div className="grid grid-cols-2 gap-4 border-t border-gray-100 dark:border-white/5 pt-4 mt-4 text-center">
-                  <div>
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">
-                      {primaryArena ? "Goal Focus" : "Focused Today"}
-                    </span>
-                    {stats ? (
-                      <span className="text-3xl font-black text-primary-600 tabular-nums">
-                        {stats.focusedToday >= 60 ? `${Math.floor(stats.focusedToday / 60)}h ${stats.focusedToday % 60}m` : `${stats.focusedToday}m`}
-                      </span>
-                    ) : <Shimmer variant="stats" className="h-8 w-20 mx-auto" />}
-                  </div>
-                  <div>
-                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-1">
-                      {primaryArena ? "Goal Acc." : "Avg Accuracy"}
-                    </span>
-                    {stats ? (
-                      <span className="text-3xl font-black text-gray-900 dark:text-white tabular-nums">{stats.accuracy}%</span>
-                    ) : <Shimmer variant="stats" className="h-8 w-20 mx-auto" />}
-                  </div>
-                </div>
 
                 <div className="mt-6 pt-6 border-t border-gray-100/50 dark:border-white/5">
                   <div className="flex items-center justify-between mb-3">
@@ -311,9 +357,15 @@ const Home = () => {
                       <Shimmer variant="bar" className="h-12" />
                     ) : tasks.length > 0 ? (
                       tasks.map((t) => (
-                        <Link key={t._id} to={t.text.includes("conceptual errors") ? "/test-tracker" : "/tasks"} className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm p-3 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:scale-[1.02] transition-all group">
+                        <Link
+                          key={t._id}
+                          to="/timer"
+                          state={{ autoTask: t }}
+                          className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm p-3 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:scale-[1.02] transition-all group"
+                        >
                           <div className={`w-2 h-2 rounded-full shrink-0 ${t.priority === "high" ? "bg-rose-500" : "bg-primary-500"}`}></div>
-                          <span className="text-xs font-bold text-gray-600 dark:text-gray-300 truncate group-hover:text-gray-900 dark:group-hover:text-white uppercase tracking-tight">{t.text}</span>
+                          <span className="text-xs font-bold text-gray-600 dark:text-gray-300 truncate group-hover:text-gray-900 dark:group-hover:text-white tracking-tight normal-case capitalize">{t.text.toLowerCase()}</span>
+                          <FiZap className="ml-auto text-[10px] text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </Link>
                       ))
                     ) : (
@@ -323,21 +375,22 @@ const Home = () => {
                 </div>
               </div>
 
+              {/* Strategic Tip (Old Card Design) - Now in Right Column */}
               {strategy && (
-                <div className={`mt-2 bg-gradient-to-br ${strategy.color} p-6 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden group border border-white/20`}>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-lg shadow-inner">
-                      {strategy.icon}
-                    </div>
-                    <h4 className="font-black text-xs uppercase tracking-widest">{strategy.title}</h4>
-                  </div>
-                  <p className="text-[11px] font-bold opacity-90 leading-relaxed tracking-tight pl-1">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className={`bg-gradient-to-br ${strategy.color} p-8 rounded-[3rem] shadow-2xl shadow-gray-200 dark:shadow-none text-white relative overflow-hidden group border border-white/10`}
+                >
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                  <h4 className="font-black text-lg mb-2 flex items-center gap-2">
+                    {strategy.icon} {strategy.title}
+                  </h4>
+                  <p className="text-xs font-medium opacity-90 leading-relaxed">
                     {strategy.text}
                   </p>
-
-                  {/* Subtle animated background element */}
-                  <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000" />
-                </div>
+                </motion.div>
               )}
             </div>
           ) : (
@@ -348,7 +401,28 @@ const Home = () => {
             </div>
           )}
         </div>
-      </div >
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto w-full border-t border-gray-200 dark:border-gray-800 mt-20 pt-12 pb-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center md:text-left">
+          <div>
+            <span className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest block mb-2">Data Security</span>
+            <p className="text-sm font-black text-gray-900 dark:text-white/80">JWT Protected</p>
+          </div>
+          <div>
+            <span className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest block mb-2">Sync Status</span>
+            <p className="text-sm font-black text-gray-900 dark:text-white/80">Real-time Cloud</p>
+          </div>
+          <div>
+            <span className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest block mb-2">Architecture</span>
+            <p className="text-sm font-black text-gray-900 dark:text-white/80">Scalable MERN</p>
+          </div>
+          <div>
+            <span className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest block mb-2">UX Philosophy</span>
+            <p className="text-sm font-black text-gray-900 dark:text-white/80">Deep Focus</p>
+          </div>
+        </div>
+      </div>
     </div >
   );
 };

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTimer } from '../hooks/useTimer';
-import { fetchArenas, fetchSyllabus, setCurrentArena, createArena, deleteArena, togglePrimaryArena } from '../redux/slice/arenaSlice';
+import { fetchArenas, fetchSyllabus, setCurrentArena, createArena, deleteArena, togglePrimaryArena, updateArenaTitle } from '../redux/slice/arenaSlice';
 import SyllabusTree from '../components/syllabus/SyllabusTree';
 import ArenaModal from '../components/arena/ArenaModal';
 import ExamCountdown from '../components/arena/ExamCountdown';
 import LegacyLinker from '../components/arena/LegacyLinker';
 import { motion } from 'framer-motion';
-import { FiPlus, FiRefreshCcw, FiLayers, FiTarget, FiTrash2, FiStar } from 'react-icons/fi';
+import { FiPlus, FiRefreshCcw, FiLayers, FiTarget, FiTrash2, FiStar, FiEdit2, FiCheck, FiX } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import api from '../utils/api';
 
@@ -16,7 +16,28 @@ const ArenaDashboard = () => {
   const { isActive: isTimerActive } = useTimer();
   const { arenas, currentArenaId, syllabus, syllabusLoading } = useSelector(state => state.arena);
   const [modalType, setModalType] = useState(null); // 'create' | 'delete' | 'reset'
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editTitleValue, setEditTitleValue] = useState("");
 
+  const currentArena = arenas.find(a => a._id === currentArenaId);
+
+  const startHeaderEdit = () => {
+    if (currentArena) {
+      setEditTitleValue(currentArena.title);
+      setIsEditingTitle(true);
+    }
+  };
+
+  const submitHeaderEdit = async () => {
+    if (editTitleValue.trim() && currentArena) {
+      await dispatch(updateArenaTitle({ arenaId: currentArenaId, title: editTitleValue }));
+      setIsEditingTitle(false);
+    }
+  };
+
+  const cancelHeaderEdit = () => {
+    setIsEditingTitle(false);
+  };
   useEffect(() => {
     dispatch(fetchArenas());
   }, [dispatch]);
@@ -26,8 +47,6 @@ const ArenaDashboard = () => {
       dispatch(fetchSyllabus(currentArenaId));
     }
   }, [currentArenaId, dispatch, syllabus]);
-
-  const currentArena = arenas.find(a => a._id === currentArenaId);
 
   const handleCreateConfirm = ({ title, templateId }) => {
     dispatch(createArena({ title, templateId, isPrimary: true }));
@@ -160,8 +179,39 @@ const ArenaDashboard = () => {
                   <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary-600 to-indigo-700 flex items-center justify-center text-white font-black text-xl shadow-lg">
                     {currentArena?.title?.[0] || 'A'}
                   </div>
-                  <div>
-                    <h2 className="font-black text-xl text-gray-900 dark:text-white">{currentArena?.title || 'Select an Arena'}</h2>
+                  <div className="flex-1">
+                    {isEditingTitle ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          autoFocus
+                          value={editTitleValue}
+                          onChange={(e) => setEditTitleValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') submitHeaderEdit();
+                            if (e.key === 'Escape') cancelHeaderEdit();
+                          }}
+                          className="font-black text-xl text-gray-900 dark:text-white bg-transparent border-b-2 border-primary-500 focus:outline-none w-full max-w-[300px]"
+                        />
+                        <button onClick={submitHeaderEdit} className="p-1 hover:bg-green-100 rounded-full text-green-600">
+                          <FiCheck />
+                        </button>
+                        <button onClick={cancelHeaderEdit} className="p-1 hover:bg-red-100 rounded-full text-red-500">
+                          <FiX />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 group">
+                        <h2 className="font-black text-xl text-gray-900 dark:text-white">{currentArena?.title || 'Select an Arena'}</h2>
+                        {currentArena && (
+                          <button
+                            onClick={startHeaderEdit}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-gray-400 hover:text-primary-600"
+                          >
+                            <FiEdit2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    )}
                     <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       Recursive Roadmap • {Object.keys(syllabus[currentArenaId]?.byId || {}).length} Nodes
                     </p>
