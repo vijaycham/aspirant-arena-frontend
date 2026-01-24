@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TimerDisplay from '../TimerDisplay';
 
 // Mock Framer Motion and Icons
@@ -36,13 +36,21 @@ describe('TimerDisplay Component', () => {
     onFullScreen: vi.fn(),
   };
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders correctly in default state', () => {
     render(<TimerDisplay {...defaultProps} />);
     
     // Time Display
     expect(screen.getByText('25:00')).toBeInTheDocument();
     
-    // Mode Buttons
+    // Toggle Switch
+    expect(screen.getByText('Countdown')).toBeInTheDocument();
+    expect(screen.getByText('Stopwatch')).toBeInTheDocument();
+    
+    // Mode Buttons (Visible in Countdown)
     expect(screen.getByText('Focus')).toBeInTheDocument();
     expect(screen.getByText('Short Break')).toBeInTheDocument();
     
@@ -50,27 +58,36 @@ describe('TimerDisplay Component', () => {
     expect(screen.getByText('Zen Mode')).toBeInTheDocument();
   });
 
-  it('highlights current mode button', () => {
+  it('toggles mode when switches are clicked', () => {
     render(<TimerDisplay {...defaultProps} />);
-    const focusBtn = screen.getByText('Focus');
-    const breakBtn = screen.getByText('Short Break');
-
-    // Focus is active mode in defaultProps
-    expect(focusBtn.className).toContain('bg-white');
-    expect(breakBtn.className).toContain('text-gray-400');
+    
+    // Click Stopwatch
+    fireEvent.click(screen.getByText('Stopwatch'));
+    expect(defaultProps.switchMode).toHaveBeenCalledWith('STOPWATCH');
+    
+    // Click Countdown (should switch to FOCUS if currently STOPWATCH)
+    // Note: To test this transition properly, we'd need to re-render with mode='STOPWATCH', 
+    // but checking the call on the button is enough for unit test.
   });
 
-  it('calls switchMode on button click', () => {
-    render(<TimerDisplay {...defaultProps} />);
-    fireEvent.click(screen.getByText('Short Break'));
-    expect(defaultProps.switchMode).toHaveBeenCalledWith('SHORT_BREAK');
-    expect(defaultProps.setIsEditing).toHaveBeenCalledWith(false);
+  it('hides pomodoro tabs in stopwatch mode', () => {
+    render(<TimerDisplay {...defaultProps} mode="STOPWATCH" />);
+    
+    expect(screen.queryByText('Focus')).not.toBeInTheDocument();
+    expect(screen.queryByText('Short Break')).not.toBeInTheDocument();
+    expect(screen.getByText('Health Cap: 4 Hours Max')).toBeInTheDocument();
   });
 
-  it('activates editing mode on clicking time', () => {
+  it('activates editing mode on clicking time (Countdown only)', () => {
     render(<TimerDisplay {...defaultProps} />);
-    fireEvent.click(screen.getByText('25:00').closest('div')); // Click the container
+    fireEvent.click(screen.getByText('25:00').closest('div'));
     expect(defaultProps.setIsEditing).toHaveBeenCalledWith(true);
+  });
+
+  it('does NOT activate editing mode on clicking time (Stopwatch)', () => {
+    render(<TimerDisplay {...defaultProps} mode="STOPWATCH" />);
+    fireEvent.click(screen.getByText('25:00').closest('div')); // Assuming formatTime returns same for 25m
+    expect(defaultProps.setIsEditing).not.toHaveBeenCalled();
   });
 
   it('displays input form when isEditing is true', () => {
@@ -99,21 +116,14 @@ describe('TimerDisplay Component', () => {
     expect(defaultProps.onFullScreen).toHaveBeenCalled();
   });
 
-  it('renders correct cycle indicators', () => {
-    // cycleNumber is 1
-    const { container } = render(<TimerDisplay {...defaultProps} />);
-    // Check for bars. There are 4 bars.
-    // 1st bar should be active-like or past?
-    // Logic: num < cycleNumber (past) || num === cycleNumber && isActive (current active) || else (future)
-    // Default: cycleNumber=1, isActive=false -> all grey or first one waiting?
-    // Code: num < 1 (false), num === 1 && false (false) -> bg-gray-200
-    // Actually, if it's cycle 1 and not active, it's just ready.
-    
-    // Let's test passed cycle
-    // We expect bg-gray-200 usually for unstarted.
-    const bars = container.querySelectorAll('.rounded-full');
-    expect(bars.length).toBe(5); // 4 bars + Zen Mode button uses rounded-full? No, Zen mode uses rounded-full too.
-    // The bars are in a div with flex gap-2. 
-    // They have specific classes.
+  it('renders cycle indicators only in Countdown mode', () => {
+    const { container, rerender } = render(<TimerDisplay {...defaultProps} />);
+    // In Countdown, we expect 4 bars
+    // Note: Zen Mode button and Toggle buttons also use .rounded-*, so specific class targeting is tricky.
+    // relying on structure logic
+    expect(container.querySelectorAll('.h-2.w-10').length).toBe(4);
+
+    rerender(<TimerDisplay {...defaultProps} mode="STOPWATCH" />);
+    expect(container.querySelectorAll('.h-2.w-10').length).toBe(0);
   });
 });

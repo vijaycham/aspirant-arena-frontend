@@ -5,6 +5,30 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] – 2026-01-24
+### Added
+- **Stopwatch Mode (Count-Up)**
+  - Infinite study sessions with a 4-hour safety cap.
+  - Short sessions (<5 minutes) are ignored with contextual user feedback.
+  - Fully integrated with efficiency, streaks, and analytics.
+
+- **Daily Goal Widget**
+  - Visual progress ring for daily focus targets.
+  - One-time confetti celebration when the goal is achieved.
+  - Offline-safe goal completion handling.
+
+### Changed
+- Improved mobile layout and widget positioning.
+- Stabilized timer rendering to eliminate flicker and NaN edge cases.
+- Optimized layout containers to prevent UI jumps during mode switches.
+
+### Fixed
+- Timer resume glitches when switching between Countdown and Stopwatch.
+- Mobile overflow issues with timer mode toggles.
+
+### Dependencies
+- Added `canvas-confetti` for lightweight celebratory effects.
+
 ## [1.5.5] – 2026-01-24
 ### Fixed
 - Rounded focus session duration to avoid losing near-complete minutes.

@@ -23,11 +23,18 @@ export const useTimer = () => {
   const rehydrateTime = useCallback(() => {
     const target = localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
     if (target) {
+      if (target === "STOPWATCH_RUNNING") {
+        const start = parseInt(localStorage.getItem('timer-startTime'), 10);
+        if (start && !isNaN(start)) {
+          return Math.floor((Date.now() - start) / 1000);
+        }
+        return 0;
+      }
       const remaining = Math.ceil((parseInt(target, 10) - Date.now()) / 1000);
       return Math.max(0, remaining);
     }
     const paused = localStorage.getItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
-    if (paused) return parseInt(paused, 10);
+    if (paused && !isNaN(parseInt(paused, 10))) return parseInt(paused, 10);
 
     const timings = loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES);
     const currentMode = localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS";
@@ -36,16 +43,27 @@ export const useTimer = () => {
 
   /* ------------------ STATE ------------------ */
   const [mode, setMode] = useState(() => localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS");
-  const [modeTimings, setModeTimings] = useState(() => loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES));
+  // 🛡️ MERGE: Ensure we include ANY new keys from DEFAULT_MODES even if using cached data
+  const [modeTimings, setModeTimings] = useState(() => {
+    const saved = loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES);
+    return { ...DEFAULT_MODES, ...saved };
+  });
 
   const [timeLeft, setTimeLeft] = useState(() => {
     const targetTime = localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
     if (targetTime) {
+      if (targetTime === "STOPWATCH_RUNNING") {
+        const start = parseInt(localStorage.getItem('timer-startTime'), 10);
+        if (start && !isNaN(start)) {
+          return Math.floor((Date.now() - start) / 1000);
+        }
+        return 0;
+      }
       const remaining = Math.ceil((parseInt(targetTime, 10) - Date.now()) / 1000);
       return Math.max(0, remaining);
     }
     const pausedRemaining = localStorage.getItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
-    if (pausedRemaining) return parseInt(pausedRemaining, 10);
+    if (pausedRemaining && !isNaN(parseInt(pausedRemaining, 10))) return parseInt(pausedRemaining, 10);
 
     const timings = loadJSON(TIMER_STORAGE_KEYS.MODE_TIMINGS, DEFAULT_MODES);
     const currentMode = localStorage.getItem(TIMER_STORAGE_KEYS.MODE) || "FOCUS";
@@ -445,11 +463,13 @@ export const useTimer = () => {
     completedRef.current = true;
 
     localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem('timer-startTime'); // Clear stopwatch start
     localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
     setActiveTick(t => t + 1);
     setTimeLeft(rehydrateTime);
     // ✅ ALWAYS subtract current timeLeft from total time for accuracy
-    const elapsed = modeTimings[mode].time - timeLeft;
+    // UNLESS it's Stopwatch, where timeLeft IS the elapsed time.
+    const elapsed = mode === "STOPWATCH" ? timeLeft : (modeTimings[mode].time - timeLeft);
 
     if (!manual) {
       playChime();
@@ -482,6 +502,15 @@ export const useTimer = () => {
         setSelectedArenaId("");
         setSelectedNodeId("");
       }
+    } else if (mode === "STOPWATCH") {
+      // ⏱️ Start Fresh Stopwatch
+      if (elapsed >= MIN_VALID_DURATION) {
+        saveSession(elapsed, "completed", reflectionEnabled ? null : 3);
+      } else {
+        toast("Session < 5m not logged ⏳", { icon: "👻" });
+      }
+      setMode("STOPWATCH");
+      setTimeLeft(0);
     } else {
       // Break Complete -> Back to Focus
       setMode("FOCUS");
@@ -512,9 +541,28 @@ export const useTimer = () => {
       // 🧠 Smart Start: Use override if provided (e.g. immediate start after edit)
       const duration = (typeof overrideSeconds === 'number' && overrideSeconds > 0) ? overrideSeconds : timeLeft;
 
-      const newTarget = Date.now() + duration * 1000;
-      localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
-      localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+      if (mode === "STOPWATCH") {
+        // ⏱️ STOPWATCH START:
+        // If resuming, we calculate new StartTime based on previously elapsed time
+        // If fresh start, StartTime = Now
+        const savedPaused = localStorage.getItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+        const pausedElapsed = savedPaused ? parseInt(savedPaused, 10) : 0;
+
+        // 🛡️ Guard: If parsing failed (NaN), fallback to 0
+        const validElapsed = isNaN(pausedElapsed) ? 0 : pausedElapsed;
+
+        const newStart = Date.now() - (validElapsed * 1000);
+
+        localStorage.setItem('timer-startTime', newStart.toString());
+        // Dummy target to satisfy "isActive" checks elsewhere (will be ignored by worker logic for stopwatch)
+        localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, "STOPWATCH_RUNNING");
+        localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+      } else {
+        // ⏳ STANDARD START:
+        const newTarget = Date.now() + duration * 1000;
+        localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
+        localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+      }
 
       if (!startTimeRef.current) {
         startTimeRef.current = new Date();
@@ -559,7 +607,7 @@ export const useTimer = () => {
 
   const skipTimer = () => handleTimerComplete(true);
 
-  const resetCycle = () => {
+  const resetCycle = useCallback(() => {
     const elapsed = modeTimings[mode].time - timeLeft;
     if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
@@ -580,7 +628,7 @@ export const useTimer = () => {
     setSelectedNodeId("");
 
     toast.success("Cycle reset 🔁");
-  };
+  }, [mode, modeTimings, timeLeft, saveSession]);
 
   const resetDay = () => {
     const elapsed = modeTimings[mode].time - timeLeft;
@@ -654,21 +702,41 @@ export const useTimer = () => {
     workerRef.current.onmessage = (e) => {
       if (e.data === "tick") {
         // ABSOLUTE TIME CHECK 🛡️
-        // Instead of blindly decrementing, we check against the fixed Target Time
-        const targetTime = parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME), 10);
+        const rawTarget = localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME);
 
-        if (targetTime) {
+        if (rawTarget) {
           const now = Date.now();
-          const remaining = Math.ceil((targetTime - now) / 1000);
+          // For Standard: Parse target. For Stopwatch: Ignore target value.
+          const targetTime = parseInt(rawTarget, 10);
 
-          if (remaining <= 0) {
-            // Timer Finished
-            setTimeLeft(0);
-            onCompleteRef.current();
+          // 🧠 STOPWATCH: Count-up Logic
+          const isStopwatch = localStorage.getItem(TIMER_STORAGE_KEYS.MODE) === "STOPWATCH";
+          if (isStopwatch) {
+            const startTime = parseInt(localStorage.getItem('timer-startTime'), 10);
+            if (startTime) {
+              const elapsed = Math.floor((now - startTime) / 1000);
+              // 🛡️ Safety Cap: Auto-stop after 4 hours
+              if (elapsed >= 14400) { // 14400 = 4 hours
+                setTimeLeft(14400);
+                onCompleteRef.current(); // Saves and resets
+                workerRef.current.postMessage("stop");
+              } else {
+                setTimeLeft(elapsed);
+              }
+            }
           } else {
-            // Normal Tick
-            setTimeLeft(remaining);
-          }
+            // 🧠 STANDARD: Count-down Logic
+            const remaining = Math.ceil((targetTime - now) / 1000);
+
+            if (remaining <= 0) {
+              // Timer Finished
+              setTimeLeft(0);
+              onCompleteRef.current();
+            } else {
+              // Normal Tick
+              setTimeLeft(remaining);
+            }
+          } // End of standard check
         } else {
           // If active but no target, stop worker
           workerRef.current.postMessage("stop");
@@ -697,10 +765,20 @@ export const useTimer = () => {
           setTimeLeft(timeToApply);
           localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
         }
-        const newTarget = Date.now() + timeToApply * 1000;
-        localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
+
+        if (mode === "STOPWATCH") {
+          // Resume Stopwatch: StartTime = Now - PreviouslyElapsed
+          const newStart = Date.now() - (timeToApply * 1000);
+          localStorage.setItem('timer-startTime', newStart.toString());
+          // We set dummy target to keep worker happy/ticking
+          localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, "STOPWATCH_RUNNING");
+        } else {
+          // Resume Standard Timer
+          const newTarget = Date.now() + timeToApply * 1000;
+          localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, newTarget.toString());
+        }
       }
-      if (timeLeft > 0) {
+      if (timeLeft > 0 || mode === "STOPWATCH") {
         workerRef.current.postMessage("start");
       }
     } else {
@@ -712,7 +790,10 @@ export const useTimer = () => {
 
   // 🛡️ Safe progress calculation (prevent NaN/Infinity)
   const totalTime = modeTimings[mode]?.time || 1;
-  const progress = Math.min(100, Math.max(0, ((totalTime - timeLeft) / totalTime) * 100));
+  // If Stopwatch, we can just return 100 or calculate modulo for a spinner effect
+  const progress = mode === "STOPWATCH"
+    ? 100
+    : Math.min(100, Math.max(0, ((totalTime - timeLeft) / totalTime) * 100));
 
   /* ------------------ MEDIA SESSION API (Mobile Controls) ------------------ */
   // 1. Dynamic Metadata Updates (Tick-based)
