@@ -4,7 +4,13 @@ import { FiLayers, FiTarget, FiSearch, FiChevronRight, FiPlus } from "react-icon
 import { useSelector, useDispatch } from "react-redux";
 import { fetchArenas, fetchSyllabus } from "../../redux/slice/arenaSlice";
 import { toLocalDateTimeInput, fromLocalDateTimeInput } from "../../utils/tasks/taskHelpers";
-
+const NAVIGABLE_TYPES = new Set([
+  'root',
+  'category',
+  'subject',
+  'topic',
+  'subtopic'
+]);
 const TaskInput = ({ 
   task, 
   setTask, 
@@ -279,7 +285,7 @@ const TaskInput = ({
                         <button
                           key={node._id}
                           onClick={() => {
-                            if (node.type === 'subject' || node.type === 'topic' || node.type === 'category' || node.type === 'root') {
+                            if (NAVIGABLE_TYPES.has(node.type)) {
                               setCurrentParentId(node._id);
                             } else {
                               setSelectedNodeId(node._id);
@@ -298,21 +304,24 @@ const TaskInput = ({
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                             {(node.type === 'subject' || node.type === 'topic' || node.type === 'category' || node.type === 'root') ? (
+                             {/* Navigation Indicator (if folder) */}
+                             {NAVIGABLE_TYPES.has(node.type) && (
                                <FiChevronRight className="text-gray-300 group-hover:text-primary-400 transition-all" />
-                             ) : (
-                               <button 
-                                 onClick={(e) => {
-                                   e.stopPropagation();
-                                   setSelectedNodeId(node._id);
-                                   setShowArenaDropdown(false);
-                                   if (!task.trim()) setTask(node.title);
-                                 }}
-                                 className="opacity-0 group-hover:opacity-100 p-1.5 bg-primary-600 text-white rounded-lg transition-all shadow-lg shadow-primary-200"
-                               >
-                                 <FiPlus size={12} />
-                               </button>
                              )}
+                             
+                             {/* Selection Action (Always available) */}
+                             <button 
+                               onClick={(e) => {
+                                 e.stopPropagation(); // Prevent navigation
+                                 setSelectedNodeId(node._id);
+                                 setShowArenaDropdown(false);
+                                 if (!task.trim()) setTask(node.title);
+                               }}
+                               className="p-1.5 opacity-0 group-hover:opacity-100 bg-primary-50 hover:bg-primary-600 text-primary-600 hover:text-white rounded-lg transition-all shadow-sm hover:shadow-lg"
+                               title="Select this topic"
+                             >
+                               <FiPlus size={12} />
+                             </button>
                           </div>
                         </button>
                       ))}
