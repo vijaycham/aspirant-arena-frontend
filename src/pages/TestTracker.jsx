@@ -15,6 +15,7 @@ import { hasAccess } from "../utils/auth/verifyHelpers";
 const TestTracker = () => {
   const { currentUser: user } = useSelector((state) => state.user);
   const {
+    arenas,
     stats,
     subjects,
     selectedSubject,
@@ -47,12 +48,12 @@ const TestTracker = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300 pb-20 font-outfit relative overflow-x-hidden">
       {/* Modals */}
-      <InsightModal 
-        viewingReflection={viewingReflection} 
-        setViewingReflection={setViewingReflection} 
+      <InsightModal
+        viewingReflection={viewingReflection}
+        setViewingReflection={setViewingReflection}
       />
-      
-      <DeleteConfirmModal 
+
+      <DeleteConfirmModal
         confirmDeleteData={confirmDeleteData}
         setConfirmDeleteData={setConfirmDeleteData}
         handleDelete={handleDelete}
@@ -69,10 +70,10 @@ const TestTracker = () => {
               {selectedSubject === "All" ? "Global preparation metrics" : `Focusing on ${selectedSubject} Mastery`}
             </p>
           </div>
-          
+
           <div className="flex items-center gap-2 md:gap-3 bg-gray-50/50 dark:bg-slate-800/50 p-1 md:p-2 rounded-xl md:rounded-2xl border border-gray-100 dark:border-white/5 w-full md:w-auto">
             <span className="text-[9px] md:text-xs font-bold text-gray-400 uppercase tracking-widest ml-2 hidden lg:inline text-nowrap">Filter Analytics:</span>
-            <select 
+            <select
               value={selectedSubject}
               onChange={(e) => {
                 setSelectedSubject(e.target.value);
@@ -88,28 +89,28 @@ const TestTracker = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 mt-6 md:mt-8 space-y-6 md:space-y-8 relative">
-        
+
         {/* 🔒 Full Page Lock ONLY if grace period EXPIRED and unverified */}
         {user && !hasAccess(user) && (
           <div className="fixed inset-0 z-[100] mt-[88px] md:mt-[112px] backdrop-blur-md flex items-center justify-center p-6">
-             <div className="bg-white/90 p-10 rounded-[4rem] shadow-2xl border border-white max-w-lg w-full relative">
-                <LockedOverlay message="Grace period expired. Advanced data analytics and mock test tracking are now locked. Please verify your email to continue accessing your preparation metrics." />
-                <div className="h-[350px]"></div>
-             </div>
+            <div className="bg-white/90 p-10 rounded-[4rem] shadow-2xl border border-white max-w-lg w-full relative">
+              <LockedOverlay message="Grace period expired. Advanced data analytics and mock test tracking are now locked. Please verify your email to continue accessing your preparation metrics." />
+              <div className="h-[350px]"></div>
+            </div>
           </div>
         )}
 
         {/* Quick Stats Grid */}
-        <StatsGrid 
-          quickStats={quickStats} 
-          selectedSubject={selectedSubject} 
+        <StatsGrid
+          quickStats={quickStats}
+          selectedSubject={selectedSubject}
           loading={loading}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
           {/* Left Column: Input Form */}
           <div className="lg:col-span-4 lg:col-start-1">
-            <TestLogForm 
+            <TestLogForm
               formData={formData}
               setFormData={setFormData}
               handleSubmit={handleSubmit}
@@ -118,6 +119,7 @@ const TestTracker = () => {
               showAdvance={showAdvance}
               setShowAdvance={setShowAdvance}
               subjects={subjects}
+              arenas={arenas}
               marksLost={marksLost}
               accountedMarks={accountedMarks}
             />
@@ -125,7 +127,7 @@ const TestTracker = () => {
 
           {/* Right Column: Analytics */}
           <div className="lg:col-span-8">
-            <AnalyticsSection 
+            <AnalyticsSection
               selectedSubject={selectedSubject}
               chartData={chartData}
               currentTarget={currentTarget}
@@ -135,9 +137,9 @@ const TestTracker = () => {
             />
           </div>
         </div>
-          
+
         {/* Full Width Archive Section */}
-        <SessionArchive 
+        <SessionArchive
           filteredTests={filteredTests}
           loading={loading}
           page={page}

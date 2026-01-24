@@ -3,14 +3,15 @@ import { Link, useSearchParams } from "react-router-dom";
 import api from "../utils/api";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfile } from "../redux/user/authSlice";
+import { fetchArenas } from "../redux/slice/arenaSlice";
 import toast from "react-hot-toast";
 import Shimmer from "../components/Shimmer";
 import LockedOverlay from "../components/LockedOverlay";
 import { hasAccess } from "../utils/auth/verifyHelpers";
+import { FiLayers, FiStar, FiTarget, FiActivity, FiChevronRight } from "react-icons/fi";
 
 const getStrategyNote = (stats) => {
   if (!stats) return null;
-
   if (stats.pendingRevisions > 5) {
     return {
       title: "Revision Bottleneck",
@@ -19,7 +20,6 @@ const getStrategyNote = (stats) => {
       icon: "⚠️"
     };
   }
-
   if (stats.accuracy < 50) {
     return {
       title: "Foundation Alert ",
@@ -28,7 +28,6 @@ const getStrategyNote = (stats) => {
       icon: "🧐"
     };
   }
-
   if (stats.accuracy >= 70) {
     return {
       title: "Strong Momentum ",
@@ -37,7 +36,6 @@ const getStrategyNote = (stats) => {
       icon: "🚀"
     };
   }
-
   return {
     title: "Consistency Tip ",
     text: "Daily analysis of mistakes compounds into major score improvement.",
@@ -48,6 +46,7 @@ const getStrategyNote = (stats) => {
 
 const Home = () => {
   const { currentUser: user } = useSelector((state) => state.user);
+  const { arenas } = useSelector((state) => state.arena);
   const userId = user?._id;
   const isEmailVerified = user?.isEmailVerified;
   const createdAt = user?.createdAt;
@@ -55,30 +54,65 @@ const Home = () => {
   const [searchParams] = useSearchParams();
   const [stats, setStats] = useState(null);
   const [tasks, setTasks] = useState([]);
+  const [primaryArena, setPrimaryArena] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Sync Arenas on Mount
+  useEffect(() => {
+    if (arenas.length === 0 && userId) {
+      dispatch(fetchArenas());
+    }
+  }, [arenas.length, dispatch, userId]);
 
   useEffect(() => {
     // 🛡️ Only fetch if user has access (verified or within grace period)
     const userForAccess = { isEmailVerified, createdAt };
     if (userId && hasAccess(userForAccess)) {
-      const fetchHomeStats = async () => {
+      const fetchHomeData = async () => {
+        setLoading(true);
         try {
-          const [testsRes, tasksRes] = await Promise.all([
-            api.get("/test"),
-            api.get("/tasks")
+          const tzOffset = new Date().getTimezoneOffset();
+          const primary = arenas.find(a => a.isPrimary);
+          const arenaFilter = primary ? `&arenaId=${primary._id}` : '';
+          const arenaQuery = primary ? `?arenaId=${primary._id}` : '';
+
+          const [testsRes, tasksRes, focusRes] = await Promise.all([
+            api.get(`/test${arenaQuery}`),
+            api.get("/tasks"),
+            api.get(`/focus/stats/today?offset=${tzOffset}${arenaFilter}`)
           ]);
-          
+
           const taskItems = tasksRes?.data?.tasks || [];
           const tests = testsRes?.data?.tests || [];
-          
-          const avgAcc = tests.length > 0 
+          const focusStats = focusRes?.data || {};
+
+          if (primary) {
+            // Calculate progress for primary arena
+            try {
+              const syllabusRes = await api.get(`/arenas/${primary._id}/syllabus`);
+              const nodes = syllabusRes.data.nodes || [];
+              const microTopics = nodes.filter(n => n.type === 'micro-topic');
+              const completedCount = microTopics.filter(n => n.status === 'completed').length;
+              const progress = microTopics.length > 0 ? Math.round((completedCount / microTopics.length) * 100) : 0;
+              setPrimaryArena({ ...primary, progress });
+            } catch (err) {
+              setPrimaryArena(primary);
+            }
+          } else {
+            setPrimaryArena(null);
+          }
+
+          const avgAcc = tests.length > 0
             ? Math.round((tests.reduce((acc, t) => acc + (t.marksObtained / (t.totalMarks || 1)), 0) / tests.length) * 100)
             : 0;
 
           setStats({
             count: tests.length,
             accuracy: avgAcc,
+            focusedToday: focusStats.totalMinutes || 0,
             pendingRevisions: taskItems.filter(t => !t.completed && t.text.includes("Revise conceptual errors")).length
           });
+
           const priorityWeight = { high: 3, medium: 2, low: 1 };
           const sortedTasks = taskItems
             .filter(t => !t.completed)
@@ -90,23 +124,20 @@ const Home = () => {
           setTasks(sortedTasks.slice(0, 3));
         } catch (err) {
           console.error("Failed to load dashboard stats", err);
+        } finally {
+          setLoading(false);
         }
       };
-      fetchHomeStats();
+      fetchHomeData();
+    } else {
+      setLoading(false);
     }
-  }, [userId, isEmailVerified, createdAt]);
+  }, [userId, isEmailVerified, createdAt, arenas]);
 
   // Handle successful verification redirect
   useEffect(() => {
     if (searchParams.get("verified") === "true") {
-      toast.success("Email verified successfully! Welcome to the Arena.", {
-        id: "verify-success",
-        duration: 5000,
-      });
-            
-      // Sync profile to remove banner/unlock features if state is stale
-
-      // Clear the "verified" param from URL so this doesn't run again on re-render/user sync
+      toast.success("Email verified successfully! Welcome to the Arena.", { id: "verify-success", duration: 5000 });
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("verified");
       window.history.replaceState({}, "", `${window.location.pathname}?${newParams.toString()}`);
@@ -115,12 +146,8 @@ const Home = () => {
         if (!userId || isEmailVerified) return;
         try {
           const res = await api.get("/profile");
-          if (res.status === "success" && res.data.user) {
-            dispatch(updateProfile(res.data.user));
-          }
-        } catch (err) {
-          console.error("Sync failed", err);
-        }
+          if (res.status === "success" && res.data.user) dispatch(updateProfile(res.data.user));
+        } catch (err) { console.error("Sync failed", err); }
       };
       syncProfile();
     }
@@ -134,45 +161,36 @@ const Home = () => {
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-primary-200/30 dark:bg-primary-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob"></div>
         <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-secondary-200/30 dark:bg-secondary-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-purple-200/30 dark:bg-purple-900/10 blur-3xl opacity-60 mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-4000"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        
+
         {/* Hero Section */}
         <div className="lg:col-span-7 space-y-6 md:space-y-8 text-center lg:text-left">
-            <span className="text-[10px] md:text-xs font-black text-gray-500 dark:text-gray-500 uppercase tracking-widest">Aspirant Arena</span>
-          
+          <span className="text-[10px] md:text-xs font-black text-gray-500 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2 justify-center lg:justify-start">
+            <FiActivity className="text-primary-600" /> High Performance Dashboard
+          </span>
+
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 dark:text-white leading-[1.1] tracking-tighter transition-colors duration-200">
-            Where Ambition Meets <br className="hidden lg:block" />
-            <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">
-              High Performance
-            </span>
+            {primaryArena ? (
+              <>Master your <span className="bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">{primaryArena.title}</span></>
+            ) : (
+              <>Elite Focus <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">Architecture</span></>
+            )}
           </h1>
-          
+
           <p className="text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-400 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0 transition-colors duration-200">
-            The all-in-one strategic hub for UPSC aspirants. Track mock tests, 
-            automate revision loops, and master your syllabus with data-driven precision.
+            {primaryArena
+              ? `You are currently focusing on ${primaryArena.title}. Track your syllabus, automate revision loops, and master every micro-topic with elite precision.`
+              : "Welcome back. Track your mock tests, automate revision loops, and sync your study sessions across specialized Roadmap Arenas."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-            <Link
-              to="/test-tracker"
-              className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base"
-            >
-              Analyze Performance 📈
+            <Link to="/arena" className="px-8 py-4 rounded-[2rem] bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black shadow-xl hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base border border-transparent">
+              Roadmap Arenas ⛩️
             </Link>
-            <Link
-              to="/arena"
-              className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base"
-            >
-              Master Syllabus ⛩️
-            </Link>
-            <Link
-              to="/tasks"
-              className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-2 text-sm md:text-base"
-            >
-              Manage Tasks 📝
+            <Link to="/test-tracker" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+              Performance 📈
             </Link>
           </div>
         </div>
@@ -181,138 +199,107 @@ const Home = () => {
         <div className="lg:col-span-5 relative">
           {user ? (
             <div className="space-y-6">
-              {/* Stats Card */}
               <div className={`relative bg-white dark:bg-slate-900/50 dark:backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl shadow-gray-200 dark:shadow-slate-900/50 border border-gray-100 dark:border-white/10 scale-100 lg:scale-105 transition-all duration-200 hover:rotate-1 overflow-hidden`}>
-                
-                {/* 🔒 Locked State only if grace period EXPIRED and unverified */}
-                {user && !hasAccess(user) && (
-                   <LockedOverlay />
-                )}
+
+                {user && !hasAccess(user) && <LockedOverlay />}
 
                 <div className="flex justify-between items-start mb-8">
-                  <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Live Progress</h3>
-                  <div className="w-12 h-12 bg-primary-50 dark:bg-primary-500/20 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 text-2xl font-black italic">!</div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-8">
-                  <div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Overall Accuracy</span>
-                    {stats ? (
-                      <span className="text-4xl font-black text-primary-600 animate-fade-in">
-                        {stats.accuracy}%
-                      </span>
-                    ) : user && !hasAccess(user) ? (
-                      <span className="text-4xl font-black text-gray-200">0%</span>
-                    ) : (
-                      <Shimmer variant="stats" className="mt-1" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Tests Logged</span>
-                    {stats ? (
-                      <span className="text-4xl font-black text-gray-900 dark:text-white animate-fade-in">
-                        {stats.count}
-                      </span>
-                    ) : user && !hasAccess(user) ? (
-                      <span className="text-4xl font-black text-gray-200">0</span>
-                    ) : (
-                      <Shimmer variant="stats" className="mt-1" />
-                    )}
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Arena Progress</span>
-                    <Link to="/arena" className="block transform hover:scale-105 transition-transform">
-                      <span className="text-4xl font-black text-secondary-600">
-                        {user.primaryArenaProgress || 0}%
-                      </span>
-                    </Link>
+                  <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Live Command</h3>
+                  <div className="w-12 h-12 bg-primary-50 dark:bg-primary-500/10 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 text-2xl font-black italic">
+                    <FiTarget />
                   </div>
                 </div>
 
-                {stats?.pendingRevisions > 0 && (
-                  <div className="mt-6 flex items-center justify-between bg-rose-50 dark:bg-rose-900/10 p-3 rounded-2xl border border-rose-100 dark:border-rose-900/20">
-                    <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Active Revision Loops</span>
-                    <span className="bg-rose-500 text-white text-[10px] font-black px-3 py-1 rounded-full">{stats.pendingRevisions} Pending</span>
+                {primaryArena ? (
+                  <div className="space-y-8">
+                    <div className="flex items-center gap-6">
+                      <div className="relative w-24 h-24 shrink-0">
+                        <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                          <circle className="text-gray-100 dark:text-gray-800 stroke-current" strokeWidth="10" fill="transparent" r="40" cx="50" cy="50" />
+                          <circle
+                            className="text-primary-600 stroke-current transition-all duration-1000"
+                            strokeWidth="10" strokeLinecap="round" fill="transparent" r="40" cx="50" cy="50"
+                            strokeDasharray={`${2.51 * (primaryArena.progress || 0)} 251`}
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center font-black text-lg text-gray-900 dark:text-white">{primaryArena.progress || 0}%</div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Primary Goal</span>
+                        <h4 className="text-xl font-black text-gray-900 dark:text-white truncate max-w-[180px]">{primaryArena.title}</h4>
+                        <Link to="/arena" className="text-xs font-bold text-primary-600 hover:underline flex items-center gap-1 mt-1">
+                          Roadmap Active <FiStar className="fill-current" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-8 p-6 bg-gray-50 dark:bg-slate-800/50 rounded-[2rem] border border-dashed border-gray-200 dark:border-white/5 text-center flex flex-col items-center">
+                    <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/10 flex items-center justify-center text-amber-500 mb-3 animate-pulse">
+                      <FiLayers size={24} />
+                    </div>
+                    <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tight">No Primary Roadmap</h4>
+                    <Link to="/arena" className="text-[10px] font-black text-primary-600 uppercase hover:underline mt-1 flex items-center gap-1">Set One Now <FiChevronRight /></Link>
                   </div>
                 )}
-                
-                <div className="mt-10 pt-8 border-t border-gray-100/50">
-                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4">Urgent Revision Tasks</span>
-                   <div className="space-y-3">
-                     {!stats && (!user || hasAccess(user)) ? (
-                       <>
-                         <Shimmer variant="bar" className="h-12" />
-                         <Shimmer variant="bar" className="h-12 w-5/6" />
-                       </>
-                     ) : tasks.length > 0 ? (
-                       tasks.map((t) => (
-                         <Link
-                           key={t._id}
-                           to={t.text.includes("conceptual errors") ? "/test-tracker" : "/tasks"}
-                           className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm p-3 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md hover:border-primary-100 dark:hover:border-white/10 hover:scale-[1.02] active:scale-95 transition-all group"
-                         >
-                           <div
-                             className={`w-2 h-2 rounded-full shrink-0 ${
-                               t.priority === "high"
-                                 ? "bg-rose-500 shadow-sm shadow-rose-200 dark:shadow-none"
-                                 : "bg-primary-500 shadow-sm shadow-primary-200 dark:shadow-none"
-                             }`}
-                           ></div>
-                           <span className="text-xs font-bold text-gray-600 dark:text-gray-300 truncate group-hover:text-gray-900 dark:group-hover:text-white">
-                             {t.text}
-                           </span>
-                         </Link>
-                       ))
-                     ) : (
-                       <p className="text-xs font-bold text-gray-300 italic uppercase">
-                         No pending revisions. Great job!
-                       </p>
-                     )}
-                   </div>
+
+                <div className="grid grid-cols-2 gap-8 border-t border-gray-100 dark:border-white/5 pt-6 mt-8">
+                  <div>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">
+                      {primaryArena ? "Goal Focus" : "Focused Today"}
+                    </span>
+                    {stats ? (
+                      <span className="text-3xl font-black text-primary-600">
+                        {stats.focusedToday >= 60 ? `${Math.floor(stats.focusedToday / 60)}h ${stats.focusedToday % 60}m` : `${stats.focusedToday}m`}
+                      </span>
+                    ) : <Shimmer variant="stats" className="h-8 w-16" />}
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">
+                      {primaryArena ? "Goal Acc." : "Avg Accuracy"}
+                    </span>
+                    {stats ? (
+                      <span className="text-3xl font-black text-gray-900 dark:text-white">{stats.accuracy}%</span>
+                    ) : <Shimmer variant="stats" className="h-8 w-16" />}
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-8 border-t border-gray-100/50 dark:border-white/5">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Strategic Tasks</span>
+                    <Link to="/tasks" className="text-[9px] font-black text-primary-600 uppercase hover:underline">Manage All</Link>
+                  </div>
+                  <div className="space-y-3">
+                    {loading ? (
+                      <Shimmer variant="bar" className="h-12" />
+                    ) : tasks.length > 0 ? (
+                      tasks.map((t) => (
+                        <Link key={t._id} to={t.text.includes("conceptual errors") ? "/test-tracker" : "/tasks"} className="flex items-center gap-3 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm p-3 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm hover:scale-[1.02] transition-all group">
+                          <div className={`w-2 h-2 rounded-full shrink-0 ${t.priority === "high" ? "bg-rose-500" : "bg-primary-500"}`}></div>
+                          <span className="text-xs font-bold text-gray-600 dark:text-gray-300 truncate group-hover:text-gray-900 dark:group-hover:text-white uppercase tracking-tight">{t.text}</span>
+                        </Link>
+                      ))
+                    ) : (
+                      <p className="text-xs font-bold text-gray-300 italic uppercase py-4">Sky is clear. No urgent loops!</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Dynamic Strategy Card */}
               {strategy && (
-                <div 
-                  className={`bg-gradient-to-br ${strategy.color} p-8 rounded-[3rem] shadow-xl text-white relative overflow-hidden group`}
-                >
-                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-                  <h4 className="font-black text-lg mb-2 flex items-center gap-2">
-                    {strategy.icon} {strategy.title}
-                  </h4>
-                  <p className="text-xs font-medium opacity-90 leading-relaxed">
-                    {strategy.text}
-                  </p>
+                <div className={`bg-gradient-to-br ${strategy.color} p-8 rounded-[3rem] shadow-xl text-white relative overflow-hidden group`}>
+                  <h4 className="font-black text-lg mb-2 flex items-center gap-2">{strategy.icon} {strategy.title}</h4>
+                  <p className="text-[11px] font-bold uppercase tracking-tight opacity-90 leading-relaxed">{strategy.text}</p>
                 </div>
               )}
             </div>
           ) : (
-            <div className="bg-white p-12 rounded-[4rem] shadow-2xl shadow-gray-200 border border-gray-100 text-center space-y-6">
-               <div className="w-20 h-20 bg-gray-50 rounded-[2rem] mx-auto flex items-center justify-center text-4xl">🚀</div>
-               <h3 className="text-2xl font-black text-gray-900">Join the Arena</h3>
-               <p className="text-sm text-gray-500 font-medium">Create your free workspace to start tracking your journey to the Civil Services.</p>
-               <Link to="/signup" className="block w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-colors">Get Started</Link>
+            <div className="bg-white dark:bg-slate-900 p-12 rounded-[4rem] shadow-2xl border border-gray-100 dark:border-white/5 text-center space-y-6">
+              <div className="w-20 h-20 bg-gray-50 dark:bg-slate-800 rounded-[2rem] mx-auto flex items-center justify-center text-4xl shadow-inner italic font-black text-primary-600">🏛️</div>
+              <h3 className="text-2xl font-black text-gray-900 dark:text-white">Join the Arena</h3>
+              <Link to="/signup" className="block w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all uppercase text-xs tracking-widest">Initialize Workspace</Link>
             </div>
           )}
-        </div>
-
-      </div>
-
-      {/* Trust Blocks */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full mt-24 mb-12 py-12 border-y border-gray-100">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-           {[
-             { label: "Data Security", value: "JWT Protected" },
-             { label: "Sync Status", value: "Real-time Cloud" },
-             { label: "Architecture", value: "Scalable MERN" },
-             { label: "UX Philosophy", value: "Deep Focus" }
-           ].map((item, i) => (
-             <div key={i} className="text-center md:text-left">
-               <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{item.label}</div>
-               <div className="text-sm font-black text-gray-800">{item.value}</div>
-             </div>
-           ))}
         </div>
       </div>
     </div>

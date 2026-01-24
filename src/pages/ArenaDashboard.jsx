@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchArenas, fetchSyllabus, setCurrentArena, createArena, deleteArena } from '../redux/slice/arenaSlice';
+import { fetchArenas, fetchSyllabus, setCurrentArena, createArena, deleteArena, togglePrimaryArena } from '../redux/slice/arenaSlice';
 import SyllabusTree from '../components/syllabus/SyllabusTree';
 import ArenaModal from '../components/arena/ArenaModal';
 import ExamCountdown from '../components/arena/ExamCountdown';
@@ -121,7 +121,19 @@ const ArenaDashboard = () => {
                     <h3 className={`font-black truncate text-sm ${currentArenaId === arena._id ? 'text-primary-700 dark:text-primary-400' : 'text-gray-700 dark:text-gray-300'}`}>
                       {arena.title}
                     </h3>
-                    {arena.isPrimary && <FiStar className="text-amber-500 fill-amber-500 text-xs" title="Primary Arena" />}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(togglePrimaryArena(arena._id));
+                      }}
+                      className="transition-transform hover:scale-125 p-1"
+                    >
+                      {arena.isPrimary ? (
+                        <FiStar className="text-amber-500 fill-amber-500 text-xs" title="Primary Arena" />
+                      ) : (
+                        <FiStar className="text-gray-300 hover:text-amber-400 text-xs" title="Set as Primary" />
+                      )}
+                    </button>
                   </div>
                   <div className={`text-[9px] uppercase tracking-wider font-bold ${currentArenaId === arena._id ? 'text-primary-400' : 'text-gray-400'}`}>
                     Template: {arena.templateId}

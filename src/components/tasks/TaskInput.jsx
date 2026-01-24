@@ -1,66 +1,50 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiLayers, FiTarget, FiSearch, FiChevronRight, FiPlus } from "react-icons/fi";
+import { FiLayers, FiTarget, FiSearch, FiPlus, FiX } from "react-icons/fi";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchArenas, fetchSyllabus } from "../../redux/slice/arenaSlice";
 import { toLocalDateTimeInput, fromLocalDateTimeInput } from "../../utils/tasks/taskHelpers";
-const NAVIGABLE_TYPES = new Set([
-  'root',
-  'category',
-  'subject',
-  'topic',
-  'subtopic'
-]);
-const TaskInput = ({ 
-  task, 
-  setTask, 
-  priority, 
-  setPriority, 
-  dueDate, 
-  setDueDate, 
-  onAdd, 
-  onCancel, 
-  isEditing, 
+
+const TaskInput = ({
+  task,
+  setTask,
+  priority,
+  setPriority,
+  dueDate,
+  setDueDate,
+  onAdd,
+  onCancel,
+  isEditing,
   onKeyDown,
   selectedArenaId,
   setSelectedArenaId,
   selectedNodeId,
   setSelectedNodeId
 }) => {
-  const { arenas, syllabus } = useSelector(state => state.arena);
+  const { arenas, syllabus, currentArenaId } = useSelector(state => state.arena);
   const dispatch = useDispatch();
   const [showArenaDropdown, setShowArenaDropdown] = useState(false);
   const [nodeSearch, setNodeSearch] = useState("");
-  const [currentParentId, setCurrentParentId] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Auto-suggestions based on what the user is typing in the task input
   const suggestions = React.useMemo(() => {
     if (!task || task.length < 2) return [];
-    
-    // Search within selected arena or across all active arenas if none selected
+
     let sourceData = [];
     if (selectedArenaId && syllabus[selectedArenaId]) {
-      sourceData = syllabus[selectedArenaId];
+      sourceData = Object.values(syllabus[selectedArenaId].byId);
     } else {
-      sourceData = Object.values(syllabus).flat();
+      sourceData = Object.values(syllabus).flatMap(s => Object.values(s.byId));
     }
 
-    const matches = sourceData.filter(n => 
-      n.type !== 'subject' && 
-      n.type !== 'root' &&
-      n.type !== 'category' &&
+    const matches = sourceData.filter(n =>
+      !['root', 'category', 'subject'].includes(n.type) &&
       n.title.toLowerCase().includes(task.toLowerCase())
     ).map(n => ({ ...n, arenaId: n.arenaId || selectedArenaId }));
-    
-    return matches.slice(0, 5); 
-  }, [task, syllabus, selectedArenaId]);
 
-  // Reset navigation when arena changes
-  React.useEffect(() => {
-    setCurrentParentId(null);
-    setNodeSearch("");
-  }, [selectedArenaId]);
+    return matches.slice(0, 5);
+  }, [task, syllabus, selectedArenaId]);
 
   React.useEffect(() => {
     if (arenas.length === 0) dispatch(fetchArenas());
@@ -72,34 +56,29 @@ const TaskInput = ({
     }
   }, [selectedArenaId, dispatch, syllabus]);
 
-  const selectedNode = selectedNodeId && selectedArenaId && syllabus[selectedArenaId]?.find(n => n._id === selectedNodeId);
+  // Set default arena if none selected
+  React.useEffect(() => {
+    if (!selectedArenaId && currentArenaId) {
+      setSelectedArenaId(currentArenaId);
+    }
+  }, [currentArenaId, selectedArenaId, setSelectedArenaId]);
 
-  // Get children of current parent or top-level subjects
-  const currentLevelNodes = React.useMemo(() => {
+  const selectedNode = selectedNodeId && selectedArenaId && syllabus[selectedArenaId]?.byId[selectedNodeId];
+  const selectedArena = arenas.find(a => a._id === selectedArenaId);
+
+  // Search results for the dropdown
+  const searchResults = React.useMemo(() => {
     if (!selectedArenaId || !syllabus[selectedArenaId]) return [];
-    const allNodes = syllabus[selectedArenaId];
-    
-    if (nodeSearch) {
-      return allNodes.filter(n => 
-        n.type !== 'subject' && 
-        n.title.toLowerCase().includes(nodeSearch.toLowerCase())
-      ).slice(0, 15);
-    }
-    
-    return allNodes.filter(n => n.parentId === (currentParentId || null)); // Handle null explicitly for roots
-  }, [selectedArenaId, syllabus, currentParentId, nodeSearch]);
+    const allNodes = Object.values(syllabus[selectedArenaId].byId);
 
-  // Build breadcrumbs for navigation
-  const breadcrumbs = React.useMemo(() => {
-    if (!selectedArenaId || !currentParentId || !syllabus[selectedArenaId]) return [];
-    const trail = [];
-    let current = syllabus[selectedArenaId].find(n => n._id === currentParentId);
-    while (current) {
-      trail.unshift(current);
-      current = syllabus[selectedArenaId].find(n => n._id === current.parentId);
-    }
-    return trail;
-  }, [selectedArenaId, currentParentId, syllabus]);
+    const query = nodeSearch.toLowerCase().trim();
+    if (!query) return allNodes.filter(n => !['root', 'category', 'subject'].includes(n.type)).slice(0, 10);
+
+    return allNodes.filter(n =>
+      !['root', 'category', 'subject'].includes(n.type) &&
+      n.title.toLowerCase().includes(query)
+    ).slice(0, 20);
+  }, [selectedArenaId, syllabus, nodeSearch]);
 
   const dropdownRef = React.useRef(null);
   const btnRef = React.useRef(null);
@@ -123,7 +102,7 @@ const TaskInput = ({
   return (
     <div className="glass-card dark:border-white/10 p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-gray-200/50 dark:shadow-black/50 border border-white relative z-50 transition-colors duration-200">
       <div className="flex flex-col gap-6">
-        <div className="space-y-1">
+        <div className="space-y-1 relative">
           <label className="text-[10px] font-black text-gray-400 uppercase ml-1 tracking-widest">Task Description</label>
           <input
             type="text"
@@ -154,7 +133,7 @@ const TaskInput = ({
                     onClick={() => {
                       setSelectedArenaId(suggestion.arenaId);
                       setSelectedNodeId(suggestion._id);
-                      setTask(suggestion.title);
+                      if (!task.trim()) setTask(suggestion.title);
                       setShowSuggestions(false);
                     }}
                     className="w-full text-left p-3 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors group flex items-center justify-between"
@@ -173,46 +152,42 @@ const TaskInput = ({
               </motion.div>
             )}
           </AnimatePresence>
-          
+
           <div className="flex flex-wrap gap-2 mt-2">
-            {!selectedNodeId ? (
-              <button
-                ref={btnRef}
-                onClick={() => {
-                  if (arenas.length === 1) {
-                    setSelectedArenaId(arenas[0]._id);
-                    setShowArenaDropdown(true);
-                  } else {
-                    setShowArenaDropdown(true);
-                  }
-                }}
-                className="px-3 py-1.5 rounded-xl bg-white/50 dark:bg-slate-800/50 border border-gray-100 dark:border-white/10 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-slate-700 transition-colors flex items-center gap-2 shadow-sm"
-              >
-                <FiLayers size={10} /> Link Roadmap Topic
-              </button>
-            ) : (
-              <div className="flex items-center gap-1">
-                <button
-                  ref={btnRef}
-                  onClick={() => setShowArenaDropdown(true)}
-                  className="px-3 py-1.5 rounded-xl bg-primary-50 border border-primary-100 text-[9px] font-black uppercase tracking-widest text-primary-600 transition-colors flex items-center gap-2 shadow-sm"
-                >
+            <button
+              ref={btnRef}
+              onClick={() => setShowArenaDropdown(!showArenaDropdown)}
+              className={`px-3 py-1.5 rounded-xl transition-all border flex items-center gap-2 shadow-sm text-[9px] font-black uppercase tracking-widest ${selectedArenaId
+                  ? 'bg-primary-50 border-primary-100 text-primary-600'
+                  : 'bg-white/50 dark:bg-slate-800/50 border-gray-100 dark:border-white/10 text-gray-400 hover:text-primary-600'
+                }`}
+            >
+              <FiLayers size={10} /> {selectedArena ? selectedArena.title : 'Link Roadmap'}
+            </button>
+
+            {selectedNodeId && (
+              <div className="flex items-center gap-1 group">
+                <div className="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-500/20 text-[9px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 flex items-center gap-2 shadow-sm">
                   <FiTarget size={10} className="animate-pulse" /> {selectedNode?.title || 'Linked Topic'}
-                </button>
-                <button 
-                  onClick={() => {
-                    setSelectedNodeId("");
-                    setSelectedArenaId("");
-                  }}
-                  className="p-1.5 rounded-lg bg-gray-50 text-gray-400 hover:text-rose-500 transition-all"
+                </div>
+                <button
+                  onClick={() => setSelectedNodeId("")}
+                  className="p-1.5 rounded-lg bg-gray-50 dark:bg-slate-800 text-gray-400 hover:text-rose-500 transition-all"
+                  title="Unlink Topic"
                 >
-                  &times;
+                  <FiX size={12} />
                 </button>
               </div>
             )}
+
+            {!selectedNodeId && selectedArenaId && (
+              <span className="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-500/10 text-[9px] font-black uppercase tracking-widest text-amber-600/60 dark:text-amber-400/60 italic">
+                General Study in {selectedArena?.title}
+              </span>
+            )}
           </div>
 
-          {/* Arena Dropdown Menu (Inline version for TaskInput) */}
+          {/* New Simplified Linking Dropdown */}
           <AnimatePresence>
             {showArenaDropdown && (
               <div className="relative">
@@ -221,117 +196,108 @@ const TaskInput = ({
                   initial={{ opacity: 0, y: 10, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                  className="absolute top-full left-0 right-0 mt-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-2 border-gray-100/50 dark:border-slate-800 rounded-[2rem] shadow-2xl shadow-gray-200/50 dark:shadow-black/80 z-[70] p-6 max-h-[400px] overflow-hidden flex flex-col ring-1 ring-black/5 dark:ring-white/5"
+                  className="absolute top-full left-0 right-0 mt-4 bg-white dark:bg-slate-900 border-2 border-gray-100/50 dark:border-slate-800 rounded-[2rem] shadow-2xl z-[70] p-6 max-h-[450px] overflow-hidden flex flex-col"
                 >
-                   <div className="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-white/10 pb-4">
-                      <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Master Roadmap Link</h3>
-                      <button onClick={() => setShowArenaDropdown(false)} className="text-gray-400 hover:text-black dark:hover:text-white">&times;</button>
-                    </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Target Your Session</h3>
+                    <button onClick={() => setShowArenaDropdown(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full">&times;</button>
+                  </div>
 
-                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
-                      {arenas.map(a => (
-                        <button
-                          key={a._id}
-                          onClick={() => setSelectedArenaId(a._id)}
-                          className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight border whitespace-nowrap transition-colors ${
-                            selectedArenaId === a._id 
-                              ? 'bg-primary-600 border-primary-600 text-white shadow-lg' 
-                              : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400 hover:border-gray-200 dark:hover:border-slate-600'
+                  {/* Arena Selection Tabs */}
+                  <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                    <button
+                      onClick={() => setSelectedArenaId("")}
+                      className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight border whitespace-nowrap transition-colors ${!selectedArenaId
+                          ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900'
+                          : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400'
+                        }`}
+                    >
+                      No Arena (Global)
+                    </button>
+                    {arenas.map(a => (
+                      <button
+                        key={a._id}
+                        onClick={() => {
+                          setSelectedArenaId(a._id);
+                          setSelectedNodeId(""); // Reset node if switching arena
+                        }}
+                        className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight border whitespace-nowrap transition-colors ${selectedArenaId === a._id
+                            ? 'bg-primary-600 border-primary-600 text-white shadow-lg'
+                            : 'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-gray-400'
                           }`}
-                        >
-                          {a.title}
-                        </button>
-                      ))}
-                    </div>
+                      >
+                        {a.title} {a.isPrimary && "⭐"}
+                      </button>
+                    ))}
+                  </div>
 
-                    <div className="relative mb-4">
-                      <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input 
-                        type="text"
-                        placeholder="Search topics..."
-                        value={nodeSearch}
-                        onChange={(e) => setNodeSearch(e.target.value)}
-                        className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:ring-2 ring-primary-500/10 dark:text-gray-200 transition-all"
-                      />
-                    </div>
+                  {selectedArenaId && (
+                    <>
+                      <div className="relative mb-4">
+                        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder={`Search topics in ${selectedArena?.title}...`}
+                          value={nodeSearch}
+                          onChange={(e) => setNodeSearch(e.target.value)}
+                          className="w-full bg-gray-50 dark:bg-slate-800 border-gray-100 dark:border-slate-700 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:ring-2 ring-primary-500/10 dark:text-gray-200 transition-all"
+                        />
+                      </div>
 
-                    <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide min-h-[32px] items-center">
-                       <button 
-                         onClick={() => setCurrentParentId(null)}
-                         className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all ${!currentParentId ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
-                       >
-                         Root
-                       </button>
-                       {breadcrumbs.map((bc, idx) => (
-                         <React.Fragment key={bc._id}>
-                           <FiChevronRight size={10} className="text-gray-300 dark:text-gray-600" />
-                           <button 
-                             onClick={() => setCurrentParentId(bc._id)}
-                             className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-all whitespace-nowrap ${idx === breadcrumbs.length - 1 ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
-                           >
-                             {bc.title}
-                           </button>
-                         </React.Fragment>
-                       ))}
-                    </div>
-
-                    <div className="overflow-y-auto flex-1 space-y-1 pr-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-slate-700">
-                      {!selectedArenaId ? (
-                        <p className="text-center text-gray-400 text-[10px] py-10 uppercase font-black opacity-50">Select an Arena first</p>
-                      ) : currentLevelNodes.length === 0 ? (
-                        <p className="text-center text-gray-400 text-[10px] py-10 uppercase font-black opacity-50">No topics found</p>
-                      ) : currentLevelNodes.map(node => (
-                        <button
-                          key={node._id}
-                          onClick={() => {
-                            if (NAVIGABLE_TYPES.has(node.type)) {
-                              setCurrentParentId(node._id);
-                            } else {
+                      <div className="overflow-y-auto flex-1 space-y-1 pr-2 scrollbar-thin">
+                        {searchResults.length === 0 ? (
+                          <div className="text-center py-10">
+                            <p className="text-gray-400 text-[10px] uppercase font-black opacity-50">No matching topics found</p>
+                            <p className="text-[9px] text-gray-400 mt-1 italic">Selecting the Arena alone will track this as "General Study"</p>
+                          </div>
+                        ) : searchResults.map(node => (
+                          <button
+                            key={node._id}
+                            onClick={() => {
                               setSelectedNodeId(node._id);
                               setShowArenaDropdown(false);
                               if (!task.trim()) setTask(node.title);
-                            }
-                          }}
-                          className="w-full text-left p-3 rounded-xl border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 transition-all group flex items-center justify-between"
-                        >
-                          <div>
-                            <p className="text-[8px] text-gray-400 mt-1 uppercase font-black tracking-tighter">
-                              {node.type}
-                            </p>
-                            <p className="text-xs font-bold text-gray-700 dark:text-gray-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors uppercase tracking-tight">
-                              {node.title}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                             {/* Navigation Indicator (if folder) */}
-                             {NAVIGABLE_TYPES.has(node.type) && (
-                               <FiChevronRight className="text-gray-300 group-hover:text-primary-400 transition-all" />
-                             )}
-                             
-                             {/* Selection Action (Always available) */}
-                             <button 
-                               onClick={(e) => {
-                                 e.stopPropagation(); // Prevent navigation
-                                 setSelectedNodeId(node._id);
-                                 setShowArenaDropdown(false);
-                                 if (!task.trim()) setTask(node.title);
-                               }}
-                               className="p-1.5 opacity-0 group-hover:opacity-100 bg-primary-50 hover:bg-primary-600 text-primary-600 hover:text-white rounded-lg transition-all shadow-sm hover:shadow-lg"
-                               title="Select this topic"
-                             >
-                               <FiPlus size={12} />
-                             </button>
-                          </div>
-                        </button>
-                      ))}
+                            }}
+                            className={`w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between group ${selectedNodeId === node._id
+                                ? 'bg-indigo-50 border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-500/30'
+                                : 'border-transparent hover:bg-gray-50 dark:hover:bg-white/5'
+                              }`}
+                          >
+                            <div>
+                              <p className="text-[8px] text-gray-400 uppercase font-black tracking-tighter opacity-70">
+                                {node.type}
+                              </p>
+                              <p className={`text-xs font-bold transition-colors uppercase tracking-tight ${selectedNodeId === node._id ? 'text-indigo-600' : 'text-gray-700 dark:text-gray-200'
+                                }`}>
+                                {node.title}
+                              </p>
+                            </div>
+                            <FiPlus className={`transition-all ${selectedNodeId === node._id ? 'text-indigo-400 rotate-45' : 'text-gray-300 group-hover:text-primary-400'}`} />
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {!selectedArenaId && (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700">
+                      <FiTarget className="text-gray-300 h-8 w-8 mb-3" />
+                      <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Global Study Mode</p>
+                      <p className="text-[9px] text-gray-400 mt-1 max-w-[200px]">Time will be tracked as "Self-Growth" without linking to any roadmap.</p>
+                      <button
+                        onClick={() => setShowArenaDropdown(false)}
+                        className="mt-4 px-6 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[9px] font-black uppercase rounded-xl"
+                      >
+                        Keep Global
+                      </button>
                     </div>
+                  )}
                 </motion.div>
               </div>
             )}
           </AnimatePresence>
         </div>
-        
+
         <div className="flex flex-col lg:flex-row items-stretch lg:items-end gap-6">
           <div className="flex flex-col lg:flex-row gap-4 flex-1 w-full">
             <div className="space-y-1 w-full md:w-32 flex-none">

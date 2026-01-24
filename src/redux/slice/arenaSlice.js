@@ -20,6 +20,18 @@ export const fetchSyllabus = createAsyncThunk('arena/fetchSyllabus', async (aren
   }
 });
 
+export const togglePrimaryArena = createAsyncThunk(
+  'arena/togglePrimary',
+  async (arenaId, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(`/arenas/${arenaId}`);
+      return response.data.arena;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to toggle primary');
+    }
+  }
+);
+
 export const createArena = createAsyncThunk('arena/createArena', async (arenaData, { rejectWithValue }) => {
   try {
     const response = await api.post('/arenas', arenaData);
@@ -224,6 +236,16 @@ const arenaSlice = createSlice({
           state.currentArenaId = state.arenas.length > 0 ? (state.arenas.find(a => a.isPrimary)?._id || state.arenas[0]._id) : null;
         }
         delete state.syllabus[action.payload];
+      })
+      .addCase(togglePrimaryArena.fulfilled, (state, action) => {
+        state.arenas = state.arenas.map(a => ({
+          ...a,
+          isPrimary: a._id === action.payload._id
+        }));
+        toast.success(`Primary Arena set to ${action.payload.title} ⭐`);
+      })
+      .addCase(togglePrimaryArena.rejected, (state, action) => {
+        toast.error(action.payload);
       });
   }
 });

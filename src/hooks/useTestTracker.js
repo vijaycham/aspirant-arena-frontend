@@ -32,7 +32,8 @@ const useTestTracker = () => {
     difficulty: "Medium",
     reflection: "",
     timeTaken: "",
-    startTime: ""
+    startTime: "",
+    arenaId: ""
   });
 
   const fetchData = useCallback(async () => {
@@ -77,7 +78,8 @@ const useTestTracker = () => {
       difficulty: "Medium",
       reflection: "",
       timeTaken: "",
-      startTime: ""
+      startTime: "",
+      arenaId: ""
     });
     setEditingId(null);
     setShowAdvance(false);
@@ -135,8 +137,8 @@ const useTestTracker = () => {
 
     try {
       if (editingId) {
-        await api.put(`/test/${editingId}`, payload);
-        await syncRevisionTask(payload); // Now runs on update too
+        await api.patch(`/test/${editingId}`, payload);
+        await syncRevisionTask(payload);
         toast.success("Test record updated! ✨");
       } else {
         await api.post("/test", payload);
@@ -166,7 +168,8 @@ const useTestTracker = () => {
       difficulty: test.difficulty || "Medium",
       reflection: test.reflection || "",
       timeTaken: test.timeTaken || "",
-      startTime: test.startTime || ""
+      startTime: test.startTime || "",
+      arenaId: test.arenaId || ""
     });
     setEditingId(test._id);
     setShowAdvance(true);
@@ -284,6 +287,7 @@ const useTestTracker = () => {
   }, [stats, selectedSubject]);
 
   return {
+    arenas: useSelector((state) => state.arena.arenas),
     tests,
     stats,
     subjects,
