@@ -49,6 +49,22 @@ const FocusRhythm = ({ todaySessions }) => {
           ))}
         </div>
       </div>
+
+      {/* 🧭 Semantic Legend */}
+      <div className="flex justify-center items-center gap-4 mt-2">
+        <div className="flex items-center gap-1.5 opacity-60 grayscale hover:grayscale-0 transition-all">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400/50"></div>
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Flow</span>
+        </div>
+        <div className="flex items-center gap-1.5 opacity-60 grayscale hover:grayscale-0 transition-all">
+          <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50"></div>
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Zone</span>
+        </div>
+        <div className="flex items-center gap-1.5 opacity-60 grayscale hover:grayscale-0 transition-all">
+          <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-sm shadow-rose-400/50"></div>
+          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Drift</span>
+        </div>
+      </div>
     </div>
   );
 };

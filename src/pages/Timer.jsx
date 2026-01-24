@@ -372,7 +372,7 @@ const Timer = () => {
                       className="text-[10px] font-black text-primary-600 uppercase tracking-widest hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded-lg transition-all flex items-center gap-1.5"
                     >
                       <FaTasks className="text-primary-500" size={10} /> 
-                      {selectedTaskId ? "Change Task" : "Choose Task"}
+                      {selectedTaskId ? "Change Task" : "Lock a Focus Goal"}
                     </button>
                   ) : (
                     <span className="text-[9px] font-bold text-gray-300 uppercase tracking-widest italic">No tasks active</span>
@@ -380,17 +380,34 @@ const Timer = () => {
                 </div>
 
                 <div className="relative group/input">
-                  <div className="absolute inset-0 bg-primary-100/20 blur-xl rounded-full opacity-0 group-focus-within/input:opacity-100 transition-opacity duration-500"></div>
+                  {/* 🔒 ONLY SHOW LOCK IF ACTIVE AND SUBJECT EXISTS */}
+                  {isActive && subject && (
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-500 z-20 animate-in fade-in zoom-in duration-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                        <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                  
+                  <div className={`absolute inset-0 bg-primary-100/20 blur-xl rounded-full opacity-0 group-focus-within/input:opacity-100 transition-opacity duration-500 ${isActive ? 'opacity-0' : ''}`}></div>
                   <input
                     type="text"
-                    placeholder="Focus Mission... (e.g. Laxmikanth Polity)"
+                    disabled={isActive && !!subject}
+                    readOnly={isActive && !!subject}
+                    placeholder={isActive && subject ? "Mission Locked In..." : "Focus Mission... (e.g. Laxmikanth Polity)"}
                     value={subject}
                     onChange={(e) => {
+                      if (isActive && !!subject) return; // Prevent edit only if locked
                       setSubject(e.target.value);
                       setSelectedTaskId(""); 
                       setSelectedNodeId("");
                     }}
-                    className="relative w-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/60 dark:border-white/10 focus:border-primary-300 focus:bg-white/60 dark:focus:bg-slate-800/60 px-6 py-4 rounded-2xl outline-none text-center font-bold text-gray-800 dark:text-white transition-all placeholder:text-gray-400 text-base shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
+                    className={`relative w-full px-6 py-4 rounded-2xl outline-none text-center font-bold text-base transition-all duration-300
+                      ${isActive && subject
+                        ? "bg-primary-50/50 dark:bg-primary-900/10 border-2 border-primary-200 dark:border-primary-800 text-primary-800 dark:text-primary-100 pl-10 cursor-not-allowed shadow-inner" 
+                        : "bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/60 dark:border-white/10 focus:border-primary-300 focus:bg-white/60 dark:focus:bg-slate-800/60 text-gray-800 dark:text-white placeholder:text-gray-400 shadow-sm hover:shadow-md focus:shadow-lg focus:scale-[1.02]"
+                      }
+                    `}
                   />
                   
                   {/* Task Metadata Indicator (if linked to Syllabus) */}
