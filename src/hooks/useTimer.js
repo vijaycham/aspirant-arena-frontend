@@ -856,6 +856,17 @@ export const useTimer = () => {
     };
   }, []);
 
+  // 🛡️ Auto-Complete on Load: If we wake up and time is already 0 (finished offline), complete it immediately.
+  // Placed here to ensure handleTimerComplete is defined.
+  useEffect(() => {
+    if (isActive && timeLeft <= 0 && mode !== "STOPWATCH") {
+      const timer = setTimeout(() => {
+        handleTimerComplete();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, timeLeft, mode, handleTimerComplete]);
+
   return {
     mode,
     setMode: switchMode,

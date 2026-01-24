@@ -5,6 +5,12 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] – 2026-01-24
+### Fixed
+- Auto-complete focus sessions that finished while the app was closed or device was asleep
+- Prevented timer from getting stuck at `00:00` after background or offline completion
+- Ensured completed sessions are always logged and recoverable on app reopen
+
 ## [1.6.1] – 2026-01-24
 ### Fixed
 - Prevented focus session data loss when switching timer modes during an active run.
