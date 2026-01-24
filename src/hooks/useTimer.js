@@ -197,6 +197,19 @@ export const useTimer = () => {
     return () => window.removeEventListener("storage", handleStorage);
   }, [rehydrateTime]);
 
+  // 🛡️ Data Safety: Handle Tab Close/Refresh
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      // We don't block unload, but we ensure localStorage is up-to-date
+      // Note: We cannot reliable run async saveSession here.
+      // But our LocalStorage based rehydration handles the state restoration perfectly
+      // as long as we don't clear the keys.
+      // So we mainly rely on 'timer-targetTime' or 'timer-startTime' which are set on START.
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
   /* ------------------ LOCAL STORAGE SYNC ------------------ */
   /* ------------------ LOCAL STORAGE SYNC (OPTIMIZED) ------------------ */
   // 1. Config Sync (Low Frequency) - Only writes when settings change
@@ -653,10 +666,17 @@ export const useTimer = () => {
   };
 
   const switchMode = (newMode) => {
+    // 🛡️ Auto-Save: If switching from a valid session, save it first
+    const elapsed = mode === "STOPWATCH" ? timeLeft : (modeTimings[mode].time - timeLeft);
+    if ((mode === "FOCUS" || mode === "STOPWATCH") && elapsed >= MIN_VALID_DURATION) {
+      saveSession(elapsed, "interrupted");
+    }
+
     setMode(newMode);
     setTimeLeft(modeTimings[newMode].time);
     localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
     localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+    localStorage.removeItem('timer-startTime'); // Clear stopwatch start too
     setActiveTick(t => t + 1);
     startTimeRef.current = null;
     sessionIdRef.current = null; // Clear ID on mode switch

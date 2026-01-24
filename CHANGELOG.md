@@ -5,6 +5,11 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] – 2026-01-24
+### Fixed
+- Prevented focus session data loss when switching timer modes during an active run.
+- Active sessions are now either blocked from unsafe mode switches or automatically saved as interrupted.
+
 ## [1.6.0] – 2026-01-24
 ### Added
 - **Stopwatch Mode (Count-Up)**

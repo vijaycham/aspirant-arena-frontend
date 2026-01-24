@@ -65,9 +65,23 @@ describe('TimerDisplay Component', () => {
     fireEvent.click(screen.getByText('Stopwatch'));
     expect(defaultProps.switchMode).toHaveBeenCalledWith('STOPWATCH');
     
-    // Click Countdown (should switch to FOCUS if currently STOPWATCH)
     // Note: To test this transition properly, we'd need to re-render with mode='STOPWATCH', 
     // but checking the call on the button is enough for unit test.
+  });
+
+  it('prevents mode switch when timer is active', () => {
+    // Override isActive to true
+    render(<TimerDisplay {...defaultProps} isActive={true} />);
+    
+    // Attempt to click Stopwatch
+    fireEvent.click(screen.getByText('Stopwatch'));
+    
+    // Should NOT call switchMode
+    expect(defaultProps.switchMode).not.toHaveBeenCalled();
+    
+    // Attempt to click Short Break
+    fireEvent.click(screen.getByText('Short Break'));
+    expect(defaultProps.switchMode).not.toHaveBeenCalled();
   });
 
   it('hides pomodoro tabs in stopwatch mode', () => {

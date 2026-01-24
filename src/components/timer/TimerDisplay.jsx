@@ -36,6 +36,10 @@ const TimerDisplay = ({
          {/* Countdown Option */}
          <button
             onClick={() => {
+               if (isActive) {
+                  toast("Pause timer before switching modes ⏸️", { icon: "🚧" });
+                  return;
+               }
                if (mode === 'STOPWATCH') switchMode('FOCUS');
             }}
             className={`relative z-10 px-4 md:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors w-24 md:w-32 ${
@@ -47,7 +51,13 @@ const TimerDisplay = ({
 
          {/* Stopwatch Option */}
          <button
-            onClick={() => switchMode('STOPWATCH')}
+            onClick={() => {
+               if (isActive) {
+                  toast("Pause timer before switching modes ⏸️", { icon: "🚧" });
+                  return;
+               }
+               switchMode('STOPWATCH');
+            }}
             className={`relative z-10 px-4 md:px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors w-24 md:w-32 ${
                mode === 'STOPWATCH' ? 'text-primary-600 dark:text-white' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500'
             }`}
@@ -71,9 +81,13 @@ const TimerDisplay = ({
                     <button
                        key={key}
                        onClick={() => {
-                          switchMode(key);
-                          setIsEditing(false);
-                       }}
+                           if (isActive) {
+                              toast("Pause first to change mode ⏸️");
+                              return;
+                           }
+                           switchMode(key);
+                           setIsEditing(false);
+                        }}
                        className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all ${
                           mode === key 
                              ? "bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800 text-primary-600 dark:text-primary-400" 
