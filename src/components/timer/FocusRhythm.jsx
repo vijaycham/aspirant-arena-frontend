@@ -51,7 +51,7 @@ const FocusRhythm = ({ todaySessions }) => {
       </div>
 
       {/* 🧭 Semantic Legend */}
-      <div className="flex justify-center items-center gap-4 mt-2">
+      <div className="flex justify-center items-center gap-4 mt-2 flex-wrap">
         <div className="flex items-center gap-1.5 opacity-60 grayscale hover:grayscale-0 transition-all">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400/50"></div>
           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Flow</span>
