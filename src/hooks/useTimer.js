@@ -166,6 +166,8 @@ export const useTimer = () => {
         TIMER_STORAGE_KEYS.TARGET_TIME,
         TIMER_STORAGE_KEYS.PAUSED_REMAINING,
         TIMER_STORAGE_KEYS.MODE,
+        TIMER_STORAGE_KEYS.CYCLE,
+        TIMER_STORAGE_KEYS.SESSIONS,
         TIMER_STORAGE_KEYS.SUBJECT,
         TIMER_STORAGE_KEYS.TASK_ID,
         'timer_arena_id',
@@ -174,7 +176,8 @@ export const useTimer = () => {
         TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE,
         TIMER_STORAGE_KEYS.AMBIENT_VOLUME,
         TIMER_STORAGE_KEYS.ENABLE_REFLECTION,
-        TIMER_STORAGE_KEYS.MODE_TIMINGS
+        TIMER_STORAGE_KEYS.MODE_TIMINGS,
+        TIMER_STORAGE_KEYS.PENDING_SESSION,
       ];
 
       if (syncKeys.includes(e.key)) {
@@ -184,20 +187,29 @@ export const useTimer = () => {
         setTimeLeft(rehydrateTime);
 
         if (e.newValue !== null) {
-          switch (e.key) {
-            case TIMER_STORAGE_KEYS.MODE: setMode(e.newValue); break;
-            case TIMER_STORAGE_KEYS.SUBJECT: setSubject(e.newValue); break;
-            case TIMER_STORAGE_KEYS.TASK_ID: setSelectedTaskId(e.newValue); break;
-            case 'timer_arena_id': setSelectedArenaId(e.newValue); break;
-            case 'timer_node_id': setSelectedNodeId(e.newValue); break;
-            case TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED: setAmbientEnabled(e.newValue === "true"); break;
-            case TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE: setAmbientType(e.newValue); break;
-            case TIMER_STORAGE_KEYS.MODE_TIMINGS:
-              setModeTimings(JSON.parse(e.newValue));
-              break;
-            case TIMER_STORAGE_KEYS.AMBIENT_VOLUME: setVolume(parseFloat(e.newValue)); break;
-            case TIMER_STORAGE_KEYS.ENABLE_REFLECTION: setReflectionEnabled(e.newValue !== "false"); break;
-            default: break;
+          try {
+            switch (e.key) {
+              case TIMER_STORAGE_KEYS.MODE: setMode(e.newValue); break;
+              case TIMER_STORAGE_KEYS.CYCLE: setCycleNumber(parseInt(e.newValue, 10)); break;
+              case TIMER_STORAGE_KEYS.SESSIONS: setSessionsCompleted(parseInt(e.newValue, 10)); break;
+              case TIMER_STORAGE_KEYS.SUBJECT: setSubject(e.newValue); break;
+              case TIMER_STORAGE_KEYS.TASK_ID: setSelectedTaskId(e.newValue); break;
+              case 'timer_arena_id': setSelectedArenaId(e.newValue); break;
+              case 'timer_node_id': setSelectedNodeId(e.newValue); break;
+              case TIMER_STORAGE_KEYS.AMBIENT_SOUND_ENABLED: setAmbientEnabled(e.newValue === "true"); break;
+              case TIMER_STORAGE_KEYS.AMBIENT_SOUND_TYPE: setAmbientType(e.newValue); break;
+              case TIMER_STORAGE_KEYS.MODE_TIMINGS:
+                setModeTimings(JSON.parse(e.newValue));
+                break;
+              case TIMER_STORAGE_KEYS.AMBIENT_VOLUME: setVolume(parseFloat(e.newValue)); break;
+              case TIMER_STORAGE_KEYS.ENABLE_REFLECTION: setReflectionEnabled(e.newValue !== "false"); break;
+              case TIMER_STORAGE_KEYS.PENDING_SESSION:
+                setPendingSession(JSON.parse(e.newValue));
+                break;
+              default: break;
+            }
+          } catch (err) {
+            console.error("Storage sync failed for key:", e.key, err);
           }
         }
       }
@@ -382,9 +394,30 @@ export const useTimer = () => {
 
     // If no rating is provided yet, we store it as a pending session for the UI to handle
     if (!rating && status === "completed") {
-      setPendingSession({ seconds, status });
+      // 📸 SNAPSHOT STATE: Capture all context so it's not lost when timer resets
+      setPendingSession({
+        seconds,
+        status,
+        snapshot: {
+          mode,
+          cycleNumber,
+          subject,
+          selectedTaskId,
+          selectedArenaId,
+          selectedNodeId
+        }
+      });
       return;
     }
+
+    // Use snapshot if available, otherwise fall back to current state
+    const snapshot = pendingSession?.snapshot || {};
+    const finalMode = snapshot.mode || mode;
+    const finalCycle = snapshot.cycleNumber || cycleNumber;
+    const finalSubject = snapshot.subject || subject;
+    const finalTask = snapshot.selectedTaskId || selectedTaskId;
+    const finalArena = snapshot.selectedArenaId || selectedArenaId;
+    const finalNode = snapshot.selectedNodeId || selectedNodeId;
 
     // Optimistic Update
     const addedMinutes = Math.round(seconds / 60);
@@ -399,15 +432,15 @@ export const useTimer = () => {
       const startTime = startTimeRef.current || new Date(endTime.getTime() - seconds * 1000);
 
       await api.post("/focus", {
-        subject: subject || "General Study",
-        task: selectedTaskId || undefined,
-        arenaId: selectedArenaId || undefined,
-        nodeId: selectedNodeId || undefined,
+        subject: finalSubject || "General Study",
+        task: finalTask || undefined,
+        arenaId: finalArena || undefined,
+        nodeId: finalNode || undefined,
         startTime,
         endTime,
         duration: addedMinutes,
-        type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break" }[mode] || "focus",
-        cycleNumber,
+        type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break", STOPWATCH: "focus" }[finalMode] || "focus",
+        cycleNumber: finalCycle,
         source: "pomodoro",
         status,
         focusRating: rating || 3,
@@ -416,8 +449,8 @@ export const useTimer = () => {
       });
 
       // ⛩️ Sync syllabus progress if a node is linked
-      if (selectedNodeId) {
-        dispatch(syncNodeTime({ nodeId: selectedNodeId, duration: addedMinutes }));
+      if (finalNode) {
+        dispatch(syncNodeTime({ nodeId: finalNode, duration: addedMinutes }));
       }
 
       startTimeRef.current = null;

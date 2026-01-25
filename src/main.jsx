@@ -26,21 +26,24 @@ Sentry.init({
     Sentry.replayIntegration(),
   ],
   // Performance Monitoring
-  tracesSampleRate: 1.0, 
+  tracesSampleRate: 1.0,
   // Session Replay
-  replaysSessionSampleRate: 0.1, 
+  replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
   environment: import.meta.env.MODE, // 👈 Fix: Dynamically set environment (development/production)
+  ignoreErrors: [
+    "Error invoking post: Method not found",
+  ],
 });
 
 import GlobalError from "./components/GlobalError";
 
 const router = createBrowserRouter([
-  { 
-    path: "/*", 
+  {
+    path: "/*",
     element: <App />, // All routes are handled here 
     errorElement: <GlobalError />
-  }, 
+  },
 ]);
 
 const root = createRoot(document.getElementById("root"));
