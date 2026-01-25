@@ -5,6 +5,21 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] – 2026-01-25
+### Fixed
+- Corrected Pomodoro race condition where the final focus session could be mis-logged as a break.
+- Ensured timer sessions auto-complete after backgrounding or offline periods.
+- Restored cross-tab consistency for active cycles and reflection modals.
+- Fixed PostHog user identification to use proper email and full name.
+- Reduced Sentry noise by filtering known browser-injected errors.
+
+### Improved
+- Safer Arena deletion with exact-name confirmation.
+- Case-insensitive, mobile-friendly deletion inputs.
+- Clear contextual warnings when deleting an arena.
+- Home dashboard now defaults to global focus statistics unless scoped.
+- Unified welcome email + admin notifications across all signup flows.
+
 ## [1.7.0] – 2026-01-25
 ### Added
 - **Search-First Task Engine**: Completely redesigned `TaskInput` to prioritize a predictive type-ahead search over manual dropdown selection.

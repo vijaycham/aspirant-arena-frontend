@@ -45,8 +45,8 @@ const App = () => {
   useEffect(() => {
     if (currentUser) {
       posthog.identify(currentUser._id, {
-        email: currentUser.email,
-        name: currentUser.name,
+        email: currentUser.emailId,
+        name: `${currentUser.firstName} ${currentUser.lastName || ""}`,
       });
     } else {
       posthog.reset();

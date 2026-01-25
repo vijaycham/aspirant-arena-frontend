@@ -282,6 +282,7 @@ const ArenaDashboard = () => {
       <ArenaModal
         isOpen={!!modalType}
         type={modalType}
+        arenaData={currentArena}
         onClose={() => setModalType(null)}
         onConfirm={
           modalType === 'delete' ? handleDeleteConfirm :
