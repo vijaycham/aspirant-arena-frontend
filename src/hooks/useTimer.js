@@ -431,24 +431,89 @@ export const useTimer = () => {
       const endTime = new Date();
       const startTime = startTimeRef.current || new Date(endTime.getTime() - seconds * 1000);
 
-      await api.post("/focus", {
-        subject: finalSubject || "General Study",
-        task: finalTask || undefined,
-        arenaId: finalArena || undefined,
-        nodeId: finalNode || undefined,
-        startTime,
-        endTime,
-        duration: addedMinutes,
-        type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break", STOPWATCH: "focus" }[finalMode] || "focus",
-        cycleNumber: finalCycle,
-        source: "pomodoro",
-        status,
-        focusRating: rating || 3,
-        notes,
-        sessionId
-      });
+      const startDay = new Date(startTime);
+      startDay.setHours(0, 0, 0, 0);
+      const endDay = new Date(endTime);
+      endDay.setHours(0, 0, 0, 0);
 
-      // ⛩️ Sync syllabus progress if a node is linked
+      // 🌓 Midnight Split Logic
+      if (startDay.getTime() !== endDay.getTime()) {
+        console.log("Session crossed midnight - Splitting...");
+
+        // 1. Calculate Split Point (Midnight of end day)
+        const midnight = new Date(endDay); // 00:00:00 of Ends Day
+
+        // 2. Durations
+        const durationYesterday = Math.floor((midnight.getTime() - startTime.getTime()) / 1000);
+        const durationToday = Math.floor((endTime.getTime() - midnight.getTime()) / 1000);
+
+        const minsYesterday = Math.round(durationYesterday / 60);
+        const minsToday = Math.round(durationToday / 60);
+
+        // 3. Payload Template
+        const basePayload = {
+          subject: finalSubject || "General Study",
+          task: finalTask || undefined,
+          arenaId: finalArena || undefined,
+          nodeId: finalNode || undefined,
+          cycleNumber: finalCycle,
+          source: "pomodoro",
+          status,
+          focusRating: rating || 3,
+          notes,
+          type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break", STOPWATCH: "focus" }[finalMode] || "focus",
+        };
+
+        // 4. Send Two Requests (Series to avoid race conditions on backend stats)
+        // Session A: Yesterday
+        if (minsYesterday > 0) {
+          await api.post("/focus", {
+            ...basePayload,
+            startTime: startTime,
+            endTime: new Date(midnight.getTime() - 1000), // 23:59:59
+            duration: minsYesterday,
+            sessionId: safeUUID() // New ID for split chunk
+          });
+        }
+
+        // Session B: Today (Main ID kept here for consistency)
+        if (minsToday > 0) {
+          await api.post("/focus", {
+            ...basePayload,
+            startTime: midnight,
+            endTime: endTime,
+            duration: minsToday,
+            sessionId: sessionId // Keep original ID here
+          });
+
+          // 🛡️ Update Local Stats ONLY for Today's portion
+          // Note: We already optimistically added the full duration above. We should correct it.
+          // But stats fetch below will fix it anyway. 
+          // For immediate UI feedback, let's correct the optimistic update:
+          setTotalMinutesToday(prev => prev - minsYesterday); // Remove yesterday's chunk
+        }
+
+      } else {
+        // Normal Single Session
+        await api.post("/focus", {
+          subject: finalSubject || "General Study",
+          task: finalTask || undefined,
+          arenaId: finalArena || undefined,
+          nodeId: finalNode || undefined,
+          startTime,
+          endTime,
+          duration: addedMinutes,
+          type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break", STOPWATCH: "focus" }[finalMode] || "focus",
+          cycleNumber: finalCycle,
+          source: "pomodoro",
+          status,
+          focusRating: rating || 3,
+          notes,
+          sessionId
+        });
+      }
+
+      // ⛩️ Sync syllabus progress if a node is linked (Accumulate TOTAL duration)
       if (finalNode) {
         dispatch(syncNodeTime({ nodeId: finalNode, duration: addedMinutes }));
       }
@@ -458,13 +523,14 @@ export const useTimer = () => {
       setPendingSession(null);
       toast.success("Focus logged 🎯");
 
-      // 🦔 PostHog Event
+      // 🦔 PostHog Event (Log total duration for analytics simplicity)
       posthog.capture('focus_session_logged', {
         duration_minutes: addedMinutes,
         mode: mode,
         subject: subject || "General",
         status: status,
-        rating: rating
+        rating: rating,
+        split_session: startDay.getTime() !== endDay.getTime()
       });
 
       // Re-fetch stats to update efficiency and rhythm
@@ -809,6 +875,32 @@ export const useTimer = () => {
     return () => {
       workerRef.current.terminate();
     };
+  }, []);
+
+  // 🌙 Midnight Check: Soft Reset for "Today\'s Stats" only
+  useEffect(() => {
+    const midnightInterval = setInterval(() => {
+      const lastChecked = localStorage.getItem('timer_last_midnight_check');
+      const now = new Date();
+      const todayStr = now.toDateString();
+
+      // If we haven't checked today, or it's a new day
+      if (lastChecked !== todayStr) {
+        localStorage.setItem('timer_last_midnight_check', todayStr);
+
+        // Only reset visual stats, NEVER stop the timer
+        if (lastChecked) { // Don't reset on very first load
+          setTotalMinutesToday(0);
+          setEffectiveMinutesToday(0);
+          setSessionsCompleted(0);
+          setTodaySessions([]);
+          // Keep subject/task/timer active!
+          toast("It's a new day! ☀️ Stats reset, keep being awesome!", { icon: "📅" });
+        }
+      }
+    }, 60000); // Check every minute
+
+    return () => clearInterval(midnightInterval);
   }, []);
 
   // Sync Start/Stop with Target Time
