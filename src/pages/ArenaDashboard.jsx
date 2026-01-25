@@ -173,8 +173,8 @@ const ArenaDashboard = () => {
 
           {/* Main - Syllabus Tracker */}
           <div className="lg:col-span-9">
-            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white dark:border-white/10 shadow-2xl shadow-gray-200/50 dark:shadow-black/50 rounded-[2.5rem] overflow-hidden min-h-[600px]">
-              <div className="p-8 border-b border-gray-100 dark:border-white/5 bg-white/40 dark:bg-white/5 flex items-center justify-between">
+            <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-white dark:border-white/10 shadow-2xl shadow-gray-200/50 dark:shadow-black/50 rounded-[2.5rem] overflow-hidden min-h-[600px] relative">
+              <div className="p-4 md:p-8 border-b border-gray-100 dark:border-white/5 bg-white/40 dark:bg-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary-600 to-indigo-700 flex items-center justify-center text-white font-black text-xl shadow-lg">
                     {currentArena?.title?.[0] || 'A'}
@@ -218,20 +218,21 @@ const ArenaDashboard = () => {
                   </div>
                 </div>
 
-                {/* Progress Mini-Chart */}
-                <div className="hidden sm:flex items-center gap-4 bg-white dark:bg-slate-800 px-4 py-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                  <div className="text-right">
-                    <p className="text-[9px] text-gray-400 uppercase font-black tracking-widest">Progress</p>
-                    <p className="font-mono text-primary-600 font-black text-lg">
-                      {currentArenaId && syllabus[currentArenaId] ?
+                {/* Progress Mini-Chart - Hidden on mobile for cleaner UI */}
+                {/* Progress Mini-Chart - Minimalist on Mobile (Percentage only) */}
+                <div className="flex items-center gap-2 md:gap-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                  <div className="text-right flex flex-col items-end">
+                    <p className="hidden md:block text-[9px] text-gray-400 uppercase font-black tracking-widest leading-none mb-1">Progress</p>
+                    <p className="font-mono text-primary-600 font-black text-sm md:text-lg leading-none">
+                      {currentArenaId && syllabus[currentArenaId] && Object.keys(syllabus[currentArenaId].byId).length > 0 ?
                         Math.round((Object.values(syllabus[currentArenaId].byId).filter(n => n.status === 'completed').length / Object.keys(syllabus[currentArenaId].byId).length) * 100)
                         : 0}%
                     </p>
                   </div>
-                  <div className="w-24 h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div className="hidden md:block w-24 h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
                       style={{
-                        width: `${currentArenaId && syllabus[currentArenaId] ?
+                        width: `${currentArenaId && syllabus[currentArenaId] && Object.keys(syllabus[currentArenaId].byId).length > 0 ?
                           (Object.values(syllabus[currentArenaId].byId).filter(n => n.status === 'completed').length / Object.keys(syllabus[currentArenaId].byId).length) * 100
                           : 0}%`
                       }}
@@ -241,7 +242,7 @@ const ArenaDashboard = () => {
                 </div>
               </div>
 
-              <div className="p-8">
+              <div className="p-4 md:p-8">
                 {currentArenaId ? (
                   <SyllabusTree
                     syllabusData={syllabus[currentArenaId]}
@@ -259,16 +260,22 @@ const ArenaDashboard = () => {
                     </p>
                     <div className="flex flex-wrap gap-4 justify-center">
                       <button
-                        onClick={() => setModalType('create')}
-                        className="px-8 py-3.5 rounded-2xl bg-gray-900 text-white font-black hover:bg-black hover:scale-[1.03] transition-all shadow-xl shadow-gray-200 text-sm uppercase tracking-wider"
+                        onClick={() => handleCreateConfirm({ title: 'UPSC GS Master', templateId: 'upsc-gs' })}
+                        className="px-8 py-3.5 rounded-2xl bg-gray-900 dark:bg-primary-600 text-white font-black hover:scale-[1.03] transition-all shadow-xl shadow-gray-200 dark:shadow-primary-900/20 text-[10px] uppercase tracking-widest"
                       >
                         UPSC GS Master
                       </button>
                       <button
-                        onClick={() => setModalType('create')}
-                        className="px-8 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-white font-black hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 hover:border-gray-200 transition-all text-sm uppercase tracking-wider"
+                        onClick={() => handleCreateConfirm({ title: 'Custom Track', templateId: 'general' })}
+                        className="px-8 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-gray-100 dark:border-gray-700 text-gray-600 dark:text-white font-black hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 hover:border-gray-200 transition-all text-[10px] uppercase tracking-widest"
                       >
-                        Custom / General
+                        Custom Template
+                      </button>
+                      <button
+                        onClick={() => handleCreateConfirm({ title: 'New Arena', templateId: 'none' })}
+                        className="px-8 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-dashed border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 font-black hover:border-primary-500 hover:text-primary-600 transition-all text-[10px] uppercase tracking-widest"
+                      >
+                        Blank Canvas
                       </button>
                     </div>
                   </div>
