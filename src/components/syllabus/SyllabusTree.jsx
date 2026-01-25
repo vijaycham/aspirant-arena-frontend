@@ -190,7 +190,7 @@ const SyllabusNode = React.memo(function SyllabusNode({
           <div className="md:hidden relative">
             <button
               onClick={(e) => { e.stopPropagation(); setShowManage(!showManage); }}
-              className={`p-2 rounded-lg transition-all ${showManage ? 'bg-primary-600 text-white shadow-lg' : 'bg-gray-50 dark:bg-slate-800 text-gray-400'}`}
+              className={`syllabus-interaction-trigger p-2 rounded-lg transition-all ${showManage ? 'bg-primary-600 text-white shadow-lg' : 'bg-gray-50 dark:bg-slate-800 text-gray-400'}`}
               aria-label="Manage node"
             >
               <FiEdit2 size={16} />
@@ -201,7 +201,7 @@ const SyllabusNode = React.memo(function SyllabusNode({
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-full mt-2 min-w-[140px] bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/10 p-1.5 rounded-2xl shadow-2xl z-20 origin-top-right overflow-hidden"
+                  className="syllabus-interaction-area absolute right-0 top-full mt-2 min-w-[140px] bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/10 p-1.5 rounded-2xl shadow-2xl z-20 origin-top-right overflow-hidden"
                 >
                   {node.type !== 'subject' && node.type !== 'root' && node.type !== 'category' && (
                     <button
@@ -248,7 +248,7 @@ const SyllabusNode = React.memo(function SyllabusNode({
             {canHaveChildren && (
               <button
                 onClick={(e) => { e.stopPropagation(); setIsAddingChild(true); }}
-                className="p-1.5 hover:text-primary-600 transition-colors"
+                className="syllabus-interaction-trigger p-1.5 hover:text-primary-600 transition-colors"
                 title="Add Child Topic"
               >
                 <FiCornerDownRight size={14} />
@@ -291,7 +291,7 @@ const SyllabusNode = React.memo(function SyllabusNode({
       </div>
 
       {isAddingChild && (
-        <div className="pl-4 md:pl-9 py-2 flex gap-2">
+        <div className="syllabus-interaction-area pl-4 md:pl-9 py-2 flex gap-2">
           <input
             autoFocus
             className="border border-gray-200 dark:border-white/10 bg-white dark:bg-slate-800 text-gray-900 dark:text-white rounded px-2 py-1 text-sm flex-1 outline-none focus:border-primary-500"
@@ -413,10 +413,16 @@ const SyllabusTree = ({ syllabusData, arenaId, isLoading }) => {
   // Close menu/form on click outside
   React.useEffect(() => {
     const handleClickOutside = (e) => {
-      if (treeRef.current && !treeRef.current.contains(e.target)) {
-        setActiveManageNodeId(null);
-        setActiveAddNodeId(null);
+      // If clicking inside an interaction area (popup/form) or a trigger button, do nothing.
+      // Let the specific React event handlers manage the logic to prevent fighting/flicker.
+      if (
+        e.target.closest('.syllabus-interaction-area') ||
+        e.target.closest('.syllabus-interaction-trigger')
+      ) {
+        return;
       }
+      setActiveManageNodeId(null);
+      setActiveAddNodeId(null);
     };
     if (activeManageNodeId || activeAddNodeId) {
       document.addEventListener('mousedown', handleClickOutside);
