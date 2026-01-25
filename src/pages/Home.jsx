@@ -86,7 +86,7 @@ const Home = () => {
           const [testsRes, tasksRes, focusRes] = await Promise.all([
             api.get(`/test${arenaQuery}`),
             api.get("/tasks"),
-            api.get(`/focus/stats/today?offset=${tzOffset}${arenaFilter}`)
+            api.get(`/focus/stats/today?offset=${tzOffset}`)
           ]);
 
           const taskItems = tasksRes?.data?.tasks || [];
