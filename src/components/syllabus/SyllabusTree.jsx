@@ -20,7 +20,8 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [newChildTitle, setNewChildTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(node.title || "");
+  const [editTitle, setEditTitle] = useState(node?.title || "");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (!node) return null;
 
@@ -76,9 +77,8 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
   };
 
   const handleDelete = () => {
-    if (window.confirm(`Delete "${node.title}" and its children?`)) {
-      dispatch(deleteNode({ arenaId, nodeId: node._id }));
-    }
+    dispatch(deleteNode({ arenaId, nodeId: node._id }));
+    setShowDeleteConfirm(false);
   };
 
   const statusIcons = {
@@ -97,7 +97,7 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
   };
 
   return (
-    <div className={`select-none ${depth > 0 ? 'ml-6 border-l border-dashed border-gray-300/50' : ''}`}>
+    <div className={`select-none ${depth > 0 ? 'ml-3 md:ml-6 border-l border-dashed border-gray-300/50' : ''}`}>
       <div
         onClick={() => isExpandable && setIsOpen(!isOpen)}
         className={`group flex items-center transition-all rounded-lg ${isExpandable ? 'cursor-pointer' : ''} ${typeStyles[node.type] || ''}`}
@@ -136,7 +136,7 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
             />
           ) : (
             <div className="flex items-center gap-2">
-              <span className={`truncate font-medium ${node.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-gray-200'}`}>
+              <span className={`font-medium leading-tight ${node.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-gray-200'} ${depth > 2 ? 'truncate' : ''}`}>
                 {node.title}
               </span>
               {node.timeSpent > 0 && (
@@ -186,7 +186,7 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
           )}
           {node.type !== 'root' && (
             <button
-              onClick={(e) => { e.stopPropagation(); handleDelete(); }}
+              onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
               className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-900/10 text-rose-500 hover:bg-rose-600 hover:text-white transition-all shadow-sm"
               title="Delete Topic"
             >
@@ -230,6 +230,43 @@ const SyllabusNode = React.memo(function SyllabusNode({ node, byId, childrenMap,
               />
             ))}
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 max-w-sm w-full text-center"
+            >
+              <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-6">
+                <FiTrash2 />
+              </div>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">Delete Topic?</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-8 leading-relaxed">
+                Are you sure you want to delete <span className="text-gray-900 dark:text-white font-bold italic">&quot;{node.title}&quot;</span>? <br />
+                This will remove all sub-topics and progress tracking permanently.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 py-4 bg-gray-50 dark:bg-slate-800 text-gray-400 font-bold rounded-2xl hover:bg-gray-100 transition-all uppercase tracking-widest text-[10px]"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 py-4 bg-rose-500 text-white font-black rounded-2xl hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/20 uppercase tracking-widest text-[10px]"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

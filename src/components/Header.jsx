@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   FaBars,
@@ -33,6 +33,13 @@ const Header = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [streak, setStreak] = useState(0);
   const profileRef = useRef(null);
+  const location = useLocation();
+
+  // 🚪 Close all menus on route change or auth change
+  useEffect(() => {
+    setProfileOpen(false);
+    setMobileMenuOpen(false);
+  }, [location.pathname, isAuthenticated]);
 
   // 🖱️ Close dropdown on outside click
   useEffect(() => {
@@ -42,7 +49,11 @@ const Header = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, []);
 
   // ⌨️ Close dropdown on Escape key

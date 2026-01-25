@@ -177,7 +177,7 @@ const Home = () => {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-600 dark:text-primary-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2 animate-in fade-in slide-in-from-left-4">
             Aspirant Arena
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-gray-900 dark:text-white leading-[1.1] tracking-tighter transition-colors duration-200">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-gray-900 dark:text-white leading-[1.05] tracking-tighter transition-colors duration-200">
             {primaryArena ? (
               <>Master your <br className="hidden lg:block" /><span className="bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">{primaryArena.title}</span></>
             ) : (
@@ -198,74 +198,43 @@ const Home = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
             {!isTimerActive ? (
               <>
-                <Link to="/timer" className="px-8 py-4 rounded-[2rem] bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black shadow-xl hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base border border-transparent">
+                <Link to="/timer" className="px-8 py-3.5 rounded-[2rem] bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black shadow-xl hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base border border-transparent">
                   Focus Arena ⚡
                 </Link>
-                <Link to="/test-tracker" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                <Link to="/test-tracker" className="px-8 py-3.5 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
                   Analyze Performance 📈
                 </Link>
-                <Link to="/tasks" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                <Link to="/tasks" className="px-8 py-3.5 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
                   Manage Tasks 📝
                 </Link>
               </>
             ) : (
               <div className="flex flex-wrap gap-4">
-                <Link to="/test-tracker" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                <Link to="/test-tracker" className="px-8 py-3.5 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
                   Analyze Performance 📈
                 </Link>
-                <Link to="/arena" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                <Link to="/arena" className="px-8 py-3.5 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
                   Master Syllabus ⛩️
                 </Link>
-                <Link to="/tasks" className="px-8 py-4 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
+                <Link to="/tasks" className="px-8 py-3.5 rounded-[2rem] bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-black shadow-xl shadow-gray-100/50 dark:shadow-none hover:bg-gray-50 dark:hover:bg-slate-700 hover:scale-[1.03] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-3 text-sm md:text-base">
                   Manage Tasks 📝
                 </Link>
               </div>
             )}
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="pt-16 grid grid-cols-3 gap-8 border-t border-gray-200 dark:border-white/5 mt-24"
-          >
-            <div className="space-y-2">
-              <div className="w-8 h-8 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
-                <FiLayers size={16} />
-              </div>
-              <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Map</h5>
-              <p className="text-[9px] text-gray-700 dark:text-gray-400 font-bold leading-relaxed uppercase tracking-tighter">Recursive Roadmap</p>
-            </div>
-
-            <div className="space-y-2">
-              <div className="w-8 h-8 rounded-xl bg-secondary-100 dark:bg-secondary-900/30 flex items-center justify-center text-secondary-600 dark:text-secondary-400">
-                <FiActivity size={16} />
-              </div>
-              <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Analyze</h5>
-              <p className="text-[9px] text-gray-700 dark:text-gray-400 font-bold leading-relaxed uppercase tracking-tighter">Error-First Intel</p>
-            </div>
-
-            <div className="space-y-2">
-              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                <FiTarget size={16} />
-              </div>
-              <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest">Command</h5>
-              <p className="text-[9px] text-gray-700 dark:text-gray-400 font-bold leading-relaxed uppercase tracking-tighter">Deep Focus Auto</p>
-            </div>
-          </motion.div>
         </div>
 
         {/* Dashboard Preview Widget */}
-        <div className="lg:col-span-5 relative">
+        <div className="lg:col-span-5 relative mt-12 lg:mt-0">
           {user ? (
             <div className="space-y-6">
-              <div className={`relative bg-white dark:bg-slate-900/50 dark:backdrop-blur-xl p-8 rounded-[3rem] shadow-2xl shadow-gray-200 dark:shadow-slate-900/50 border border-gray-100 dark:border-white/10 scale-100 lg:scale-105 transition-all duration-200 hover:rotate-1 overflow-hidden`}>
+              <div className={`relative bg-white dark:bg-slate-950/80 dark:backdrop-blur-2xl p-8 rounded-[3rem] shadow-2xl shadow-gray-200 dark:shadow-slate-950/50 border border-gray-100 dark:border-white/5 scale-100 lg:scale-105 transition-all duration-200 hover:rotate-1 overflow-hidden`}>
 
                 {user && !hasAccess(user) && <LockedOverlay />}
 
                 <div className="flex justify-between items-start mb-8">
-                  <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-                    {isTimerActive ? "Live Command" : "Progress Intel"}
+                  <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                    {isTimerActive ? "Live Command" : "LIVE PROGRESS"}
                   </h3>
                   <div className="w-12 h-12 bg-primary-50 dark:bg-primary-500/20 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 text-2xl font-black italic">
                     {isTimerActive ? <FiTarget /> : "!"}
@@ -289,7 +258,7 @@ const Home = () => {
                             {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                           </span>
                           <span className="text-[9px] font-black text-primary-500 uppercase tracking-[0.2em] mt-2">
-                            {timerMode === 'FOCUS' ? 'Focusing' : 'Break'}
+                            {timerMode === 'FOCUS' ? 'Focusing' : timerMode === 'STOPWATCH' ? 'Stopwatch' : 'Break'}
                           </span>
                         </div>
                       </div>
@@ -303,12 +272,12 @@ const Home = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-8 mb-4 px-4">
-                    <div className="text-center">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Arena Progress</span>
-                      <div className="flex flex-col items-center">
-                        <span className="text-4xl font-black text-gray-900 dark:text-white">
-                          {primaryArena ? (primaryArena.progress || 0) : 0}<span className="text-lg text-gray-400 ml-1">%</span>
+                  <div className="grid grid-cols-2 gap-y-10 gap-x-8 mb-4 px-2">
+                    <div className="text-left">
+                      <span className="text-[9px] md:text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-1">Arena Progress</span>
+                      <div className="flex flex-col">
+                        <span className="text-4xl font-black text-primary-600 dark:text-primary-400">
+                          {primaryArena ? (primaryArena.progress || 0) : 0}<span className="text-xl text-gray-400/60 ml-1">%</span>
                         </span>
                         {!primaryArena && (
                           <Link to="/arena" className="text-[10px] font-bold text-primary-600 hover:underline mt-1 uppercase tracking-wide">
@@ -318,28 +287,28 @@ const Home = () => {
                       </div>
                     </div>
 
-                    <div className="text-center">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Focus Today</span>
+                    <div className="text-left">
+                      <span className="text-[9px] md:text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-1">Focus Today</span>
                       <div>
-                        <span className="text-4xl font-black text-gray-900 dark:text-white">
-                          {stats ? Math.round(stats.focusedToday / 60 * 10) / 10 : 0}<span className="text-lg text-gray-400 ml-1">h</span>
+                        <span className="text-4xl font-black text-primary-600 dark:text-primary-400">
+                          {stats ? Math.round(stats.focusedToday / 60 * 10) / 10 : 0}<span className="text-xl text-gray-400/60 ml-1">h</span>
                         </span>
                       </div>
                     </div>
 
-                    <div className="text-center">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Accuracy</span>
+                    <div className="text-left">
+                      <span className="text-[9px] md:text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-1">Overall Accuracy</span>
                       <div>
-                        <span className="text-4xl font-black text-gray-900 dark:text-white">
-                          {stats ? stats.accuracy : 0}<span className="text-lg text-gray-400 ml-1">%</span>
+                        <span className="text-4xl font-black text-primary-600 dark:text-primary-400">
+                          {stats ? stats.accuracy : 0}<span className="text-xl text-gray-400/60 ml-1">%</span>
                         </span>
                       </div>
                     </div>
 
-                    <div className="text-center">
-                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">Tests Logged</span>
+                    <div className="text-left">
+                      <span className="text-[9px] md:text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-1">Tests Logged</span>
                       <div>
-                        <span className="text-4xl font-black text-gray-900 dark:text-white">
+                        <span className="text-4xl font-black text-primary-600 dark:text-primary-400">
                           {stats ? stats.count : 0}
                         </span>
                       </div>
@@ -375,7 +344,7 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Strategic Tip (Old Card Design) - Now in Right Column */}
+              {/* Strategic Tip */}
               {strategy && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -400,6 +369,40 @@ const Home = () => {
               <Link to="/signup" className="block w-full py-4 bg-primary-600 text-white font-black rounded-2xl hover:bg-primary-700 transition-all uppercase text-xs tracking-widest">Initialize Workspace</Link>
             </div>
           )}
+        </div>
+
+        {/* Strategic Pillars Grid - Moved AFTER Widget for Mobile/Tab stack */}
+        <div className="lg:col-span-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="grid grid-cols-3 gap-8 border-t border-gray-200 dark:border-white/5 mt-12 md:mt-24 pt-12 md:pt-16"
+          >
+            <div className="space-y-2 text-center lg:text-left">
+              <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mx-auto lg:mx-0">
+                <FiLayers size={16} />
+              </div>
+              <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none">Map</h5>
+              <p className="text-[9px] text-gray-500 dark:text-gray-400 font-bold leading-none uppercase tracking-tighter">Recursive Roadmap</p>
+            </div>
+
+            <div className="space-y-2 text-center lg:text-left">
+              <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mx-auto lg:mx-0">
+                <FiActivity size={16} />
+              </div>
+              <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none">Analyze</h5>
+              <p className="text-[9px] text-gray-500 dark:text-gray-400 font-bold leading-none uppercase tracking-tighter">Error-First Intel</p>
+            </div>
+
+            <div className="space-y-2 text-center lg:text-left">
+              <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 mx-auto lg:mx-0">
+                <FiTarget size={16} />
+              </div>
+              <h5 className="text-[10px] font-black text-gray-900 dark:text-white uppercase tracking-widest leading-none">Command</h5>
+              <p className="text-[9px] text-gray-500 dark:text-gray-400 font-bold leading-none uppercase tracking-tighter">Deep Focus Auto</p>
+            </div>
+          </motion.div>
         </div>
       </div>
 
