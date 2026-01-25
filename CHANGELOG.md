@@ -5,6 +5,20 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] – 2026-01-26
+### Added
+- Mobile-optimized syllabus roadmap layout.
+- Native bottom-sheet confirmation for destructive actions on mobile.
+
+### Changed
+- Recursive indentation capped on small screens.
+- Secondary syllabus actions consolidated for touch-friendly usage.
+
+### Fixed
+- Unstable add/manage menu behavior in deep syllabus trees.
+- Accidental form closures caused by imprecise click-outside detection.
+
+
 ## [1.7.1] – 2026-01-25
 ### Fixed
 - Corrected Pomodoro race condition where the final focus session could be mis-logged as a break.
