@@ -26,7 +26,9 @@ export const useTimer = () => {
       if (target === "STOPWATCH_RUNNING") {
         const start = parseInt(localStorage.getItem('timer-startTime'), 10);
         if (start && !isNaN(start)) {
-          return Math.floor((Date.now() - start) / 1000);
+          const elapsed = Math.floor((Date.now() - start) / 1000);
+          // 🛡️ Hotfix: Cap at 4 hours during rehydration
+          return Math.min(elapsed, 14400);
         }
         return 0;
       }
@@ -55,7 +57,9 @@ export const useTimer = () => {
       if (targetTime === "STOPWATCH_RUNNING") {
         const start = parseInt(localStorage.getItem('timer-startTime'), 10);
         if (start && !isNaN(start)) {
-          return Math.floor((Date.now() - start) / 1000);
+          const elapsed = Math.floor((Date.now() - start) / 1000);
+          // 🛡️ Hotfix: Cap at 4 hours
+          return Math.min(elapsed, 14400);
         }
         return 0;
       }
@@ -558,7 +562,7 @@ export const useTimer = () => {
         startTime: startTimeRef.current || new Date(Date.now() - seconds * 1000),
         endTime: new Date(),
         duration: addedMinutes,
-        type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break" }[mode] || "focus",
+        type: { FOCUS: "focus", SHORT_BREAK: "short-break", LONG_BREAK: "long-break", STOPWATCH: "focus" }[mode] || "focus",
         cycleNumber,
         source: "pomodoro",
         status,
@@ -579,18 +583,34 @@ export const useTimer = () => {
   };
 
   const handleTimerComplete = useCallback((manual = false) => {
-    // 🛡️ Guard against double firing from worker/timeout race conditions
     if (completedRef.current) return;
     completedRef.current = true;
 
-    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
-    localStorage.removeItem('timer-startTime'); // Clear stopwatch start
-    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
     setActiveTick(t => t + 1);
     setTimeLeft(rehydrateTime);
-    // ✅ ALWAYS subtract current timeLeft from total time for accuracy
-    // UNLESS it's Stopwatch, where timeLeft IS the elapsed time.
-    const elapsed = mode === "STOPWATCH" ? timeLeft : (modeTimings[mode].time - timeLeft);
+    // ✅ ABSOLUTE ACCURACY HOTFIX: Calculate elapsed using timestamps, not just state
+    let elapsed = 0;
+    if (mode === "STOPWATCH") {
+      const startTime = parseInt(localStorage.getItem('timer-startTime'), 10);
+      elapsed = startTime ? Math.floor((Date.now() - startTime) / 1000) : timeLeft;
+    } else {
+      const targetTime = parseInt(localStorage.getItem(TIMER_STORAGE_KEYS.TARGET_TIME), 10);
+      if (targetTime) {
+        // Mode time (e.g. 1500s) minus (Target - Now)
+        const remaining = Math.max(0, Math.ceil((targetTime - Date.now()) / 1000));
+        elapsed = modeTimings[mode].time - remaining;
+      } else {
+        elapsed = modeTimings[mode].time - timeLeft;
+      }
+    }
+
+    // 🛡️ Safe to remove now that calculation is done
+    localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
+    localStorage.removeItem('timer-startTime');
+    localStorage.removeItem(TIMER_STORAGE_KEYS.PAUSED_REMAINING);
+
+    // 🛡️ Health Cap: Force max 4 hours for logging
+    const finalElapsed = Math.min(elapsed, 14400);
 
     if (!manual) {
       playChime();
@@ -601,9 +621,9 @@ export const useTimer = () => {
     }
 
     if (mode === "FOCUS") {
-      if (elapsed >= MIN_VALID_DURATION) {
+      if (finalElapsed >= MIN_VALID_DURATION) {
         // Only trigger modal if reflection is enabled
-        saveSession(elapsed, manual ? "interrupted" : "completed", reflectionEnabled ? null : 3);
+        saveSession(finalElapsed, manual ? "interrupted" : "completed", reflectionEnabled ? null : 3);
       } else if (!manual) {
         toast("Good warmup! Work > 5m to log it.", { icon: "🌱" });
       }
@@ -625,8 +645,8 @@ export const useTimer = () => {
       }
     } else if (mode === "STOPWATCH") {
       // ⏱️ Start Fresh Stopwatch
-      if (elapsed >= MIN_VALID_DURATION) {
-        saveSession(elapsed, "completed", reflectionEnabled ? null : 3);
+      if (finalElapsed >= MIN_VALID_DURATION) {
+        saveSession(finalElapsed, "completed", reflectionEnabled ? null : 3);
       } else {
         toast("Session < 5m not logged ⏳", { icon: "👻" });
       }

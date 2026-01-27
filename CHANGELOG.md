@@ -5,6 +5,12 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.3] – 2026-01-27
+### Fixed
+- **Stopwatch 4-Hour Limit**: Implemented a robust 14,400-second (4-hour) cap during stopwatch rehydration and session logging to ensure health-conscious usage.
+- **Pomodoro Accuracy**: Migrated session duration calculation to absolute `Date.now()` logic, eliminating discrepancies caused by browser tab throttling in background modes.
+- **Timer Stability**: Hardened `handleTimerComplete` to use reliable timestamps instead of potentially stale UI state.
+
 ## [1.7.2] – 2026-01-26
 ### Added
 - Mobile-optimized syllabus roadmap layout.
