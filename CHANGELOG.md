@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Stopwatch 4-Hour Limit**: Implemented a robust 14,400-second (4-hour) cap during stopwatch rehydration and session logging to ensure health-conscious usage.
 - **Pomodoro Accuracy**: Migrated session duration calculation to absolute `Date.now()` logic, eliminating discrepancies caused by browser tab throttling in background modes.
+- **Tab Title Fix**: Resolved an issue where the browser tab incorrectly showed "Break" during an active stopwatch session.
+- **Improved Resilience**: Stopwatch sessions now correctly save as "interrupted" during manual resets or mode switches (if >5m).
 - **Timer Stability**: Hardened `handleTimerComplete` to use reliable timestamps instead of potentially stale UI state.
 
 ## [1.7.2] – 2026-01-26

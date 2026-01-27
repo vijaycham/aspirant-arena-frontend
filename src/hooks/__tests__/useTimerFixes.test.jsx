@@ -134,4 +134,59 @@ describe("useTimer Hotfixes", () => {
             );
         }, { timeout: 2000 });
     });
+
+    it("should show 'Stopwatch' in document.title when in stopwatch mode", () => {
+        act(() => {
+            localStorage.setItem(TIMER_STORAGE_KEYS.MODE, "STOPWATCH");
+            // Trigger storage sync
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: TIMER_STORAGE_KEYS.MODE,
+                newValue: "STOPWATCH"
+            }));
+            localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, "STOPWATCH_RUNNING");
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: TIMER_STORAGE_KEYS.TARGET_TIME,
+                newValue: "STOPWATCH_RUNNING"
+            }));
+        });
+
+        const { result } = renderHook(() => useTimer(), { wrapper });
+
+        // Force a tick to update timeLeft and document.title
+        act(() => {
+            vi.advanceTimersByTime(1000);
+        });
+
+        expect(document.title).toContain("Stopwatch");
+    });
+
+    it("should save an interrupted session when resetting a valid stopwatch session", async () => {
+        const { result } = renderHook(() => useTimer(), { wrapper });
+
+        act(() => {
+            const tenMinsAgo = BASE_TIME - (10 * 60 * 1000);
+            localStorage.setItem(TIMER_STORAGE_KEYS.MODE, "STOPWATCH");
+            localStorage.setItem('timer-startTime', tenMinsAgo.toString());
+            localStorage.setItem(TIMER_STORAGE_KEYS.TARGET_TIME, "STOPWATCH_RUNNING");
+
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: TIMER_STORAGE_KEYS.MODE,
+                newValue: "STOPWATCH"
+            }));
+        });
+
+        act(() => {
+            result.current.resetTimer();
+        });
+
+        await vi.waitFor(() => {
+            expect(api.post).toHaveBeenCalledWith(
+                "/focus",
+                expect.objectContaining({
+                    duration: 10,
+                    status: "interrupted"
+                })
+            );
+        });
+    });
 });

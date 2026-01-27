@@ -303,7 +303,7 @@ export const useTimer = () => {
       if (isActive) {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = (timeLeft % 60).toString().padStart(2, '0');
-        const modeLabel = mode === "FOCUS" ? "Focusing" : "Break Time";
+        const modeLabel = mode === "FOCUS" ? "Focusing" : mode === "STOPWATCH" ? "Stopwatch" : "Break Time";
         document.title = `(${minutes}:${seconds}) ${modeLabel} | Aspirant Arena`;
       } else {
         document.title = "Aspirant Arena | Deep Work Hub";
@@ -615,8 +615,8 @@ export const useTimer = () => {
     if (!manual) {
       playChime();
       sendNotification(
-        mode === "FOCUS" ? "Session Complete! 🎯" : "Break Over! ⚡",
-        mode === "FOCUS" ? "Great job! Time for a well-deserved break." : "Break is finished. Ready to dive back in?"
+        mode === "FOCUS" ? "Session Complete! 🎯" : mode === "STOPWATCH" ? "Stopwatch Limit Reached! ⏱️" : "Break Over! ⚡",
+        mode === "FOCUS" ? "Great job! Time for a well-deserved break." : mode === "STOPWATCH" ? "You've hit the 4-hour limit. Take a rest!" : "Break is finished. Ready to dive back in?"
       );
     }
 
@@ -733,8 +733,8 @@ export const useTimer = () => {
   }, [isActive, timeLeft, rehydrateTime, mode]);
 
   const resetTimer = () => {
-    const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
+    const elapsed = mode === "STOPWATCH" ? timeLeft : (modeTimings[mode].time - timeLeft);
+    if ((mode === "FOCUS" || mode === "STOPWATCH") && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
@@ -749,8 +749,8 @@ export const useTimer = () => {
   const skipTimer = () => handleTimerComplete(true);
 
   const resetCycle = useCallback(() => {
-    const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
+    const elapsed = mode === "STOPWATCH" ? timeLeft : (modeTimings[mode].time - timeLeft);
+    if ((mode === "FOCUS" || mode === "STOPWATCH") && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
@@ -772,8 +772,8 @@ export const useTimer = () => {
   }, [mode, modeTimings, timeLeft, saveSession]);
 
   const resetDay = () => {
-    const elapsed = modeTimings[mode].time - timeLeft;
-    if (mode === "FOCUS" && elapsed >= MIN_VALID_DURATION) {
+    const elapsed = mode === "STOPWATCH" ? timeLeft : (modeTimings[mode].time - timeLeft);
+    if ((mode === "FOCUS" || mode === "STOPWATCH") && elapsed >= MIN_VALID_DURATION) {
       saveSession(elapsed, "interrupted");
     }
     localStorage.removeItem(TIMER_STORAGE_KEYS.TARGET_TIME);
