@@ -1,11 +1,27 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { FaRocket, FaShieldAlt, FaChartBar, FaAngleRight, FaCheck } from "react-icons/fa";
+import { FaRocket, FaShieldAlt, FaChartBar, FaAngleRight, FaCheck, FaMapMarkedAlt, FaHourglassHalf, FaChartLine, FaBrain } from "react-icons/fa";
 import logo from "../../assets/3.png";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import api from "../utils/api";
 
 const Landing = () => {
   const [searchParams] = useSearchParams();
+  const [stats, setStats] = useState({ totalUsers: 0, samplePhotos: [] });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await api.get("/auth/public-stats");
+        if (response.status === "success") {
+          setStats(response.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch public stats:", err);
+      }
+    };
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     if (searchParams.get("verified") === "true") {
@@ -33,17 +49,17 @@ const Landing = () => {
               <span className="flex h-2 w-2 rounded-full bg-primary-500 animate-pulse"></span>
               <span className="text-xs font-black text-gray-500 uppercase tracking-widest">Built for UPSC Aspirants</span>
             </div>
-            
+
             <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-gray-900 leading-[0.95] tracking-tighter">
               Aspirant <br />
               <span className="bg-gradient-to-r from-primary-600 via-indigo-600 to-secondary-600 bg-clip-text text-transparent">
                 Arena
               </span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
-              Master your civil services preparation with a precision-engineered 
-              workspace. Track mocks, automate revision, and analyze subject progress 
+              Master your civil services preparation with a precision-engineered
+              workspace. Track mocks, automate revision, and analyze subject progress
               in one high-performance arena.
             </p>
 
@@ -66,18 +82,18 @@ const Landing = () => {
             </div>
 
             <div className="flex items-center justify-center lg:justify-start gap-8 pt-4 opacity-70 grayscale hover:grayscale-0 transition-all">
-                <div className="flex items-center gap-2">
-                    <FaCheck className="text-primary-500 text-xs" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Free Forever</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <FaCheck className="text-primary-500 text-xs" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Cloud Sync</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <FaCheck className="text-primary-500 text-xs" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Zero Ads</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <FaCheck className="text-primary-500 text-xs" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Free Forever</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaCheck className="text-primary-500 text-xs" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Cloud Sync</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <FaCheck className="text-primary-500 text-xs" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Zero Ads</span>
+              </div>
             </div>
           </div>
 
@@ -98,10 +114,10 @@ const Landing = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { title: "Mock Tracking", icon: <FaChartBar className="text-primary-500" />, desc: "Log and analyze mocks." },
-                    { title: "Smart Revision", icon: <FaRocket className="text-indigo-500" />, desc: "Auto-generated tasks." },
-                    { title: "Focused UI", icon: <FaShieldAlt className="text-secondary-500" />, desc: "Zero distractions." },
-                    { title: "Daily Insights", icon: <FaRocket className="text-emerald-500" />, desc: "Performance based tips." }
+                    { title: "Interactive Syllabi", icon: <FaMapMarkedAlt className="text-primary-500" />, desc: "Visualize your entire roadmap." },
+                    { title: "Deep Focus Arena", icon: <FaHourglassHalf className="text-indigo-500" />, desc: "Distraction-free study zones." },
+                    { title: "Mock Analytics", icon: <FaChartLine className="text-secondary-500" />, desc: "Precision trend analysis." },
+                    { title: "Smart Revision", icon: <FaBrain className="text-emerald-500" />, desc: "Auto-prioritized topic review." }
                   ].map((f, i) => (
                     <div key={i} className="p-4 rounded-3xl bg-gray-50 border border-gray-100 hover:bg-white hover:border-primary-100 hover:shadow-lg transition-all">
                       <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mb-3 text-lg">
@@ -114,15 +130,22 @@ const Landing = () => {
                 </div>
 
                 <div className="pt-4 mt-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="flex -space-x-3">
-                        {[1,2,3,4].map(i => (
-                            <div key={i} className="w-9 h-9 rounded-full border-2 border-white bg-gray-200 overflow-hidden shadow-sm">
-                                <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" />
-                            </div>
-                        ))}
-                        <div className="w-9 h-9 rounded-full border-2 border-white bg-slate-900 flex items-center justify-center text-[10px] font-black text-white shadow-sm">+1k</div>
-                    </div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined by top aspirants</span>
+                  <div className="flex -space-x-3">
+                    {stats.samplePhotos.length > 0 ? (
+                      stats.samplePhotos.map((photo, i) => (
+                        <div key={i} className="w-9 h-9 rounded-full border-2 border-white bg-gray-200 overflow-hidden shadow-sm">
+                          <img src={photo} alt="user" className="w-full h-full object-cover" />
+                        </div>
+                      ))
+                    ) : (
+                      [1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="w-9 h-9 rounded-full border-2 border-white bg-gray-200 overflow-hidden shadow-sm">
+                          <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" />
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined by top aspirants</span>
                 </div>
               </div>
             </div>
@@ -133,8 +156,8 @@ const Landing = () => {
       {/* Social Proof Section */}
       <section className="py-20 border-y border-gray-100 bg-white/50 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-12">Trusted by Civil Services Aspirants</h2>
-            {/* <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale pointer-events-none">
+          <h2 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-12">Trusted by Civil Services Aspirants</h2>
+          {/* <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-40 grayscale pointer-events-none">
                 <span className="text-2xl font-black text-gray-900 tracking-tighter italic">Vajiram & Ravi Style</span>
                 <span className="text-2xl font-black text-gray-900 tracking-tighter italic">Vision IAS Flow</span>
                 <span className="text-2xl font-black text-gray-900 tracking-tighter italic">Insights On India</span>

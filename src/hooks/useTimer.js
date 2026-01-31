@@ -101,7 +101,6 @@ export const useTimer = () => {
   const workerRef = useRef(null);
   const startTimeRef = useRef(null);
   const ambientRef = useRef(null);
-  const chimeRef = useRef(null);
   const completedRef = useRef(false); // 🛡️ Prevents double completion
   const sessionIdRef = useRef(null); // 🆔 Persists session ID across pauses/retries
   const [notificationPermission, setNotificationPermission] = useState(
@@ -373,18 +372,7 @@ export const useTimer = () => {
     }
   };
 
-  const playChime = () => {
-    // 📳 Vibration (Mobile)
-    if (typeof navigator !== "undefined" && navigator.vibrate) {
-      navigator.vibrate([500, 200, 500]); // Long-Short-Long pattern
-    }
 
-    if (!chimeRef.current) {
-      chimeRef.current = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
-    }
-    chimeRef.current.currentTime = 0;
-    chimeRef.current.play().catch(e => console.warn("Chime blocked:", e));
-  };
 
   /* ------------------ ACTIONS ------------------ */
   const saveSession = useCallback(async (seconds, status = "completed", rating = 3, notes = "") => {
@@ -613,7 +601,6 @@ export const useTimer = () => {
     const finalElapsed = Math.min(elapsed, 14400);
 
     if (!manual) {
-      playChime();
       sendNotification(
         mode === "FOCUS" ? "Session Complete! 🎯" : mode === "STOPWATCH" ? "Stopwatch Limit Reached! ⏱️" : "Break Over! ⚡",
         mode === "FOCUS" ? "Great job! Time for a well-deserved break." : mode === "STOPWATCH" ? "You've hit the 4-hour limit. Take a rest!" : "Break is finished. Ready to dive back in?"
@@ -709,10 +696,6 @@ export const useTimer = () => {
         startTimeRef.current = new Date();
       }
       // Prime audio on user gesture for mobile autoplay bypass
-      if (!chimeRef.current) {
-        chimeRef.current = new Audio("https://www.soundjay.com/buttons/beep-07.mp3");
-        chimeRef.current.load();
-      }
       if (!ambientRef.current) {
         ambientRef.current = new Audio();
         ambientRef.current.loop = true;
