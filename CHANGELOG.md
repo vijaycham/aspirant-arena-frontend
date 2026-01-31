@@ -5,6 +5,19 @@ All notable changes to the **Aspirant Arena Frontend** will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.4] – 2026-01-31
+### Added
+- Real user profile avatars on the Landing Page.
+- Live public statistics integration for social proof sections.
+### Changed
+- Improved visual styling of Feature Highlight and social proof cards.
+### Fixed
+- Timer notification playing duplicate sounds on session completion.
+### Quality
+- All frontend tests passing.
+- Zero lint warnings.
+
+
 ## [1.7.3] – 2026-01-27
 ### Fixed
 - **Stopwatch 4-Hour Limit**: Implemented a robust 14,400-second (4-hour) cap during stopwatch rehydration and session logging to ensure health-conscious usage.
